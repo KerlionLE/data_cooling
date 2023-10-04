@@ -1,1 +1,7 @@
-
+include:
+  - project: 'dwh/integration/airflow_integration_ci'
+    ref: master
+    file: '/ci/.integration-ci.yml'
+ 
+variables:
+  AIRFLOW_PROJECT_NAME: "data_cooling"
