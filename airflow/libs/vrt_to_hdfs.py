@@ -1,5 +1,5 @@
 import vertica_python
-from krb import Kerberos
+from data_cooling.krb import Kerberos
 
 krb_config = {
                 'principal':'a001cd-etl-vrt-hdp@DEV002.LOCAL',
