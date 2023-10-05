@@ -43,8 +43,10 @@ with DAG(**DAG_CONFIG) as dag:
             "host": '{{ conn.vertica_staging.host }}',
             "port": '{{ conn.vertica_staging.port }}',
             "user": 'a001cd-etl-vrt-hdp@DEV002.LOCAL',
-            #"password": '{{ conn.vertica_staging.password | pprint}}',
-            "database": '{{ conn.vertica_staging.schema }}'
+            "password": '{{ conn.vertica_staging.password | pprint}}',
+            "database": '{{ conn.vertica_staging.schema }}',
+            "kerberos_service_name": 'vertica',
+            "kerberos_host_name": 'DEV002.LOCAL'
         }
     )
 
