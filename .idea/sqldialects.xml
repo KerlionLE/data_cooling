@@ -4,6 +4,6 @@
     <file url="file://$PROJECT_DIR$/airflow/libs/sqls/copy_to_vertica.sql" dialect="Vertica" />
     <file url="file://$PROJECT_DIR$/airflow/libs/sqls/create_external_table_hdfs.sql" dialect="Vertica" />
     <file url="file://$PROJECT_DIR$/airflow/libs/sqls/export_with_partitions.sql.sql" dialect="Vertica" />
-    <file url="file://$PROJECT_DIR$/airflow/libs/sqls/select_without_partitions.sql" dialect="Vertica" />
+    <file url="file://$PROJECT_DIR$/airflow/libs/sqls/export_without_partitions.sql" dialect="Vertica" />
   </component>
 </project>
