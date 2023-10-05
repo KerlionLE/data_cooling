@@ -8,7 +8,7 @@ from datetime import datetime
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 
-from tech_data_cooling.vrt_to_hdfs import con_kerberus_vertica
+from data_cooling.vrt_to_hdfs import con_kerberus_vertica
 # ------------------------------------------------------------------------------------------------------------------
 
 AIRFLOW_ENV = os.environ["AIRFLOW_ENV"]
