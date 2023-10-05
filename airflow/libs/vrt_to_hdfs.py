@@ -3,7 +3,7 @@ from data_cooling.krb import Kerberos
 
 krb_config = {
                 'principal':'a001cd-etl-vrt-hdp@DEV002.LOCAL',
-                'keytab':'/home/a001cd-ldgnpsp/tmp/hdp_vrt.keytab'
+                'keytab':'/usr/local/airflow/data/data_cooling/a001cd-etl-hdp-vrt.keytab'
              }
 
 def con_kerberus_vertica(**conn_info):
