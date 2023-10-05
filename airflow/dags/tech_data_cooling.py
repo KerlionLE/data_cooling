@@ -9,6 +9,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 
 from data_cooling.vrt_to_hdfs import con_kerberus_vertica
+
 # ------------------------------------------------------------------------------------------------------------------
 
 AIRFLOW_ENV = os.environ["AIRFLOW_ENV"]
@@ -34,17 +35,18 @@ DAG_CONFIG = {
 }
 
 with DAG(**DAG_CONFIG) as dag:
-
     vertica_to_hdfs = PythonOperator(
         task_id=f'CON_KERBERUS_VERTICA',
         trigger_rule='none_skipped',
         python_callable=con_kerberus_vertica,
-        op_kwargs = {
-            "host": '{{ conn.vertica_staging.host }}',
-            "port": '{{ conn.vertica_staging.port }}',
-            "user": '{{ conn.vertica_staging.login }}',
-            "password": '{{ conn.vertica_staging.password | pprint}}',
-            "database": '{{ conn.vertica_staging.schema }}'
+        op_kwargs={
+            'conn_info': {
+                "host": '{{ conn.vertica_staging.host }}',
+                "port": '{{ conn.vertica_staging.port }}',
+                "user": '{{ conn.vertica_staging.login }}',
+                "password": '{{ conn.vertica_staging.password | pprint}}',
+                "database": '{{ conn.vertica_staging.schema }}'
+            }
         }
     )
 

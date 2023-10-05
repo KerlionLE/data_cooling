@@ -6,7 +6,7 @@ krb_config = {
                 'keytab':'/usr/local/airflow/data/data_cooling/vrt_hdp.keytab'
              }
 
-def con_kerberus_vertica(**conn_info):
+def con_kerberus_vertica(conn_info):
     with Kerberos(krb_config['principal'], krb_config['keytab']):
         with vertica_python.connect(**conn_info) as conn:
             with conn.cursor() as cur:
