@@ -43,8 +43,8 @@ with DAG(**DAG_CONFIG) as dag:
             'conn_info': {
                 "host": '{{ conn.vertica_staging.host }}',
                 "port": '{{ conn.vertica_staging.port }}',
-                "user": '{{ conn.vertica_staging.login }}',
-                "password": '{{ conn.vertica_staging.password | pprint}}',
+                "user": 'a001cd-etl-vrt-hdp@DEV002.LOCAL',
+                "password": 'N1rpZx@7URai)GoEv',
                 "database": '{{ conn.vertica_staging.schema }}'
             }
         }
