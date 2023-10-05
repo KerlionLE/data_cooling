@@ -1,5 +1,5 @@
 import vertica_python
-from airflow.libs.krb import Kerberos
+from krb import Kerberos
 
 krb_config = {
                 'principal':'a001cd-etl-vrt-hdp@DEV002.LOCAL',
