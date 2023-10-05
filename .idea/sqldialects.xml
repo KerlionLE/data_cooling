@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/airflow/libs/sqls/sql1.sql" dialect="Vertica" />
-    <file url="file://$PROJECT_DIR$/airflow/libs/sqls/sql2.sql" dialect="Vertica" />
-    <file url="file://$PROJECT_DIR$/airflow/libs/sqls/sql3.sql" dialect="Vertica" />
-    <file url="file://$PROJECT_DIR$/airflow/libs/sqls/sql4.sql" dialect="Vertica" />
+    <file url="file://$PROJECT_DIR$/airflow/libs/sqls/copy_to_vertica.sql" dialect="Vertica" />
+    <file url="file://$PROJECT_DIR$/airflow/libs/sqls/create_external_table.sql" dialect="Vertica" />
+    <file url="file://$PROJECT_DIR$/airflow/libs/sqls/select_with_partitions.sql.sql" dialect="Vertica" />
+    <file url="file://$PROJECT_DIR$/airflow/libs/sqls/select_without_partitions.sql" dialect="Vertica" />
   </component>
 </project>
