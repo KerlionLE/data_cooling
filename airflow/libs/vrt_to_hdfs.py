@@ -10,6 +10,6 @@ def con_kerberus_vertica(conn_info):
     with Kerberos(krb_config['principal'], krb_config['keytab']):
         with vertica_python.connect(**conn_info) as conn:
             with conn.cursor() as cur:
-                cur.execute('select 1;')
+                cur.execute(f'''EXPORT TO PARQUET(directory='webhdfs:///data/vertica/ODS_LEAD_GEN_TST/KW_WORD_ENTITY_FRAME_TST', compression='snappy') AS SELECT * FROM ODS_LEAD_GEN.KW_WORD_ENTITY_FRAME;''')
                 data = cur.fetchall()
                 print(data)
