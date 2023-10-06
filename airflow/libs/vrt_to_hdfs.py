@@ -24,7 +24,7 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info):
                                 SELECT * FROM ODS_LEAD_GEN.KW_WORD_ENTITY_FRAME
                                 WHERE 1=1 %(filter_expression);
                                 """,
-                        {'filter_expression': conf_krb_info['filter_expression']})
+                        {'filter_expression': conf_query_info['filter_expression']})
 
                 else:
                     cur.execute(
@@ -36,4 +36,4 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info):
                                 FROM ODS_LEAD_GEN.KW_WORD_ENTITY_FRAME
                                 WHERE 1=1 %(filter_expression);
                                 """,
-                        {'partition_expressions': conf_krb_info['partition_expressions'], 'filter_expression': conf_krb_info['filter_expression']})
+                        {'partition_expressions': conf_query_info['partition_expressions'], 'filter_expression': conf_query_info['filter_expression']})
