@@ -39,15 +39,31 @@ with DAG(**DAG_CONFIG) as dag:
         task_id=f'CON_KERBERUS_VERTICA',
         trigger_rule='none_skipped',
         python_callable=con_kerberus_vertica,
-        op_kwargs={
-            'conn_info': {
+        op_kwargs=
+            {
+            'conf_con_info':
+                {
                 "host": '{{ conn.vertica_staging.host }}',
                 "port": '{{ conn.vertica_staging.port }}',
                 "user": 'a001cd-etl-vrt-hdp',
-                #"password": 'N1rpZx@7URai)GoEv',
                 "database": '{{ conn.vertica_staging.schema }}'
+                },
+            'conf_krb_info':
+                {
+                "principal": 'a001cd-etl-vrt-hdp@DEV002.LOCAL',
+                "keytab": '/usr/local/airflow/data/data_cooling/vrt_hdp.keytab'
+                },
+            'conf_query_info':
+                {
+                "schema_name": 'ODS_LEADGEN_TST', # is not null
+                "table_name": 'KW_WORD_ENTITY_FRAME_TST', # is not null
+                "cooling_type": 'time_based', # snapshot_based какие еще типы охлаждения могут быть с динамическим фильтром?
+                "replication_policy": 1, # 1 - переносим в hdfs только данные соответсвующие фильтру и удалеям из вертики, 0 - выполняем репликацию всех данных в hdfs для работы с ними и удаляем в соответствии с фильтром
+                "depth": "24M",
+                "filter_expression": 'AND tech_load_ts > 01.01.2000', # defaul_value for type
+                "partition_expressions": 'substr(entity_index, 1, 1)' # default value
+                }
             }
-        }
-    )
+        )
 
     vertica_to_hdfs
