@@ -53,17 +53,31 @@ with DAG(**DAG_CONFIG) as dag:
                 "principal": 'a001cd-etl-vrt-hdp@DEV002.LOCAL',
                 "keytab": '/usr/local/airflow/data/data_cooling/vrt_hdp.keytab'
                 },
-            'conf_query_info':
+            'conf_query1_info':
                 {
                 "schema_name": 'ODS_LEADGEN_TST', # is not null
                 "table_name": 'KW_WORD_ENTITY_FRAME_TST', # is not null
                 "cooling_type": 'time_based', # snapshot_based какие еще типы охлаждения могут быть с динамическим фильтром?
                 "replication_policy": 1, # 1 - переносим в hdfs только данные соответсвующие фильтру и удалеям из вертики, 0 - выполняем репликацию всех данных в hdfs для работы с ними и удаляем в соответствии с фильтром
                 "depth": "24M",
-                "filter_expression": 'AND tech_load_ts > 01.01.2000', # defaul_value for type
+                "filter_expression": 'AND tech_load_ts > {{ ts_date }}', # defaul_value for type
                 "partition_expressions": 'substr(entity_index, 1, 1)' # default value
+                },
+            'conf_query1_info':
+                {
+                "schema_name": 'ODS_LEADGEN',  # is not null
+                "table_name": 'KW_WORD_ENTITY_FRAME_TST',  # is not null
+                "cooling_type": 'time_based', # snapshot_based какие еще типы охлаждения могут быть с динамическим фильтром?
+                "replication_policy": 1, # 1 - переносим в hdfs только данные соответсвующие фильтру и удалеям из вертики, 0 - выполняем репликацию всех данных в hdfs для работы с ними и удаляем в соответствии с фильтром
+                "depth": "24M",
+                "filter_expression": 'AND tech_load_ts > {{ ts_date }}',  # defaul_value for type
+                "partition_expressions": 'substr(entity_index, 1, 1)'  # default value
                 }
             }
         )
+
+        # Перенос в varaibales
+        # Побить блоки пр схемам
+        # Засунуть данные через sql
 
     vertica_to_hdfs
