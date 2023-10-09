@@ -55,23 +55,23 @@ with DAG(**DAG_CONFIG) as dag:
                 },
             'conf_query1_info':
                 {
-                "schema_name": 'ODS_LEADGEN_TST', # is not null
-                "table_name": 'KW_WORD_ENTITY_FRAME_TST', # is not null
-                "cooling_type": 'time_based', # snapshot_based какие еще типы охлаждения могут быть с динамическим фильтром?
-                "replication_policy": 1, # 1 - переносим в hdfs только данные соответсвующие фильтру и удалеям из вертики, 0 - выполняем репликацию всех данных в hdfs для работы с ними и удаляем в соответствии с фильтром
+                "schema_name": 'ODS_LEADGEN_TST',
+                "table_name": 'KW_WORD_ENTITY_FRAME_TST',
+                "cooling_type": 'time_based',
+                "replication_policy": 1,
                 "depth": "24M",
-                "filter_expression": 'AND tech_load_ts > {{ ts_date }}', # defaul_value for type
-                "partition_expressions": 'substr(entity_index, 1, 1)' # default value
+                "filter_expression": 'AND tech_load_ts > {{ ts_date }}',
+                "partition_expressions": 'substr(entity_index, 1, 1)'
                 },
             'conf_query1_info':
                 {
-                "schema_name": 'ODS_LEADGEN',  # is not null
-                "table_name": 'KW_WORD_ENTITY_FRAME_TST',  # is not null
-                "cooling_type": 'time_based', # snapshot_based какие еще типы охлаждения могут быть с динамическим фильтром?
-                "replication_policy": 1, # 1 - переносим в hdfs только данные соответсвующие фильтру и удалеям из вертики, 0 - выполняем репликацию всех данных в hdfs для работы с ними и удаляем в соответствии с фильтром
+                "schema_name": 'ODS_LEADGEN',
+                "table_name": 'KW_WORD_ENTITY_FRAME_TST',
+                "cooling_type": 'time_based',
+                "replication_policy": 1,
                 "depth": "24M",
-                "filter_expression": 'AND tech_load_ts > {{ ts_date }}',  # defaul_value for type
-                "partition_expressions": 'substr(entity_index, 1, 1)'  # default value
+                "filter_expression": 'AND tech_load_ts > {{ ts_date }}',
+                "partition_expressions": 'substr(entity_index, 1, 1)'
                 }
             }
         )
