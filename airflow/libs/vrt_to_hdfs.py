@@ -23,8 +23,9 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info):
                                 AS
                                 SELECT * FROM ODS_LEAD_GEN.KW_WORD_ENTITY_FRAME
                                 WHERE 1=1 %(filter_expression);
-                                """,
-                                    {'filter_expression': conf_query_info['filter_expression'],
+                        """,
+                                    {
+                                    'filter_expression': conf_query_info['filter_expression'],
                                     'schema_name': conf_query_info['schema_name'],
                                     'table_name': conf_query_info['table_name']
                                     }
@@ -39,8 +40,9 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info):
                                 SELECT word, entity_index, tech_load_ts, is_deleted, tech_job_id, %(partition_expressions) as part
                                 FROM ODS_LEAD_GEN.KW_WORD_ENTITY_FRAME
                                 WHERE 1=1 %(filter_expression);
-                                """,
-                                    {'partition_expressions': conf_query_info['partition_expressions'],
+                        """,
+                                    {
+                                    'partition_expressions': conf_query_info['partition_expressions'],
                                     'filter_expression': conf_query_info['filter_expression'],
                                     'schema_name': conf_query_info['schema_name'],
                                     'table_name': conf_query_info['table_name']
