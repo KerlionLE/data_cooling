@@ -19,21 +19,30 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info):
                 if conf_query_info['partition_expressions'] is None:
                     cur.execute(
                         """
-                                EXPORT TO PARQUET(directory='webhdfs:///data/vertica/ODS_LEAD_GEN_TST/KW_WORD_ENTITY_FRAME_TST', compression='snappy') 
+                                EXPORT TO PARQUET(directory='webhdfs:///data/vertica/%(schema_name)/%(table_name)', compression='snappy') 
                                 AS
                                 SELECT * FROM ODS_LEAD_GEN.KW_WORD_ENTITY_FRAME
                                 WHERE 1=1 %(filter_expression);
                                 """,
-                        {'filter_expression': conf_query_info['filter_expression']})
+                        {'filter_expression': conf_query_info['filter_expression'],
+                                    'schema_name': conf_query_info['schema_name'],
+                                    'table_name': conf_query_info['table_name']
+                                    }
+                                )
 
                 else:
                     cur.execute(
                         """
-                                EXPORT TO PARQUET(directory='webhdfs:///data/vertica/ODS_LEAD_GEN_TST/KW_WORD_ENTITY_FRAME_TST_PART', compression='snappy')
+                                EXPORT TO PARQUET(directory='webhdfs:///data/vertica/%(schema_name)/%(table_name)', compression='snappy')
                                 OVER(PARTITION BY part) 
                                 AS
                                 SELECT word, entity_index, tech_load_ts, is_deleted, tech_job_id, %(partition_expressions) as part
                                 FROM ODS_LEAD_GEN.KW_WORD_ENTITY_FRAME
                                 WHERE 1=1 %(filter_expression);
                                 """,
-                        {'partition_expressions': conf_query_info['partition_expressions'], 'filter_expression': conf_query_info['filter_expression']})
+                        {'partition_expressions': conf_query_info['partition_expressions'],
+                                    'filter_expression': conf_query_info['filter_expression'],
+                                    'schema_name': conf_query_info['schema_name'],
+                                    'table_name': conf_query_info['table_name']
+                                    }
+                                )
