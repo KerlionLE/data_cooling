@@ -21,7 +21,7 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info):
                         """
                             EXPORT TO PARQUET(directory='webhdfs:///data/vertica/%(schema_name)/%(table_name)', compression='snappy') 
                             AS
-                            SELECT * FROM ODS_LEAD_GEN.KW_WORD_ENTITY_FRAME
+                            SELECT * FROM %(schema_name).%(table_name)
                             WHERE 1=1 %(filter_expression);
                         """,
                                     {
@@ -38,7 +38,7 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info):
                             OVER(PARTITION BY part) 
                             AS
                             SELECT word, entity_index, tech_load_ts, is_deleted, tech_job_id, %(partition_expressions) as part
-                            FROM ODS_LEAD_GEN.KW_WORD_ENTITY_FRAME
+                            FROM %(schema_name).%(table_name)
                             WHERE 1=1 %(filter_expression);
                         """,
                                     {
