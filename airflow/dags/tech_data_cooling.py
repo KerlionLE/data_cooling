@@ -39,55 +39,26 @@ with DAG(**DAG_CONFIG) as dag:
         task_id=f'CON_KERBERUS_VERTICA',
         trigger_rule='none_skipped',
         python_callable=con_kerberus_vertica,
-        op_kwargs=
+        op_kwargs={
             {
-            'CONF_CON_INFO':
-                {
-                "host": '{{ conn.vertica_staging.host }}',
-                "port": '{{ conn.vertica_staging.port }}',
-                "user": 'a001cd-etl-vrt-hdp',
-                "database": '{{ conn.vertica_staging.schema }}'
-                },
-            'CONF_KRB_INFO':
-                {
-                "principal": 'a001cd-etl-vrt-hdp@DEV002.LOCAL',
-                "keytab": '/usr/local/airflow/data/data_cooling/vrt_hdp.keytab'
-                },
-            'CONF_QUERY_INFO':
-                {
-                'CONF_QUERY_ODS_LEADGEN_TST_INFO':
+                'CONF_CON_INFO':
                     {
-                    "schema_name": 'ODS_LEADGEN_TST',
-                    "table_name": 'KW_WORD_ENTITY_FRAME_TST',
-                    "cooling_type": 'time_based',
-                    "replication_policy": 1,
-                    "depth": "24M",
-                    "last_date_cooling": '',
-                    "data_cooling_frequency": '',
-                    "filter_expression": 'AND tech_load_ts > {{ ts_date }}',
-                    "partition_expressions": 'substr(entity_index, 1, 1)'
+                        "host": '{{ conn.vertica_staging.host }}',
+                        "port": '{{ conn.vertica_staging.port }}',
+                        "user": 'a001cd-etl-vrt-hdp',
+                        "database": '{{ conn.vertica_staging.schema }}'
                     },
-                'CONF_QUERY_ODS_LEADGEN_INFO':
-                    {
-                    "schema_name": 'ODS_LEADGEN',
-                    "table_name": 'KW_WORD_ENTITY_FRAME_TST',
-                    "cooling_type": 'time_based',
-                    "replication_policy": 1,
-                    "depth": "24M",
-                    "last_date_cooling" : '',
-                    "data_cooling_frequency": '',
-                    "filter_expression": 'AND tech_load_ts > {{ ts_date }}',
-                    "partition_expressions": 'substr(entity_index, 1, 1)'
-                    }
-                }
-            }
-        )
+                'CONF_KRB_INFO': f'{{{{ var.json.{DAG_NAME}.CONF_KRB_INFO }}}}',
+                'CONF_QUERY_INFO': f'{{{{ var.json.{DAG_NAME}.CONF_QUERY_INFO }}}}'
+                # Variable.set(f'{DAG_NAME}.CONF_QUERY_INFO', '2023-12-12')
+            }}
+    )
 
-        # Перенос в varaibales
-        # Побить блоки пр схемам
-        # Засунуть данные через sql
-        # надо добавить параметры в конфиг: - в зависимости от этих параметров реализовать запуск или пропуск охлаждения конкретной таблицы
-            # последняя дата охлаждения данных
-            # периодичность запуска охлаждения
+    # Перенос в varaibales
+    # Побить блоки пр схемам
+    # Засунуть данные через sql
+    # надо добавить параметры в конфиг: - в зависимости от этих параметров реализовать запуск или пропуск охлаждения конкретной таблицы
+    # последняя дата охлаждения данных
+    # периодичность запуска охлаждения
 
     vertica_to_hdfs
