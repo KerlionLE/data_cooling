@@ -1,22 +1,22 @@
 import vertica_python
 from data_cooling.krb import Kerberos
 
-def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info):
+def con_kerberus_vertica(CONF_CON_INFO, CONF_KRB_INFO, CONF_QUERY_INFO):
 
-    if conf_query_info['schema_name'] is None or conf_query_info['table_name'] is None:
+    if CONF_QUERY_INFO['schema_name'] is None or CONF_QUERY_INFO['table_name'] is None:
         raise ValueError('Schema or Table name name must be defined')
 
-    if conf_query_info['cooling_type'] is None or conf_query_info['depth'] is None:
+    if CONF_QUERY_INFO['cooling_type'] is None or CONF_QUERY_INFO['depth'] is None:
         raise ValueError('Cooling type or depth must be defined')
 
-    if conf_query_info['replication_policy'] != 0 or 1 :
+    if CONF_QUERY_INFO['replication_policy'] != 0 or 1 :
         raise ValueError('Replication policy must be 0 or 1')
 
-    with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
-        with vertica_python.connect(**conf_con_info) as conn:
+    with Kerberos(CONF_KRB_INFO['principal'], CONF_KRB_INFO['keytab']):
+        with vertica_python.connect(**CONF_CON_INFO) as conn:
             with conn.cursor() as cur:
 
-                if conf_query_info['partition_expressions'] is None:
+                if CONF_QUERY_INFO['partition_expressions'] is None:
                     cur.execute(
                         """
                             EXPORT TO PARQUET(directory='webhdfs:///data/vertica/%(schema_name)/%(table_name)', compression='snappy') 
@@ -25,9 +25,9 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info):
                             WHERE 1=1 %(filter_expression);
                         """,
                                     {
-                                        'filter_expression': conf_query_info['filter_expression'],
-                                        'schema_name': conf_query_info['schema_name'],
-                                        'table_name': conf_query_info['table_name']
+                                        'filter_expression': CONF_QUERY_INFO['filter_expression'],
+                                        'schema_name': CONF_QUERY_INFO['schema_name'],
+                                        'table_name': CONF_QUERY_INFO['table_name']
                                     }
                                 )
 
@@ -42,9 +42,9 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info):
                             WHERE 1=1 %(filter_expression);
                         """,
                                     {
-                                        'partition_expressions': conf_query_info['partition_expressions'],
-                                        'filter_expression': conf_query_info['filter_expression'],
-                                        'schema_name': conf_query_info['schema_name'],
-                                        'table_name': conf_query_info['table_name']
+                                        'partition_expressions': CONF_QUERY_INFO['partition_expressions'],
+                                        'filter_expression': CONF_QUERY_INFO['filter_expression'],
+                                        'schema_name': CONF_QUERY_INFO['schema_name'],
+                                        'table_name': CONF_QUERY_INFO['table_name']
                                     }
                                 )

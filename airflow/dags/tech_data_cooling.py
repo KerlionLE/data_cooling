@@ -41,37 +41,44 @@ with DAG(**DAG_CONFIG) as dag:
         python_callable=con_kerberus_vertica,
         op_kwargs=
             {
-            'conf_con_info':
+            'CONF_CON_INFO':
                 {
                 "host": '{{ conn.vertica_staging.host }}',
                 "port": '{{ conn.vertica_staging.port }}',
                 "user": 'a001cd-etl-vrt-hdp',
                 "database": '{{ conn.vertica_staging.schema }}'
                 },
-            'conf_krb_info':
+            'CONF_KRB_INFO':
                 {
                 "principal": 'a001cd-etl-vrt-hdp@DEV002.LOCAL',
                 "keytab": '/usr/local/airflow/data/data_cooling/vrt_hdp.keytab'
                 },
-            'conf_query1_info':
+            'CONF_QUERY_INFO':
                 {
-                "schema_name": 'ODS_LEADGEN_TST',
-                "table_name": 'KW_WORD_ENTITY_FRAME_TST',
-                "cooling_type": 'time_based',
-                "replication_policy": 1,
-                "depth": "24M",
-                "filter_expression": 'AND tech_load_ts > {{ ts_date }}',
-                "partition_expressions": 'substr(entity_index, 1, 1)'
-                },
-            'conf_query1_info':
-                {
-                "schema_name": 'ODS_LEADGEN',
-                "table_name": 'KW_WORD_ENTITY_FRAME_TST',
-                "cooling_type": 'time_based',
-                "replication_policy": 1,
-                "depth": "24M",
-                "filter_expression": 'AND tech_load_ts > {{ ts_date }}',
-                "partition_expressions": 'substr(entity_index, 1, 1)'
+                'CONF_QUERY_ODS_LEADGEN_TST_INFO':
+                    {
+                    "schema_name": 'ODS_LEADGEN_TST',
+                    "table_name": 'KW_WORD_ENTITY_FRAME_TST',
+                    "cooling_type": 'time_based',
+                    "replication_policy": 1,
+                    "depth": "24M",
+                    "last_date_cooling": '',
+                    "data_cooling_frequency": '',
+                    "filter_expression": 'AND tech_load_ts > {{ ts_date }}',
+                    "partition_expressions": 'substr(entity_index, 1, 1)'
+                    },
+                'CONF_QUERY_ODS_LEADGEN_INFO':
+                    {
+                    "schema_name": 'ODS_LEADGEN',
+                    "table_name": 'KW_WORD_ENTITY_FRAME_TST',
+                    "cooling_type": 'time_based',
+                    "replication_policy": 1,
+                    "depth": "24M",
+                    "last_date_cooling" : '',
+                    "data_cooling_frequency": '',
+                    "filter_expression": 'AND tech_load_ts > {{ ts_date }}',
+                    "partition_expressions": 'substr(entity_index, 1, 1)'
+                    }
                 }
             }
         )
@@ -79,5 +86,8 @@ with DAG(**DAG_CONFIG) as dag:
         # Перенос в varaibales
         # Побить блоки пр схемам
         # Засунуть данные через sql
+        # надо добавить параметры в конфиг: - в зависимости от этих параметров реализовать запуск или пропуск охлаждения конкретной таблицы
+            # последняя дата охлаждения данных
+            # периодичность запуска охлаждения
 
     vertica_to_hdfs
