@@ -1,6 +1,16 @@
 import vertica_python
 from data_cooling.krb import Kerberos
 
+from airflow.models import Variable, DagModel, Connection
+
+# ------------------------------------------------------------------------------------------------------------------
+
+def set_airflow_variable(name: str, value: Any):
+    Variable.set(name, value)
+
+def get_airflow_variable(name: str) -> Any:
+    return Variable.get(name)
+
 def get_sql(path, conf_query):
     with open(path) as f:
         sql = f.read()
