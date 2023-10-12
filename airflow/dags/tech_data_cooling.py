@@ -41,11 +41,9 @@ with DAG(**DAG_CONFIG) as dag:
         python_callable=con_kerberus_vertica,
         op_kwargs=
         {
-            {
                 'conf_con_info': f'{{{{ var.json.{DAG_NAME}.conf_con_info }}}}',
                 'conf_krb_info': f'{{{{ var.json.{DAG_NAME}.conf_krb_info }}}}',
                 'conf_query_info': f'{{{{ var.json.{DAG_NAME}.conf_query_info }}}}'
-            }
         }
 
     )
