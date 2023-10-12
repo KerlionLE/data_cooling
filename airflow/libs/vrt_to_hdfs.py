@@ -8,7 +8,7 @@ from airflow.models import Variable, DagModel, Connection
 
 # ------------------------------------------------------------------------------------------------------------------
 
-def set_airflow_variable(name: str, value: Any):
+def set_airflow_variable(name: str, value: str):
     Variable.set(name, value)
 
 def get_formated_file(path, **params):
