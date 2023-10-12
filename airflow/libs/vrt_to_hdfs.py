@@ -22,7 +22,8 @@ def execute_sql(sql, conf_con_info):
             cur.execute(sql)
 
 def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scripts_path):
-    #current_date = datetime.now().date()
+    last_cooling_dates = {}
+    current_date = datetime.now().date()
 
     with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
         for conf_query in conf_query_info:
@@ -45,6 +46,8 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scri
                     partition_expressions=conf_query['partition_expressions']
                 )
             execute_sql(sql, conf_con_info)
-
+            last_cooling_dates[f"{conf_query['schema_name']}.{conf_query['table_name']}"] = current_date
         else:
             pass
+
+    return last_cooling_dates

@@ -1,11 +1,5 @@
 {
   "TECH_DATA_COOLING": {
-    "conf_con_info": {
-      "host": "{{ conn.vertica_staging.host }}",
-      "port": "{{ conn.vertica_staging.port }}",
-      "user": "a001cd-etl-vrt-hdp",
-      "database": "{{ conn.vertica_staging.schema }}"
-    },
     "conf_krb_info": {
       "principal": "a001cd-etl-vrt-hdp@DEV002.LOCAL",
       "keytab": "/usr/local/airflow/data/data_cooling/vrt_hdp.keytab"
@@ -18,18 +12,18 @@
     },
     "conf_query_info": [
        {
-        "schema_name": "ODS_LEADGEN_TST",
+        "schema_name": "ODS_LEADGEN",
         "table_name": "KW_WORD_ENTITY_FRAME_TST5",
         "cooling_type": "time_based",
         "replication_policy": 1,
         "depth": "24M",
         "last_date_cooling": "",
         "data_cooling_frequency": "* * * *",
-        "filter_expression": "AND tech_load_ts > {{ ts_date }}",
+        "filter_expression": "",
         "partition_expressions": "substr(entity_index, 1, 1)"
       },
       {
-        "schema_name": "ODS_LEADGEN",
+        "schema_name": "ODS_LEADGEN_TST",
         "table_name": "KW_WORD_ENTITY_FRAME_TST5",
         "cooling_type": "time_based",
         "replication_policy": 1,
