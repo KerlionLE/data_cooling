@@ -22,7 +22,7 @@ def execute_sql(sql, conf_con_info):
             cur.execute(sql)
 
 def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scripts_path):
-    #now_date = datetime.now()
+    #current_date = datetime.now().date()
 
     with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
         for conf_query in conf_query_info.values():
@@ -35,7 +35,6 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scri
                     table_name=conf_query['table_name'],
                     filter_expression=conf_query['filter_expression']
                 )
-
             else:
 
                 sql = get_formated_file(
@@ -46,5 +45,6 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scri
                     partition_expressions=conf_query['partition_expressions']
                 )
             execute_sql(sql, conf_con_info)
+
         else:
             pass
