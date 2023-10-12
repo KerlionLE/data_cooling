@@ -1,5 +1,6 @@
 import vertica_python
 from data_cooling.krb import Kerberos
+from datetime import datetime
 
 from airflow.models import Variable, DagModel, Connection
 
@@ -25,14 +26,18 @@ def execute_sql(sql,conf_con_info):
             cur.execute(sql)
 
 def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info):
+    now_date = datetime.now()
 
     for conf_query in conf_query_info:
-        with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
-                    if conf_query_info['partition_expressions'] is None:
+        if now_date - conf_query['last_date_cooling'] == conf_query['data_cooling_frequency']:
+            with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
+                        if conf_query_info['partition_expressions'] is None:
 
-                        sql = get_sql('airflow/libs/sqls/export_without_partitions.sql', conf_query)
-                        execute_sql(sql, conf_con_info)
+                            sql = get_sql('airflow/libs/sqls/export_without_partitions.sql', conf_query)
+                            execute_sql(sql, conf_con_info)
 
-                    else:
-                        sql = get_sql('airflow/libs/sqls/export_with_partitions.sql', conf_query)
-                        execute_sql(sql, conf_con_info)
+                        else:
+                            sql = get_sql('airflow/libs/sqls/export_with_partitions.sql', conf_query)
+                            execute_sql(sql, conf_con_info)
+        else:
+            pass
