@@ -1,3 +1,5 @@
+import os
+
 import vertica_python
 from data_cooling.krb import Kerberos
 from datetime import datetime
@@ -9,35 +11,40 @@ from airflow.models import Variable, DagModel, Connection
 def set_airflow_variable(name: str, value: Any):
     Variable.set(name, value)
 
-def get_airflow_variable(name: str) -> Any:
-    return Variable.get(name)
+def get_formated_file(path, **params):
+    with open(os.path.expandvars(path)) as f:
+        text = f.read()
+    return text.format(**params)
 
-def get_sql(path, conf_query):
-    with open(path) as f:
-        sql = f.read()
-        sql = sql.format(schema_name=conf_query['schema_name'],
-                         table_name=conf_query['table_name'],
-                         filter_expression=conf_query['filter_expression'])
-    return(sql)
-
-def execute_sql(sql,conf_con_info):
+def execute_sql(sql, conf_con_info):
     with vertica_python.connect(**conf_con_info) as conn:
         with conn.cursor() as cur:
             cur.execute(sql)
 
-def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info):
-    now_date = datetime.now()
+def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scripts_path):
+    #now_date = datetime.now()
 
-    for conf_query in conf_query_info:
-        if now_date - conf_query['last_date_cooling'] == conf_query['data_cooling_frequency']:
-            with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
-                        if conf_query_info['partition_expressions'] is None:
+    with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
+        for conf_query in conf_query_info.values():
+            #if now_date - conf_query['last_date_cooling'] == conf_query['data_cooling_frequency']:
+            if conf_query['partition_expressions'] is None:
 
-                            sql = get_sql('airflow/libs/sqls/export_without_partitions.sql', conf_query)
-                            execute_sql(sql, conf_con_info)
+                sql = get_formated_file(
+                    sql_scripts_path['sql_export_without_partitions'],
+                    schema_name=conf_query['schema_name'],
+                    table_name=conf_query['table_name'],
+                    filter_expression=conf_query['filter_expression']
+                )
 
-                        else:
-                            sql = get_sql('airflow/libs/sqls/export_with_partitions.sql', conf_query)
-                            execute_sql(sql, conf_con_info)
+            else:
+
+                sql = get_formated_file(
+                    sql_scripts_path['sql_export_with_partitions'],
+                    schema_name=conf_query['schema_name'],
+                    table_name=conf_query['table_name'],
+                    filter_expression=conf_query['filter_expression'],
+                    partition_expressions=conf_query['partition_expressions']
+                )
+            execute_sql(sql, conf_con_info)
         else:
             pass
