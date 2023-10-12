@@ -25,7 +25,7 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scri
     #current_date = datetime.now().date()
 
     with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
-        for conf_query in conf_query_info.values():
+        for conf_query in conf_query_info:
             #if now_date - conf_query['last_date_cooling'] == conf_query['data_cooling_frequency']:
             if conf_query['partition_expressions'] is None:
 

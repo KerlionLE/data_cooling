@@ -16,8 +16,8 @@
       "sql_create_external_table_hdfs": "$AIRFLOW_HOME/libs/data_cooling/sqls/create_external_table_hdfs.sql",
       "sql_copy_to_vertica": "$AIRFLOW_HOME/libs/data_cooling/sqls/copy_to_vertica.sql"
     },
-    "conf_query_info": {
-      "conf_query_info": {
+    "conf_query_info": [
+       {
         "schema_name": "ODS_LEADGEN_TST",
         "table_name": "KW_WORD_ENTITY_FRAME_TST5",
         "cooling_type": "time_based",
@@ -28,7 +28,7 @@
         "filter_expression": "AND tech_load_ts > {{ ts_date }}",
         "partition_expressions": "substr(entity_index, 1, 1)"
       },
-      "conf_query_info": {
+      {
         "schema_name": "ODS_LEADGEN",
         "table_name": "KW_WORD_ENTITY_FRAME_TST5",
         "cooling_type": "time_based",
@@ -39,6 +39,6 @@
         "filter_expression": "",
         "partition_expressions": ""
       }
-    }
+    ]
   }
 }
