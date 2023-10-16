@@ -55,7 +55,7 @@ DAG_CONFIG = {
 with DAG(**DAG_CONFIG) as dag:
 
     vertica_to_hdfs = PythonOperator(
-        task_id=f'con_kerberus_vertica',
+        task_id=f'vertica_to_hdfs',
         trigger_rule='none_skipped',
         python_callable=con_kerberus_vertica,
         op_kwargs=
