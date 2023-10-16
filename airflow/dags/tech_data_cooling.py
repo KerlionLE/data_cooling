@@ -89,4 +89,4 @@ with DAG(**DAG_CONFIG) as dag:
         }
     )
 
-    vertica_to_hdfs >> update_last_cooling_dates
+    vertica_to_hdfs >> last_cooling_dates
