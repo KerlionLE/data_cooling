@@ -13,7 +13,7 @@
     "conf_query_info": [
        {
         "schema_name": "ODS_LEAD_GEN",
-        "table_name": "KW_WORD_ENTITY_FRAME_TST",
+        "table_name": "KW_WORD_ENTITY_FRAME",
         "cooling_type": "time_based",
         "replication_policy": 1,
         "depth": "24M",
