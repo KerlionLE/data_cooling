@@ -1,5 +1,5 @@
 -- Выгружаем данные из вертики в hdfs с партицированием "на лету" (parquet)
-EXPORT TO PARQUET(directory='webhdfs:///data/vertica/{schema_name}/{table_name}', compression='snappy')
+EXPORT TO PARQUET(directory='webhdfs:///data/vertica/{schema_name}/KW_WORD_ENTITY_FRAME_TST6', compression='snappy')
 OVER(PARTITION BY part)
 AS
 SELECT *, {partition_expressions} as part
