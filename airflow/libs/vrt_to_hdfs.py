@@ -23,7 +23,7 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scri
     with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
         for conf_query in conf_query_info:
             #if now_date - conf_query['last_date_cooling'] == conf_query['data_cooling_frequency']:
-            if conf_query['partition_expressions'] is None:
+            if not conf_query['partition_expressions']:
 
                 sql = get_formated_file(
                     sql_scripts_path['sql_export_without_partitions'],
@@ -42,7 +42,7 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scri
                 )
             execute_sql(sql, conf_con_info)
             last_cooling_dates[f"{conf_query['schema_name']}.{conf_query['table_name']}"] = current_date
-        else:
-            pass
+            #else:
+            #pass
 
     return last_cooling_dates
