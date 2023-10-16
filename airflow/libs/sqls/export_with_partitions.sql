@@ -4,4 +4,5 @@ OVER(PARTITION BY part)
 AS
 SELECT *, {partition_expressions} as part
 FROM {schema_name}.{table_name}
-WHERE 1=1 {filter_expression};
+WHERE 1=1 {filter_expression}
+limit 100000;
