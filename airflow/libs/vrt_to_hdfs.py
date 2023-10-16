@@ -29,7 +29,8 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scri
                     sql_scripts_path['sql_export_without_partitions'],
                     schema_name=conf_query['schema_name'],
                     table_name=conf_query['table_name'],
-                    filter_expression=conf_query['filter_expression']
+                    filter_expression=conf_query['filter_expression'],
+                    current_date=current_date
                 )
             else:
 
@@ -38,7 +39,8 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scri
                     schema_name=conf_query['schema_name'],
                     table_name=conf_query['table_name'],
                     filter_expression=conf_query['filter_expression'],
-                    partition_expressions=conf_query['partition_expressions']
+                    partition_expressions=conf_query['partition_expressions'],
+                    current_date=current_date
                 )
             execute_sql(sql, conf_con_info)
             last_cooling_dates[f"{conf_query['schema_name']}.{conf_query['table_name']}"] = current_date
