@@ -24,8 +24,9 @@ def execute_sql(sql, conf_con_info):
 #           ''', 
 #           conf_con_info)
     
-def update_last_cooling_dates(xcom_value):
+def update_last_cooling_dates(conf_con_info, xcom_value):
     print(xcom_value)
+    print(conf_con_info)
 # ------------------------------------------------------------------------------------------------------------------
 
 AIRFLOW_ENV = os.environ["AIRFLOW_ENV"]
@@ -84,7 +85,7 @@ with DAG(**DAG_CONFIG) as dag:
                 "user": "a001cd-etl-vrt-hdp",
                 "database": "{{ conn.vertica_staging.schema }}"
                 },
-            'xcom_value' : '{{ ti.xcom_pull(task_ids=con_kerberus_vertica }}'
+            'xcom_value' : '{{ ti.xcom_pull(task_ids=con_kerberus_vertica) }}'
         }
     )
 
