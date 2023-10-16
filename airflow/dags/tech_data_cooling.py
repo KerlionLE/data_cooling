@@ -10,19 +10,22 @@ from airflow.operators.python import PythonOperator
 
 from data_cooling.vrt_to_hdfs import con_kerberus_vertica
 
+# ------------------------------------------------------------------------------------------------------------------
+def execute_sql(sql, conf_con_info):
+    with vertica_python.connect(**conf_con_info) as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql)
 
-def update_last_cooling_dates(last_cooling_dates, conf_query_info):
-    updated = []
-    for conf_query in conf_query_info:
-        last_cooling_date = last_cooling_dates.get(f"{conf_query['schema_name']}.{conf_query['table_name']}")
-        if last_cooling_date:
-            conf_query['last_date_cooling'] = last_cooling_date
-
-        updated.append(conf_query)
-
-    # update airflow variable
-    #Variable.set(name, value)
-
+def update_last_cooling_dates1(conf_con_info, xcom_value):
+    execute_sql(
+            f''' 
+                insert into analytics.bw_covariance_matrix VALUES
+                ({xcom_value})
+            ''', 
+            conf_con_info)
+    
+def update_last_cooling_dates(xcom_value):
+    print(xcom_value)
 # ------------------------------------------------------------------------------------------------------------------
 
 AIRFLOW_ENV = os.environ["AIRFLOW_ENV"]
@@ -73,9 +76,16 @@ with DAG(**DAG_CONFIG) as dag:
         task_id=f'update_last_cooling_dates',
         trigger_rule='none_skipped',
         python_callable=update_last_cooling_dates,
-        op_kwargs={
-            '{{ ti.xcom_pull(task_ids=con_kerberus_vertica }}',
-            f'{{{{ var.json.{DAG_NAME}.conf_query_info }}}}'
+        op_kwargs=
+        {
+            "conf_con_info": {
+                "host": "{{ conn.vertica_staging.host }}",
+                "port": "{{ conn.vertica_staging.port }}",
+                "user": "a001cd-etl-vrt-hdp",
+                "database": "{{ conn.vertica_staging.schema }}"
+                },
+            'xcom_value' : '{{ ti.xcom_pull(task_ids=con_kerberus_vertica }}',
+            'conf_query_info' : f'{{{{ var.json.{DAG_NAME}.conf_query_info }}}}'
         }
     )
 

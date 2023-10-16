@@ -12,7 +12,7 @@
     },
     "conf_query_info": [
        {
-        "schema_name": "ODS_LEADGEN",
+        "schema_name": "ODS_LEADGEN_TST",
         "table_name": "KW_WORD_ENTITY_FRAME_TST5",
         "cooling_type": "time_based",
         "replication_policy": 1,
@@ -24,7 +24,7 @@
       },
       {
         "schema_name": "ODS_LEADGEN_TST",
-        "table_name": "KW_WORD_ENTITY_FRAME_TST5",
+        "table_name": "KW_WORD_ENTITY_FRAME_TST6",
         "cooling_type": "time_based",
         "replication_policy": 1,
         "depth": "24M",
