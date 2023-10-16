@@ -4,12 +4,7 @@ import vertica_python
 from data_cooling.krb import Kerberos
 from datetime import datetime
 
-from airflow.models import Variable, DagModel, Connection
-
 # ------------------------------------------------------------------------------------------------------------------
-
-def set_airflow_variable(name: str, value: str):
-    Variable.set(name, value)
 
 def get_formated_file(path, **params):
     with open(os.path.expandvars(path)) as f:

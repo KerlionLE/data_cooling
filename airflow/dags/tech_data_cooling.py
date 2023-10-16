@@ -23,7 +23,6 @@ def update_last_cooling_dates(last_cooling_dates, conf_query_info):
     # update airflow variable
     #Variable.set(name, value)
 
-
 # ------------------------------------------------------------------------------------------------------------------
 
 AIRFLOW_ENV = os.environ["AIRFLOW_ENV"]
@@ -52,7 +51,7 @@ DAG_CONFIG = {
 with DAG(**DAG_CONFIG) as dag:
 
     vertica_to_hdfs = PythonOperator(
-        task_id=f'CON_KERBERUS_VERTICA',
+        task_id=f'con_kerberus_vertica',
         trigger_rule='none_skipped',
         python_callable=con_kerberus_vertica,
         op_kwargs=
@@ -75,7 +74,7 @@ with DAG(**DAG_CONFIG) as dag:
         trigger_rule='none_skipped',
         python_callable=update_last_cooling_dates,
         op_kwargs={
-            '{{ ti.xcom_pull(task_ids=CON_KERBERUS_VERTICA }}',
+            '{{ ti.xcom_pull(task_ids=con_kerberus_vertica }}',
             f'{{{{ var.json.{DAG_NAME}.conf_query_info }}}}'
         }
     )
