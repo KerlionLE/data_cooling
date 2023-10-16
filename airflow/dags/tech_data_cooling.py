@@ -16,13 +16,13 @@ def execute_sql(sql, conf_con_info):
         with conn.cursor() as cur:
             cur.execute(sql)
 
-def update_last_cooling_dates1(conf_con_info, xcom_value):
-    execute_sql(
-            f''' 
-                insert into analytics.bw_covariance_matrix VALUES
-                ({xcom_value})
-            ''', 
-            conf_con_info)
+#def update_last_cooling_dates1(conf_con_info, xcom_value):
+#    execute_sql(
+#            f''' 
+#                insert into analytics.bw_covariance_matrix VALUES
+#                ({xcom_value})
+#           ''', 
+#           conf_con_info)
     
 def update_last_cooling_dates(xcom_value):
     print(xcom_value)
@@ -84,8 +84,7 @@ with DAG(**DAG_CONFIG) as dag:
                 "user": "a001cd-etl-vrt-hdp",
                 "database": "{{ conn.vertica_staging.schema }}"
                 },
-            'xcom_value' : '{{ ti.xcom_pull(task_ids=con_kerberus_vertica }}',
-            'conf_query_info' : f'{{{{ var.json.{DAG_NAME}.conf_query_info }}}}'
+            'xcom_value' : '{{ ti.xcom_pull(task_ids=con_kerberus_vertica }}'
         }
     )
 
