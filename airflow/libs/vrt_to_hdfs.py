@@ -18,7 +18,7 @@ def execute_sql(sql, conf_con_info):
 
 def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scripts_path):
     last_cooling_dates = {}
-    current_date = str(datetime.now().date())
+    current_date = datetime.now().date()
 
     with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
         for conf_query in conf_query_info:
