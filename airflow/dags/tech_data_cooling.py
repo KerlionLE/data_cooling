@@ -16,7 +16,7 @@ def execute_sql(sql, conf_con_info):
         with conn.cursor() as cur:
             cur.execute(sql)
 
-def update_last_cooling_dates(conf_con_info, xcom_value):
+def update_last_cooling_dates1(conf_con_info, xcom_value):
     execute_sql(
             f''' 
                 insert into analytics.bw_covariance_matrix VALUES
