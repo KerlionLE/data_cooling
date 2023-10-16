@@ -12,8 +12,8 @@
     },
     "conf_query_info": [
        {
-        "schema_name": "ODS_LEADGEN_TST",
-        "table_name": "KW_WORD_ENTITY_FRAME_TST5",
+        "schema_name": "ODS_LEAD_GEN",
+        "table_name": "KW_WORD_ENTITY_FRAME",
         "cooling_type": "time_based",
         "replication_policy": 1,
         "depth": "24M",
@@ -23,8 +23,8 @@
         "partition_expressions": "substr(entity_index, 1, 1)"
       },
       {
-        "schema_name": "ODS_LEADGEN_TST",
-        "table_name": "KW_WORD_ENTITY_FRAME_TST6",
+        "schema_name": "ODS_LEAD_GEN",
+        "table_name": "KW_WORD_ENTITY_FRAME",
         "cooling_type": "time_based",
         "replication_policy": 1,
         "depth": "24M",
