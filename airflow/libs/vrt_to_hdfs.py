@@ -17,16 +17,6 @@ def execute_sql(sql, conf_con_info):
             cur.execute(sql)
 
 def get_last_date_cooling(conf_con_info, conf_query):
-    
-    sql_script_1 = f''' 
-                      CREATE TABLE IF NOT EXISTS devdb.sandbox.data_cooling
-                          (
-                               schema_table_name varchar(128),
-                               last_data_cooling varchar(128)
-                            );
-                    '''
-    
-    execute_sql(sql_script_1, conf_con_info)
 
     sql = f'''
                     select schema_table_name, max(last_data_cooling)
@@ -37,6 +27,16 @@ def get_last_date_cooling(conf_con_info, conf_query):
     last_date_cooling = execute_sql(sql, conf_con_info)
     return last_date_cooling
 
+#def put_last_date_cooling(conf_con_info, xcom_value):
+#
+#   sql = "INSERT INTO devdb.sandbox.data_cooling (schema_table_name, last_data_cooling) VALUES "
+#    values = []
+#
+#    for key, value in xcom_value.items():
+#        values.append("('{}', '{}')".format(key, value))
+#        sql += ", ".join(values)
+#
+#    execute_sql(sql, conf_con_info)
 
 def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scripts_path):
     last_cooling_dates = {}

@@ -16,13 +16,14 @@ from data_cooling.vrt_to_hdfs import con_kerberus_vertica
 def update_last_cooling_dates(conf_con_info, xcom_value, conf_krb_info):
 
     print(xcom_value)
-    sql_script_2 = "INSERT INTO devdb.sandbox.data_cooling (schema_table_name, last_data_cooling) VALUES "
+    sql_script_2 = "INSERT INTO sandbox.data_cooling (schema_table_name, last_data_cooling) VALUES "
     print(sql_script_2)
     values = []
     for key, value in xcom_value.items():
         values.append("('{}', '{}')".format(key, value))
         sql_script_2 += ", ".join(values)
-    print(sql_script_2)
+
+    sql_script_2 ="INSERT INTO devdb.sandbox.data_cooling (schema_table_name, last_data_cooling) VALUES ('ODS_LEAD_GEN.KW_WORD_ENTITY_FRAME', '2023_10_18');"
     with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
         with vertica_python.connect(**conf_con_info) as conn:
             with conn.cursor() as cur:
