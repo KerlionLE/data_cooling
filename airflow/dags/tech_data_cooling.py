@@ -36,7 +36,6 @@ def update_last_cooling_dates(conf_con_info, xcom_value):
         sql_script_2 += ", ".join(values)
     
     execute_sql(sql_script_2, conf_con_info)
-    
 # ------------------------------------------------------------------------------------------------------------------
 
 AIRFLOW_ENV = os.environ["AIRFLOW_ENV"]
