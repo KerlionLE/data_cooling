@@ -16,6 +16,18 @@ def execute_sql(sql, conf_con_info):
         with conn.cursor() as cur:
             cur.execute(sql)
 
+def get_last_date_cooling(conf_con_info, conf_query):
+    sql = f'''
+                    select schema_table_name, max(last_data_cooling)
+                    from devdb.sandbox.data_cooling
+                    where schema_table_name = {conf_query['schema_name'].conf_query['table_name']}
+                    group by schema_table_name
+                '''
+    print(sql)
+    last_date_cooling = execute_sql(sql, conf_con_info)
+    return last_date_cooling
+
+
 def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scripts_path):
     last_cooling_dates = {}
     current_date = datetime.now().date()
@@ -24,6 +36,8 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scri
     with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
         for conf_query in conf_query_info:
             #if now_date - conf_query['last_date_cooling'] == conf_query['data_cooling_frequency']:
+            last_date_cooling = get_last_date_cooling(conf_con_info, conf_query)
+            print(last_date_cooling)
             if not conf_query['partition_expressions']:
 
                 sql = get_formated_file(
