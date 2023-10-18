@@ -4,6 +4,7 @@ v1.0.0 by romanovskiimv
 """
 import os
 from datetime import datetime
+import vertica_python
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
