@@ -17,6 +17,17 @@ def execute_sql(sql, conf_con_info):
             cur.execute(sql)
 
 def get_last_date_cooling(conf_con_info, conf_query):
+    
+    sql_script_1 = f''' 
+                      CREATE TABLE IF NOT EXISTS devdb.sandbox.data_cooling
+                          (
+                               schema_table_name varchar(128),
+                               last_data_cooling varchar(128)
+                            );
+                    '''
+    
+    execute_sql(sql_script_1, conf_con_info)
+
     sql = f'''
                     select schema_table_name, max(last_data_cooling)
                     from sandbox.data_cooling
