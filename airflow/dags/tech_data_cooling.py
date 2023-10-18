@@ -19,19 +19,19 @@ def execute_sql(sql, conf_con_info, conf_krb_info):
             with conn.cursor() as cur:
                 cur.execute(sql)
 
-def update_last_cooling_datess(conf_con_info, xcom_value, conf_krb_info):
+def update_last_cooling_dates(conf_con_info, xcom_value, conf_krb_info):
 
-    sql_script_1 = f''' 
-                        CREATE TABLE IF NOT EXISTS devdb.sandbox.data_cooling
-                            (
-                                schema_table_name varchar(128),
-                                last_data_cooling varchar(128)
-                            );
-                    '''
+    #sql_script_1 = f''' 
+    #                    CREATE TABLE IF NOT EXISTS devdb.sandbox.data_cooling
+    #                        (
+    #                            schema_table_name varchar(128),
+    #                            last_data_cooling varchar(128)
+    #                        );
+    #                '''
     
-    sql_script_2 = "INSERT INTO devdb.sandbox.data_cooling (schema_table_name, last_data_cooling) VALUES "
-
     #execute_sql(sql_script_1, conf_con_info, conf_krb_info)
+    print(xcom_value)
+    sql_script_2 = "INSERT INTO devdb.sandbox.data_cooling (schema_table_name, last_data_cooling) VALUES "
 
     values = []
     for key, value in xcom_value.items():
@@ -88,7 +88,7 @@ with DAG(**DAG_CONFIG) as dag:
     last_cooling_dates = PythonOperator(
         task_id=f'update_last_cooling_dates',
         trigger_rule='none_skipped',
-        python_callable=update_last_cooling_datess,
+        python_callable=update_last_cooling_dates,
         op_kwargs=
         {
             "conf_con_info": {
