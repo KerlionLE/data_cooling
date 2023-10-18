@@ -6,16 +6,18 @@ import os
 from datetime import datetime
 import vertica_python
 
+from data_cooling.krb import Kerberos
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 
 from data_cooling.vrt_to_hdfs import con_kerberus_vertica
 
 # ------------------------------------------------------------------------------------------------------------------
-def execute_sql(sql, conf_con_info):
-    with vertica_python.connect(**conf_con_info) as conn:
-        with conn.cursor() as cur:
-            cur.execute(sql)
+def execute_sql(sql, conf_con_info, conf_krb_info ):
+    with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
+        with vertica_python.connect(**conf_con_info) as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql)
 
 def update_last_cooling_dates(conf_con_info, xcom_value):
 
@@ -95,6 +97,7 @@ with DAG(**DAG_CONFIG) as dag:
                 "user": "a001cd-etl-vrt-hdp",
                 "database": "{{ conn.vertica_staging.schema }}"
                 },
+            'conf_krb_info': f'{{{{ var.json.{DAG_NAME}.conf_krb_info }}}}',
             'xcom_value' : "{{ ti.xcom_pull(task_ids='con_kerberus_vertica') }}"
         }
     )
