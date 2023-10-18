@@ -2,4 +2,4 @@
 EXPORT TO PARQUET(directory='webhdfs:///data/vertica/{schema_name}/{table_name}_{current_date}', compression='snappy') AS 
 SELECT * FROM {schema_name}.{table_name} 
 WHERE 1=1 {filter_expression} 
-limit 100000;
+limit 100;
