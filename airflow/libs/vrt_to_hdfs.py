@@ -20,7 +20,7 @@ def get_last_date_cooling(conf_con_info, conf_query):
     sql = f'''
                     select schema_table_name, max(last_data_cooling)
                     from sandbox.data_cooling
-                    where schema_table_name = {conf_query['schema_name']}.{conf_query['table_name']}
+                    where schema_table_name = '{conf_query['schema_name']}.{conf_query['table_name']}'
                     group by schema_table_name
                 '''
     last_date_cooling = execute_sql(sql, conf_con_info)
