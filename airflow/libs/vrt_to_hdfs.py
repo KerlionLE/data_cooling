@@ -23,7 +23,6 @@ def get_last_date_cooling(conf_con_info, conf_query):
                     where schema_table_name = {conf_query['schema_name']}.{conf_query['table_name']}
                     group by schema_table_name
                 '''
-    print(last_date_cooling)
     last_date_cooling = execute_sql(sql, conf_con_info)
     return last_date_cooling
 
