@@ -39,7 +39,7 @@ def update_last_cooling_dates(conf_con_info, xcom_value, conf_krb_info):
         sql_script_2 += ", ".join(values)
     print(sql_script_2)
     sql_script_2 = f''' 
-                    INSERT INTO devdb.sandbox.data_cooling (schema_table_name, last_data_cooling) VALUES ('ODS_LEAD_GEN.KW_WORD_ENTITY_FRAME', '2023_10_18')
+                    INSERT INTO devdb.sandbox.data_cooling (schema_table_name, last_data_cooling) VALUES ('ODS_LEAD_GEN.KW_WORD_ENTITY_FRAME', '2023_10_18');
                     ''' 
     execute_sql(sql_script_2, conf_con_info, conf_krb_info)
 # ------------------------------------------------------------------------------------------------------------------
