@@ -37,7 +37,7 @@ def update_last_cooling_dates(conf_con_info, xcom_value, conf_krb_info):
     for key, value in xcom_value.items():
         values.append("('{}', '{}')".format(key, value))
         sql_script_2 += ", ".join(values)
-    print(sql_script_2)
+        
     execute_sql(sql_script_2, conf_con_info, conf_krb_info)
 # ------------------------------------------------------------------------------------------------------------------
 
