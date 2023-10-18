@@ -28,6 +28,7 @@ DAG_CONFIG = {
     'concurrency': 1,
     'max_active_runs': 1,
     'catchup': False,
+    'render_template_as_native_obj': True,
     'default_args': DEFAULT_ARGS,
     'doc_md': __doc__,
 }
