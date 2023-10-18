@@ -28,16 +28,16 @@ def update_last_cooling_dates(conf_con_info, xcom_value, conf_krb_info):
                                 last_data_cooling varchar(128)
                             );
                     '''
-
-    execute_sql(sql_script_1, conf_con_info, conf_krb_info)
     
     sql_script_2 = "INSERT INTO devdb.sandbox.data_cooling (schema_table_name, last_data_cooling) VALUES "
+
+    #execute_sql(sql_script_1, conf_con_info, conf_krb_info)
 
     values = []
     for key, value in xcom_value.items():
         values.append("('{}', '{}')".format(key, value))
         sql_script_2 += ", ".join(values)
-        
+    print(sql_script_2)
     execute_sql(sql_script_2, conf_con_info, conf_krb_info)
 # ------------------------------------------------------------------------------------------------------------------
 
