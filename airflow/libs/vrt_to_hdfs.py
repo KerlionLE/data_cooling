@@ -37,7 +37,7 @@ def execute_sql(sql, conf_con_info):
         with conn.cursor() as cur:
             cur.execute(sql)
             result = cur.fetchone()
-            print(result)
+    return result
 # ------------------------------------------------------------------------------------------------------------------
 
 def get_last_date_cooling(conf_con_info, conf_query, sql_scripts_path):
@@ -73,15 +73,8 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scri
 
     with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
         for conf_query in conf_query_info:
-            sql = get_formated_file(
-                sql_scripts_path['get_last_date_cooling'],
-                schema_name=conf_query['schema_name'],
-                table_name=conf_query['table_name']
-                )
-            print(sql)
-            last_date_cooling = execute_sql(sql, conf_con_info)
-            print(last_date_cooling)
-            if (current_date - datetime.strptime(last_date_cooling.values(), '%d/%m/%y')).days == conf_query['data_cooling_frequency']:      
+            last_date_cooling = get_last_date_cooling(conf_con_info, conf_query, sql_scripts_path)
+            if (current_date - datetime.strptime(last_date_cooling[1], '%d/%m/%y')).days == conf_query['data_cooling_frequency']:      
                 if not conf_query['partition_expressions']:
 
                     sql = get_formated_file(
