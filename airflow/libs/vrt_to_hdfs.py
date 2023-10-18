@@ -102,7 +102,7 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scri
                 execute_sql(sql, conf_con_info)
                 last_cooling_dates[f"{conf_query['schema_name']}.{conf_query['table_name']}"] = current_date
             else:
-                print("Время ещё не прошло")
+                print("Время ещё не пришло")
         if not last_cooling_dates:
             pass
         else:
