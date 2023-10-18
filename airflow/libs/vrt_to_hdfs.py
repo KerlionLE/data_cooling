@@ -18,6 +18,7 @@ def execute_sql(sql, conf_con_info):
 
 def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scripts_path):
     last_cooling_dates = {}
+    values = []
     current_date = datetime.now().date()
     current_date = current_date.strftime("%Y_%m_%d")
 
@@ -47,5 +48,12 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scri
             last_cooling_dates[f"{conf_query['schema_name']}.{conf_query['table_name']}"] = current_date
             #else:
             #pass
+        sql_script_2 = "INSERT INTO devdb.sandbox.data_cooling (schema_table_name, last_data_cooling) VALUES "
+
+        for key, value in last_cooling_dates.items():
+            values.append("('{}', '{}')".format(key, value))
+            sql_script_2 += ", ".join(values)
+        
+        execute_sql(sql_script_2, conf_con_info)
 
     return last_cooling_dates
