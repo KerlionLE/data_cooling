@@ -21,7 +21,7 @@ class Kerberos:
 
     def __enter__(self):
         self.kinit()
-        return self  # А точно надо возвращать?
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.destroy()
