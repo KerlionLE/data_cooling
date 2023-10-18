@@ -45,8 +45,7 @@ with DAG(**DAG_CONFIG) as dag:
                 "host": "{{ conn.vertica_staging.host }}",
                 "port": "{{ conn.vertica_staging.port }}",
                 "user": "a001cd-etl-vrt-hdp",
-                "database": "{{ conn.vertica_staging.schema }}",
-                "autocommit":True
+                "database": "{{ conn.vertica_staging.schema }}"
                 },
             'conf_krb_info': f'{{{{ var.json.{DAG_NAME}.conf_krb_info }}}}',
             'sql_scripts_path': f'{{{{ var.json.{DAG_NAME}.sql_scripts_path }}}}',
