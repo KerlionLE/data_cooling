@@ -20,7 +20,7 @@
         "replication_policy": 1,
         "depth": "24M",
         "last_date_cooling": "",
-        "data_cooling_frequency": "* * * *",
+        "data_cooling_frequency": "1",
         "filter_expression": "",
         "partition_expressions": "substr(entity_index, 1, 1)"
       }
