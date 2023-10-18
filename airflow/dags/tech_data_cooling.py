@@ -13,12 +13,6 @@ from airflow.operators.python import PythonOperator
 from data_cooling.vrt_to_hdfs import con_kerberus_vertica
 
 # ------------------------------------------------------------------------------------------------------------------
-def execute_sql(sql, conf_con_info, conf_krb_info):
-    with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
-        with vertica_python.connect(**conf_con_info) as conn:
-            with conn.cursor() as cur:
-                cur.execute(sql)
-
 def update_last_cooling_dates(conf_con_info, xcom_value, conf_krb_info):
 
     print(xcom_value)
@@ -29,7 +23,10 @@ def update_last_cooling_dates(conf_con_info, xcom_value, conf_krb_info):
         values.append("('{}', '{}')".format(key, value))
         sql_script_2 += ", ".join(values)
     print(sql_script_2)
-    execute_sql(sql_script_2, conf_con_info, conf_krb_info)
+    with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
+        with vertica_python.connect(**conf_con_info) as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql_script_2)
 # ------------------------------------------------------------------------------------------------------------------
 
 AIRFLOW_ENV = os.environ["AIRFLOW_ENV"]
