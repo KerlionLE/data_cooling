@@ -36,7 +36,7 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scri
         for conf_query in conf_query_info:
             #if now_date - conf_query['last_date_cooling'] == conf_query['data_cooling_frequency']:
             last_date_cooling = get_last_date_cooling(conf_con_info, conf_query)
-            print(last_date_cooling)
+            
             if not conf_query['partition_expressions']:
 
                 sql = get_formated_file(
