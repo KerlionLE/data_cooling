@@ -1,9 +1,30 @@
 import os
 
 import vertica_python
-from data_cooling.krb import Kerberos
 from datetime import datetime
+from krbticket import KrbCommand, KrbConfig
 
+# ------------------------------------------------------------------------------------------------------------------
+
+class Kerberos:
+    def __init__(self, principal, keytab, **kwargs):
+        self.principal = principal
+        self.keytab = keytab
+
+    def kinit(self):
+        kconfig = KrbConfig(principal=self.principal, keytab=self.keytab)
+        KrbCommand.kinit(kconfig)
+
+    def destroy(self):
+        kconfig = KrbConfig(principal=self.principal, keytab=self.keytab)
+        KrbCommand.kdestroy(kconfig)
+
+    def __enter__(self):
+        self.kinit()
+        return self  # А точно надо возвращать?
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.destroy()
 # ------------------------------------------------------------------------------------------------------------------
 
 def get_formated_file(path, **params):
@@ -15,6 +36,7 @@ def execute_sql(sql, conf_con_info):
     with vertica_python.connect(**conf_con_info) as conn:
         with conn.cursor() as cur:
             cur.execute(sql)
+# ------------------------------------------------------------------------------------------------------------------
 
 def get_last_date_cooling(conf_con_info, conf_query, sql_scripts_path):
 
@@ -38,6 +60,7 @@ def put_last_date_cooling(conf_con_info, conf_query, sql_scripts_path, new_last_
        values.append("('{}', '{}')".format(key, value))
        sql += ", ".join(values)
     execute_sql(sql, conf_con_info)
+# ------------------------------------------------------------------------------------------------------------------
 
 def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scripts_path):
     last_cooling_dates = {}
@@ -46,7 +69,7 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scri
 
     with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
         for conf_query in conf_query_info:
-            last_date_cooling = get_last_date_cooling(conf_con_info, conf_query)
+            last_date_cooling = get_last_date_cooling(conf_con_info, conf_query, sql_scripts_path)
             print(last_date_cooling)
             print(datetime.strptime(last_date_cooling.values(), '%d/%m/%y'))
             print(conf_query['data_cooling_frequency'])
