@@ -4,33 +4,11 @@ v1.0.0 by romanovskiimv
 """
 import os
 from datetime import datetime
-import vertica_python
 
-from data_cooling.krb import Kerberos
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 
 from data_cooling.vrt_to_hdfs import con_kerberus_vertica
-
-# ------------------------------------------------------------------------------------------------------------------
-def update_last_cooling_dates(conf_con_info, xcom_value, conf_krb_info):
-
-    print(xcom_value)
-    sql_script_2 = "INSERT INTO sandbox.data_cooling (schema_table_name, last_data_cooling) VALUES "
-    print(sql_script_2)
-    values = []
-    for key, value in xcom_value.items():
-        values.append("('{}', '{}')".format(key, value))
-        sql_script_2 += ", ".join(values)
-
-    sql_script_2 ="INSERT INTO sandbox.data_cooling (schema_table_name, last_data_cooling) VALUES ('ODS_LEAD_GEN.KW_WORD_ENTITY_FRAME', '2023_10_18');"
-    with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
-        with vertica_python.connect(**conf_con_info) as conn:
-            with conn.cursor() as cur:
-                cur.execute(sql_script_2)
-
-
-# ------------------------------------------------------------------------------------------------------------------
 
 AIRFLOW_ENV = os.environ["AIRFLOW_ENV"]
 
@@ -67,7 +45,8 @@ with DAG(**DAG_CONFIG) as dag:
                 "host": "{{ conn.vertica_staging.host }}",
                 "port": "{{ conn.vertica_staging.port }}",
                 "user": "a001cd-etl-vrt-hdp",
-                "database": "{{ conn.vertica_staging.schema }}"
+                "database": "{{ conn.vertica_staging.schema }}",
+                "autocommit":True
                 },
             'conf_krb_info': f'{{{{ var.json.{DAG_NAME}.conf_krb_info }}}}',
             'sql_scripts_path': f'{{{{ var.json.{DAG_NAME}.sql_scripts_path }}}}',
@@ -76,22 +55,4 @@ with DAG(**DAG_CONFIG) as dag:
 
     )
 
-    last_cooling_dates = PythonOperator(
-        task_id=f'update_last_cooling_dates',
-        trigger_rule='none_skipped',
-        python_callable=update_last_cooling_dates,
-        op_kwargs=
-        {
-            "conf_con_info": {
-                "host": "{{ conn.vertica_staging.host }}",
-                "port": "{{ conn.vertica_staging.port }}",
-                "user": "a001cd-etl-vrt-hdp",
-                "database": "{{ conn.vertica_staging.schema }}",
-                "autocommit":True
-                },
-            'conf_krb_info': f'{{{{ var.json.{DAG_NAME}.conf_krb_info }}}}',
-            'xcom_value' : "{{ ti.xcom_pull(task_ids='con_kerberus_vertica') }}"
-        }
-    )
-
-    vertica_to_hdfs >> last_cooling_dates
+    vertica_to_hdfs

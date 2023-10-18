@@ -8,7 +8,9 @@
       "sql_export_without_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/export_without_partitions.sql",
       "sql_export_with_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/export_with_partitions.sql",
       "sql_create_external_table_hdfs": "$AIRFLOW_HOME/libs/data_cooling/sqls/create_external_table_hdfs.sql",
-      "sql_copy_to_vertica": "$AIRFLOW_HOME/libs/data_cooling/sqls/copy_to_vertica.sql"
+      "sql_copy_to_vertica": "$AIRFLOW_HOME/libs/data_cooling/sqls/copy_to_vertica.sql",
+      "get_last_date_cooling": "$AIRFLOW_HOME/libs/data_cooling/sqls/get_last_date_cooling.sql",
+      "put_last_date_cooling": "$AIRFLOW_HOME/libs/data_cooling/sqls/put_last_date_cooling.sql"
     },
     "conf_query_info": [
        {
