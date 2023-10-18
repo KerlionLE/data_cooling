@@ -33,7 +33,7 @@ AIRFLOW_ENV = os.environ["AIRFLOW_ENV"]
 
 DEFAULT_ARGS = {
     'owner': 'romanovskiimv',
-    'start_date': datetime(2023, 10, 1),
+    'start_date': datetime(2023, 10, 17),
     'retries': 0,
     'task_concurrency': 1,
     'pool': 'tech_pool'
@@ -85,7 +85,7 @@ with DAG(**DAG_CONFIG) as dag:
                 "user": "a001cd-etl-vrt-hdp",
                 "database": "{{ conn.vertica_staging.schema }}"
                 },
-            'xcom_value' : '{{ ti.xcom_pull(task_ids=con_kerberus_vertica) }}'
+            'xcom_value' : "{{ ti.xcom_pull(task_ids='con_kerberus_vertica') }}"
         }
     )
 
