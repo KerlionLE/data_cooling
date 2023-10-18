@@ -36,6 +36,8 @@ def execute_sql(sql, conf_con_info):
     with vertica_python.connect(**conf_con_info) as conn:
         with conn.cursor() as cur:
             cur.execute(sql)
+            result = cur.fetchone()
+            print(result)
 # ------------------------------------------------------------------------------------------------------------------
 
 def get_last_date_cooling(conf_con_info, conf_query, sql_scripts_path):
