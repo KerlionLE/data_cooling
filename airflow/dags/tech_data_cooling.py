@@ -19,7 +19,7 @@ def execute_sql(sql, conf_con_info, conf_krb_info):
             with conn.cursor() as cur:
                 cur.execute(sql)
 
-def update_last_cooling_dates(conf_con_info, xcom_value, conf_krb_info):
+def update_last_cooling_datess(conf_con_info, xcom_value, conf_krb_info):
 
     sql_script_1 = f''' 
                         CREATE TABLE IF NOT EXISTS devdb.sandbox.data_cooling
@@ -88,7 +88,7 @@ with DAG(**DAG_CONFIG) as dag:
     last_cooling_dates = PythonOperator(
         task_id=f'update_last_cooling_dates',
         trigger_rule='none_skipped',
-        python_callable=update_last_cooling_dates,
+        python_callable=update_last_cooling_datess,
         op_kwargs=
         {
             "conf_con_info": {
