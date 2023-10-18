@@ -23,11 +23,13 @@ def update_last_cooling_dates(conf_con_info, xcom_value, conf_krb_info):
         values.append("('{}', '{}')".format(key, value))
         sql_script_2 += ", ".join(values)
 
-    sql_script_2 ="INSERT INTO devdb.sandbox.data_cooling (schema_table_name, last_data_cooling) VALUES ('ODS_LEAD_GEN.KW_WORD_ENTITY_FRAME', '2023_10_18');"
+    sql_script_2 ="INSERT INTO sandbox.data_cooling (schema_table_name, last_data_cooling) VALUES ('ODS_LEAD_GEN.KW_WORD_ENTITY_FRAME', '2023_10_18');"
     with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
         with vertica_python.connect(**conf_con_info) as conn:
             with conn.cursor() as cur:
                 cur.execute(sql_script_2)
+
+
 # ------------------------------------------------------------------------------------------------------------------
 
 AIRFLOW_ENV = os.environ["AIRFLOW_ENV"]
@@ -84,7 +86,8 @@ with DAG(**DAG_CONFIG) as dag:
                 "host": "{{ conn.vertica_staging.host }}",
                 "port": "{{ conn.vertica_staging.port }}",
                 "user": "a001cd-etl-vrt-hdp",
-                "database": "{{ conn.vertica_staging.schema }}"
+                "database": "{{ conn.vertica_staging.schema }}",
+                "autocommit":True
                 },
             'conf_krb_info': f'{{{{ var.json.{DAG_NAME}.conf_krb_info }}}}',
             'xcom_value' : "{{ ti.xcom_pull(task_ids='con_kerberus_vertica') }}"
