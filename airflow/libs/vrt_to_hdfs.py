@@ -64,7 +64,7 @@ def put_last_date_cooling(conf_con_info, conf_query, sql_scripts_path, new_last_
 
 def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scripts_path):
     last_cooling_dates = {}
-    current_date = pd.to_datetime('today').normalize()
+    current_date = pd.to_datetime('today').normalize().strftime('%Y-%m-%d')
 
     with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
         for conf_query in conf_query_info:
@@ -76,7 +76,7 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scri
                         schema_name=conf_query['schema_name'],
                         table_name=conf_query['table_name'],
                         filter_expression=conf_query['filter_expression'],
-                        current_date=current_date.strftime("%Y-%m-%d")
+                        current_date=current_date
                     )
 
                 else:
@@ -87,11 +87,11 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scri
                         table_name=conf_query['table_name'],
                         filter_expression=conf_query['filter_expression'],
                         partition_expressions=conf_query['partition_expressions'],
-                        current_date=current_date.strftime("%Y-%m-%d")
+                        current_date=current_date
                     )
 
                 execute_sql(sql, conf_con_info)
-                last_cooling_dates[f"{conf_query['schema_name']}.{conf_query['table_name']}"] = current_date.strftime("%Y-%m-%d")
+                last_cooling_dates[f"{conf_query['schema_name']}.{conf_query['table_name']}"] = current_date
             else:
                 print("Время ещё не пришло")
         if not last_cooling_dates:
