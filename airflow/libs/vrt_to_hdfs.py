@@ -1,9 +1,10 @@
+# ------------------------------------------------------------------------------------------------------------------
+
 import os
 import pandas as pd
 import vertica_python
 from datetime import datetime
 from krbticket import KrbCommand, KrbConfig
-
 # ------------------------------------------------------------------------------------------------------------------
 
 class Kerberos:
@@ -43,25 +44,21 @@ def execute_sql(sql, conf_con_info):
 def get_last_date_cooling(conf_con_info, conf_query, sql_scripts_path):
 
     sql = get_formated_file(
-        sql_scripts_path['get_last_date_cooling'],
+        sql_scripts_path['sql_get_last_date_cooling'],
         schema_name=conf_query['schema_name'],
         table_name=conf_query['table_name']
         )
-    last_date_cooling = execute_sql(sql, conf_con_info)
-    print(last_date_cooling)
-    return last_date_cooling
+    return execute_sql(sql, conf_con_info)
 
 def put_last_date_cooling(conf_con_info, conf_query, sql_scripts_path, new_last_date):
 
     sql = get_formated_file(
-        sql_scripts_path['put_last_date_cooling'],
+        sql_scripts_path['sql_put_last_date_cooling'],
         schema_name=conf_query['schema_name'],
         table_name=conf_query['table_name']
         )
-    values = []
-    for key, value in new_last_date.items():
-       values.append("('{}', '{}')".format(key, value))
-       sql += ", ".join(values)
+    values = ["('{}', '{}')".format(key, value) for key, value in new_last_date.items()]
+    sql += ", ".join(values)
     execute_sql(sql, conf_con_info)
 # ------------------------------------------------------------------------------------------------------------------
 
@@ -79,8 +76,9 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scri
                         schema_name=conf_query['schema_name'],
                         table_name=conf_query['table_name'],
                         filter_expression=conf_query['filter_expression'],
-                        current_date=current_date
+                        current_date=current_date.strftime("%Y-%m-%d")
                     )
+
                 else:
 
                     sql = get_formated_file(
@@ -89,8 +87,9 @@ def con_kerberus_vertica(conf_con_info, conf_krb_info, conf_query_info, sql_scri
                         table_name=conf_query['table_name'],
                         filter_expression=conf_query['filter_expression'],
                         partition_expressions=conf_query['partition_expressions'],
-                        current_date=current_date
+                        current_date=current_date.strftime("%Y-%m-%d")
                     )
+
                 execute_sql(sql, conf_con_info)
                 last_cooling_dates[f"{conf_query['schema_name']}.{conf_query['table_name']}"] = current_date.strftime("%Y-%m-%d")
             else:
