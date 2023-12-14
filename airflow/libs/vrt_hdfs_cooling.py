@@ -145,16 +145,16 @@ def gen_dml(config: list,
         if not conf['partition_expressions']:
 
             sql = get_formated_file(
-                delete_without_partitions,
+                export_without_partitions,
                 schema_name=conf['schema_name'],
                 table_name=conf['table_name'],
                 filter_expression=conf['filter_expression'],
                 current_date=conf['actual_max_tech_load_ts']
             )
-        else:
 
+        else:
             sql = get_formated_file(
-                sql_delete_with_partitions,
+                export_with_partitions,
                 schema_name=conf['schema_name'],
                 table_name=conf['table_name'],
                 filter_expression=conf['filter_expression'],
