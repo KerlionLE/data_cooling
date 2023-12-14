@@ -217,6 +217,6 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(max_tech_load_ts)
 
     'Step 5 - генераия dml скриптов'
-    gen_dml = gen_dml(config, copy_to_vertica, create_external_table_hdfs, delete_without_partitions, sql_delete_with_partitions, export_with_partitions, export_without_partitions)
-    logging.info(gen_dml)
+    gen_dmls = gen_dml(config, copy_to_vertica, create_external_table_hdfs, delete_without_partitions, sql_delete_with_partitions, export_with_partitions, export_without_partitions)
+    logging.info(gen_dmls)
 
