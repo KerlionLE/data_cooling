@@ -153,7 +153,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     sql_delete_with_partitions = conf['auxiliary_sql_paths']['sql_delete_with_partitions']
     export_with_partitions = conf['auxiliary_sql_paths']['sql_export_with_partitions']
     export_without_partitions = conf['auxiliary_sql_paths']['sql_export_without_partitions']
-    get_max_tech_load_ts = conf['auxiliary_sql_paths']['get_max_tech_load_ts']
+    get_max_tech_load_ts = conf['auxiliary_sql_paths']['sql_get_max_tech_load_ts']
 
     con_type = conf['source_system']['system_type']
     source_type = conf['replication_objects_source']['source_type']

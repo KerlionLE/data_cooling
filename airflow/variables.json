@@ -9,7 +9,7 @@
                 "connection_config": {
                     "connection": "airflow_conn",
                     "connection_conf": {
-                        "conn_id":  "vertica_preprod_test_src"
+                        "conn_id":  "vertica_staging"
                     }
                 },
                 "system_tz": "Europe/Moscow"
