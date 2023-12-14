@@ -164,8 +164,8 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
             'host': 's001cd-db-vr01.dev002.local',
             'port': '5433',
             'database': 'devdb',
-            'user': 'a001cd-etl-hdp-vrt@DEV002.LOCAL',
-            'password': 'i3Go3XE!vEpx71@Ka',
+            'user': 'a001cd-etl-vrt-hdp@DEV002.LOCAL',
+            'password': 'N1rpZx@7URai)GoEv',
         }
 
     'Step 1 - создание conn, берем конфиг, выписываем список таблиц'
