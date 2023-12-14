@@ -142,13 +142,14 @@ def gen_dml(config: list,
              delete_with_partitions: str,
              export_with_partitions: str,
              export_without_partitions: str) -> list:
-    
-    date_start = conf['actual_max_tech_load_ts']
-    print(date_start)
-    date_end = (datetime.strptime(date_start, '%Y-%m-%d %H:%M:%S') + timedelta(days=conf['depth'])).strftime('%Y-%m-%d %H:%M:%S')
-    print(date_end)
 
     for conf in config:
+
+        date_start = conf['actual_max_tech_load_ts']
+        print(date_start)
+        date_end = (datetime.strptime(date_start, '%Y-%m-%d %H:%M:%S') + timedelta(days=conf['depth'])).strftime('%Y-%m-%d %H:%M:%S')
+        print(date_end)
+
         if conf['cooling_type'] == 'time_based':
             if not conf['partition_expressions']:
                 sql = get_formated_file(
