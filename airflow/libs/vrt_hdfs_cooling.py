@@ -111,7 +111,7 @@ def get_max_load_ts(filtered_objects: list,
             table_name=conf['table_name'],
         )
         try:
-            max_date = db_connection_src.apply_script_vrt(script = 'select 1')[0]
+            max_date = db_connection_src.apply_script_vrt('select 1')[0]
         except Exception as e:
             logging.error(
                 f'''Таблица {conf['schema_name']}.{conf['table_name']} не существует или столца tech_ts нет - {e}''',
@@ -159,6 +159,14 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     source_type = conf['replication_objects_source']['source_type']
     source_config = conf['replication_objects_source']['source_config']
     system_tz = conf['source_system']['system_config']['system_tz']
+
+    db_connection_config_src = {
+            'host': 's001cd-db-vr01.dev002.local',
+            'port': '5433',
+            'database': 'devdb',
+            'user': 'a001cd-etl-hdp-vrt@DEV002.LOCAL',
+            'password': 'i3Go3XE!vEpx71@Ka',
+        }
 
     'Step 1 - создание conn, берем конфиг, выписываем список таблиц'
     db_connection_src = get_connect_manager(con_type, db_connection_config_src)
