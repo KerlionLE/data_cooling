@@ -1,1 +1,0 @@
-INSERT INTO devdb.sandbox.data_cooling (schema_table_name, last_data_cooling) VALUES 
