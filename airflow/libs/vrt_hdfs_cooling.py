@@ -89,7 +89,7 @@ def filter_objects(config: dict, system_tz: str) -> list:
 
 # ------------------------------------------------------------------------------------------------------------------
 
-def get_max_tech_load_ts(filtered_objects: list,
+def get_max_load_ts(filtered_objects: list,
                          db_connection_src: DBConnection,
                          sql_scripts_path_select: str) -> list:
     """
@@ -173,7 +173,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(filter_object)
 
     'Step 4 - текущая макс дата в проде'
-    max_tech_load_ts = get_max_tech_load_ts(filter_object, db_connection_src, get_max_tech_load_ts)
+    max_tech_load_ts = get_max_load_ts(filter_object, db_connection_src, get_max_tech_load_ts)
     logging.info(max_tech_load_ts)
 
     print(max_tech_load_ts)
