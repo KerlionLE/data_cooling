@@ -89,7 +89,7 @@ def filter_objects(config: dict, system_tz: str) -> list:
 
 # ------------------------------------------------------------------------------------------------------------------
 
-def get_max_load_ts(filtered_objects: list,
+def get_max_load_ts(config: list,
                          db_connection_src: DBConnection,
                          sql_scripts_path_select: str) -> list:
     """
@@ -102,7 +102,7 @@ def get_max_load_ts(filtered_objects: list,
     """
     filtered_objects_with_maxdate = []
 
-    for conf in filtered_objects:
+    for conf in config:
         col_name = conf.get('tech_ts_column_name') or 'tech_load_ts'
         sql_select = get_formated_file(
             sql_scripts_path_select,
@@ -132,6 +132,38 @@ def get_max_load_ts(filtered_objects: list,
                 f'''Таблица {conf['schema_name']}.{conf['table_name']} пустая ''',
             )
     return filtered_objects_with_maxdate
+
+def gen_dml(config: list,
+             copy_to_vertica: str,
+             create_external_table_hdfs: str,
+             delete_without_partitions: str,
+             sql_delete_with_partitions: str,
+             export_with_partitions: str,
+             export_without_partitions: str) -> list:
+    
+    for conf in config:
+        if not conf['partition_expressions']:
+
+            sql = get_formated_file(
+                delete_without_partitions,
+                schema_name=conf['schema_name'],
+                table_name=conf['table_name'],
+                filter_expression=conf['filter_expression'],
+                current_date=conf['actual_max_tech_load_ts']
+            )
+        else:
+
+            sql = get_formated_file(
+                sql_delete_with_partitions,
+                schema_name=conf['schema_name'],
+                table_name=conf['table_name'],
+                filter_expression=conf['filter_expression'],
+                partition_expressions=conf['partition_expressions'],
+                current_date=conf['actual_max_tech_load_ts']
+            )
+        print(sql)
+
+
 
 # ------------------------------------------------------------------------------------------------------------------
 
@@ -184,5 +216,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     max_tech_load_ts = get_max_load_ts(filter_object, db_connection_src, get_max_tech_load_ts)
     logging.info(max_tech_load_ts)
 
-    print(max_tech_load_ts)
+    'Step 5 - генераия dml скриптов'
+    gen_dml = gen_dml(config, copy_to_vertica, create_external_table_hdfs, delete_without_partitions, sql_delete_with_partitions, export_with_partitions, export_without_partitions)
+    logging.info(gen_dml)
 
