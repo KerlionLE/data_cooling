@@ -1,2 +1,2 @@
 -- Загружаем данные назад в Vertica
-COPY ODS_LEAD_GEN.KW_WORD_ENTITY_FRAME_HDP FROM 'webhdfs:///data/vertica/ODS_LEAD_GEN_TST/KW_WORD_ENTITY_FRAME_TST/*.parquet' PARQUET;
+COPY {schema_name}.{table_name} FROM 'webhdfs:///data/vertica/{schema_name}/{table_name}_{current_date}/*.parquet' PARQUET;

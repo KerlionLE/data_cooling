@@ -1,7 +1,6 @@
 import os
 import json
 
-
 def get_formated_file(path: str, **params) -> str:
     """
     Open sql команд из папки sql
@@ -15,20 +14,6 @@ def get_formated_file(path: str, **params) -> str:
         text = f.read()
     return text.format(**params)
 
-
-def open_file(path: str) -> dict:
-    """
-    Открытие файла
-    :param path: путь к файлу
-
-    :return: dict
-    """
-
-    file_path_exp = os.path.expandvars(path)
-    with open(file_path_exp, 'r') as f:
-        return json.load(f)
-
-
 def save_file(path: str, conf_info: list) -> None:
     """
     Сохранение файл
@@ -37,8 +22,6 @@ def save_file(path: str, conf_info: list) -> None:
 
     """
 
-    file_path = os.path.expandvars(path)
-    dir_path = os.path.dirname(file_path)
-    os.makedirs(dir_path, exist_ok=True)
-    with open(file_path, 'w') as f:
+    os.makedirs(os.path.dirname(os.path.expandvars(path)), exist_ok=True)
+    with open(os.path.expandvars(path), 'w') as f:
         f.write(json.dumps(conf_info))
