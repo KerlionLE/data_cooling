@@ -111,7 +111,7 @@ def get_max_load_ts(filtered_objects: list,
             table_name=conf['table_name'],
         )
         try:
-            max_date = db_connection_src.apply_script_vrt(sql_select)[0]
+            max_date = db_connection_src.apply_script_vrt('select 1')[0]
         except Exception as e:
             logging.error(
                 f'''Таблица {conf['schema_name']}.{conf['table_name']} не существует или столца tech_ts нет - {e}''',
