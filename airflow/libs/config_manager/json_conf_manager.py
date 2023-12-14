@@ -1,7 +1,4 @@
-import os
-import json 
-
-from config_manager import ConfigManager
+from .conf_manager import ConfigManager
 
 
 class JsonConfManager(ConfigManager):
