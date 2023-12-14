@@ -161,7 +161,8 @@ def gen_dml(config: list,
                 partition_expressions=conf['partition_expressions'],
                 current_date=conf['actual_max_tech_load_ts']
             )
-        print(sql)
+    
+    return sql
 
 
 
