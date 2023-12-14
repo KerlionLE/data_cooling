@@ -72,7 +72,6 @@ def get_conn(dag_name: str, env_name: str, replication_names: str, system_type: 
     
     try:
         con = BaseHook.get_connection(replication_config[system_type]['system_config']['connection_config']['connection_conf']['conn_id'])
-        print(con)
         return {
             'host': con.host,
             'port': con.port,
