@@ -72,13 +72,13 @@ def get_conn(dag_name: str, env_name: str, replication_names: str, system_type: 
     
     try:
         con = BaseHook.get_connection(replication_config[system_type]['system_config']['connection_config']['connection_conf']['conn_id'])
-        return {
+        return print({
             'host': con.host,
             'port': con.port,
             'database': con.schema,
             'user': con.login,
             'password': con.password,
-        }
+        })
     except Exception as e:
         logging.warning(f"The conn_id `con_id` isn't defined: {e}")
 
