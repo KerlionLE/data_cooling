@@ -1,14 +1,12 @@
 import logging
-import json 
 import pytz
-import vertica_python
 
 from datetime import datetime
 from croniter import croniter
 
-from config_manager import AVAILABLE_FORMAT_MANAGER
-from connect_manager import AVAILABLE_DB_CONNECTIONS, DBConnection
-from utils import get_formated_file
+from .config_manager import AVAILABLE_FORMAT_MANAGER
+from .connect_manager import AVAILABLE_DB_CONNECTIONS, DBConnection
+from .utils import get_formated_file
 
 # ------------------------------------------------------------------------------------------------------------------
 
