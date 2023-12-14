@@ -7,7 +7,7 @@ from airflow.operators.python import PythonOperator
 from airflow.hooks.base import BaseHook
 from airflow.models import Variable
 
-from vertica_replication.vrt_hdfs_cooling import preprocess_config_checks_con_dml
+from data_cooling.vrt_hdfs_cooling import preprocess_config_checks_con_dml
 from dwh_utils.airflow.common import get_dag_name
 
 AIRFLOW_ENV = os.environ['AIRFLOW_ENV']
