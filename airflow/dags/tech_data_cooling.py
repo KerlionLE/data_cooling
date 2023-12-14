@@ -57,7 +57,7 @@ def get_replication_config(dag_name: str, env_name: str, replication_names: str)
 
     return replication_config
 
-def get_conn(dag_name: str, env_name: str, replication_names: str, system_type: str) -> dict:
+def get_conn_id(dag_name: str, env_name: str, replication_names: str, system_type: str) -> dict:
     """
     Из get_replication_config забираем конфиг con
     :param dag_name: название дага
@@ -69,9 +69,21 @@ def get_conn(dag_name: str, env_name: str, replication_names: str, system_type: 
     """
     replication_config = get_replication_config(
         dag_name, env_name, replication_names)
-    
+    return replication_config[system_type]['system_config']['connection_config']['connection_conf']['conn_id']
+
+def get_conn(dag_name: str, env_name: str, replication_names: str, system_type: str) -> dict:
+    """
+    По conn_id забираем  host, port, schema, login, password, !!! В тестах нет connection поэтому pass - ошибка('airflow.exceptions.AirflowNotFoundException: The conn_id `con_id` isn't defined')
+    :param dag_name: название дага
+    :param env_name: название среды
+    :param replication_names: конфиг
+    :param system_type: название среды
+
+    :return: возвращает лист - отфильтрованный конфиг с учётом частоты
+    """
+    con_id = get_conn_id(dag_name, env_name, replication_names, system_type)
     try:
-        con = BaseHook.get_connection(replication_config[system_type]['system_config']['connection_config']['connection_conf']['conn_id'])
+        con = BaseHook.get_connection(con_id)
         return {
             'host': con.host,
             'port': con.port,
