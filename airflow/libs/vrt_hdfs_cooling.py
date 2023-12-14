@@ -1,7 +1,7 @@
 import logging
 import pytz
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from croniter import croniter
 
 from .config_manager import AVAILABLE_FORMAT_MANAGER
@@ -143,6 +143,11 @@ def gen_dml(config: list,
              export_with_partitions: str,
              export_without_partitions: str) -> list:
     
+    date_start = conf['actual_max_tech_load_ts']
+    print(date_start)
+    date_end = (datetime.strptime(date_start, '%Y-%m-%d %H:%M:%S') + timedelta(days=conf['depth'])).strftime('%Y-%m-%d %H:%M:%S')
+    print(date_end)
+
     for conf in config:
         if conf['cooling_type'] == 'time_based':
             if not conf['partition_expressions']:
@@ -156,15 +161,6 @@ def gen_dml(config: list,
             else:
                 sql = get_formated_file(
                     export_with_partitions,
-                    schema_name=conf['schema_name'],
-                    table_name=conf['table_name'],
-                    filter_expression=conf['filter_expression'],
-                    partition_expressions=conf['partition_expressions'],
-                    current_date=conf['actual_max_tech_load_ts']
-                )
-        elif conf['cooling_type'] == 'copy': 
-            sql = get_formated_file(
-                    copy_to_vertica,
                     schema_name=conf['schema_name'],
                     table_name=conf['table_name'],
                     filter_expression=conf['filter_expression'],
@@ -209,7 +205,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
             'password': 'Max110299',
         }
 
-    'Step 1 - создание conn, берем конфиг, выписываем список таблиц'
+    'Step 1 - создание conn'
     db_connection_src = get_connect_manager(con_type, db_connection_config_src)
 
     'Step 2 - берём конфиг'
