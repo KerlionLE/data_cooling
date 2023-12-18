@@ -11,7 +11,7 @@ def chconf(conf:list) -> None:
     """
 
     # schema_name и table_name
-    if isinstance('schema_name', str) or isinstance('table_name', str):
+    if isinstance('schema_name', str) is False or isinstance('table_name', str) is False:
         logging.error(
                 f'''Поля schema_name или table_name должны быть в формате строки''',
             )
@@ -28,7 +28,7 @@ def chconf(conf:list) -> None:
             )
 
     # replication_policy
-    if isinstance('replication_policy', int):
+    if isinstance('replication_policy', int) is False:
         logging.error(
                 f'''Неправельно заполнено поле replication_policy - должн быть в формате числа''',
             )
@@ -39,7 +39,7 @@ def chconf(conf:list) -> None:
             )
 
     #depth
-    if isinstance('depth', int):
+    if isinstance('depth', int) is False:
         logging.error(
                 f'''Неправельно заполнено поле depth - должн быть в формате числа''',
             )
@@ -64,7 +64,7 @@ def chconf(conf:list) -> None:
             )
 
     #tech_ts_column_name
-    if conf['tech_ts_column_name'] is not str:
+    if isinstance('tech_ts_column_name', str) is False:
         logging.error(
                 f'''Поля tech_ts_column_name должно быть в формате строки''',
             )
