@@ -97,7 +97,7 @@ def get_max_load_ts(config: list,
     Select из основных таблиц выборки. Забираем max(tech_load_ts)
     :param filtered_objects: лист - отфильтрованный конфиг с учётом частоты
     :param db_connection_src: объект соединения
-    :param sql_scripts_path_select: путь к sql скрипту - select
+    :param sql_scripts_path_select: путь к sql скрипт
 
     :return: возвращает лист - с максимальной датой(tech_load_ts) в схема-таблица
     """
@@ -137,6 +137,17 @@ def gen_dml(config: list,
              delete_with_partitions: str,
              export_with_partitions: str,
              export_without_partitions: str) -> list:
+    """
+    Генерирует DML скрипт
+    :param config: конфиг
+    :param copy_to_vertica: путь к sql скрипт 
+    :param delete_without_partitions: путь к sql скрипт
+    :param delete_with_partitions: путь к sql скрипт
+    :param export_with_partitions: путь к sql скрипт
+    :param export_without_partitions: путь к sql скрипт
+
+    :return: возвращает конфиог с dml сриптом
+    """
     
     conf_with_dml = []
 
@@ -165,7 +176,7 @@ def gen_dml(config: list,
                     filter_expression=conf['filter_expression'],
                     time_between=f'''and {conf['tech_ts_column_name']} >= '{date_delete}' and {conf['tech_ts_column_name']} >= '{date_end}'''
                 )
-                sql = f'{sql_export_without};\n{sql_delete_without};'
+                sql = f'{sql_export_without}\n{sql_delete_without}'
 
             else:
 
@@ -185,7 +196,7 @@ def gen_dml(config: list,
                     filter_expression=conf['filter_expression'],
                     time_between=f'''and {conf['tech_ts_column_name']} >= '{date_delete}' and {conf['tech_ts_column_name']} >= '{date_end}'''
                 )
-                sql = f'{sql_export_with};\n{sql_delete_with};'
+                sql = f'{sql_export_with}\n{sql_delete_with}'
             
         elif conf['cooling_type'] == 'fullcopy':
             sql_export_without = get_formated_file(
@@ -196,13 +207,32 @@ def gen_dml(config: list,
                     time_between='',
                     current_date=conf['tech_ts_column_name']
                 )
-            sql = f'{sql_export_without};'
+            sql_delete_without = get_formated_file(
+                    delete_without_partitions,
+                    schema_name=conf['schema_name'],
+                    table_name=conf['table_name'],
+                    filter_expression='',
+                    time_between=''
+                )
+            sql = f'{sql_export_without}\n{sql_delete_without}'
 
         conf['dml_script'] = sql
         conf_with_dml.append(conf)
 
     return conf_with_dml
 
+def run_dml(config: list, db_connection_config_src: DBConnection, conf_krb_info: list):
+    """
+    Запуск DML скриптов
+    :param config: конфиг
+    :param db_connection_config_src: кон к базе
+    :param conf_krb_info: конфиг соединения через керберос
+
+    :return: возвращает конфиог с dml сриптом
+    """
+
+    for conf in config:
+        print(conf)
 
 # ------------------------------------------------------------------------------------------------------------------
 
@@ -230,6 +260,8 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     source_type = conf['replication_objects_source']['source_type']
     source_config = conf['replication_objects_source']['source_config']
     system_tz = conf['source_system']['system_config']['system_tz']
+
+    conf_krb_info = conf['target_system']['system_config']['connection_config']['connection_conf']
 
     db_connection_config_src = {
             'host': 's001cd-db-vr01.dev002.local',
@@ -267,6 +299,9 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     'Step 7 - генераия dml скриптов'
     gen_dmls = gen_dml(config, copy_to_vertica, delete_without_partitions, delete_with_partitions, export_with_partitions, export_without_partitions)
     logging.info(gen_dmls)
+
+    'Step 8 - запусе dml скриптов'
+    run_dml(config, db_connection_config_src, conf_krb_info)
 
 
 # 3 - лог вретике начало/конец репликации, премя запуска/завершения/продолжительность - ошибка вертики
