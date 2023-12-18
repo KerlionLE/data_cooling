@@ -2,5 +2,5 @@
 EXPORT TO PARQUET(directory='webhdfs:///data/vertica/{schema_name}/{table_name}_{current_date}', compression='snappy') OVER(PARTITION BY part) AS 
 SELECT *, {partition_expressions} as part 
 FROM {schema_name}.{table_name} 
-WHERE 1=1 {filter_expression} 
+WHERE 1=1 {filter_expression} {time_between}
 limit 100000;

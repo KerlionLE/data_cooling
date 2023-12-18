@@ -7,6 +7,7 @@ from croniter import croniter
 from .config_manager import AVAILABLE_FORMAT_MANAGER
 from .connect_manager import AVAILABLE_DB_CONNECTIONS, DBConnection
 from .utils import get_formated_file
+from .checkconf import chconf
 
 # ------------------------------------------------------------------------------------------------------------------
 
@@ -58,8 +59,8 @@ def filter_objects(config: dict, system_tz: str) -> list:
     filtered_objects = []
     for conf in config:
 
-        last_date_cooling = conf['last_date_cooling']
-        update_freq = conf['data_cooling_frequency']
+        last_date_cooling = conf.get('last_date_cooling')
+        update_freq = conf.get('data_cooling_frequency')
 
         if update_freq is None:
             logging.error(
@@ -103,7 +104,7 @@ def get_max_load_ts(config: list,
     filtered_objects_with_maxdate = []
 
     for conf in config:
-        col_name = conf.get('tech_ts_column_name') or 'tech_load_ts'
+        col_name = conf.get('tech_ts_column_name')
         sql_select = get_formated_file(
             sql_scripts_path_select,
             column_name=col_name,
@@ -122,14 +123,9 @@ def get_max_load_ts(config: list,
             conf['actual_max_tech_load_ts'] = max_date[0][0].strftime('%Y-%m-%d %H:%M:%S')
             filtered_objects_with_maxdate.append(conf)
 
-        elif max_date[0][0] is None: 
-            logging.warning(
-                f'''У пользователя нет доступа к таблице - {conf['schema_name']}.{conf['table_name']} ''',
-            )
-
         else:
             logging.warning(
-                f'''Таблица {conf['schema_name']}.{conf['table_name']} пустая ''',
+                f'''Таблица {conf['schema_name']}.{conf['table_name']} пустая или нет доступа''',
             )
     return filtered_objects_with_maxdate
 
@@ -137,38 +133,73 @@ def get_max_load_ts(config: list,
 
 def gen_dml(config: list,
              copy_to_vertica: str,
-             create_external_table_hdfs: str,
              delete_without_partitions: str,
              delete_with_partitions: str,
              export_with_partitions: str,
              export_without_partitions: str) -> list:
+    
+    config_with_dml = []
 
     for conf in config:
 
-        date_start = conf['actual_max_tech_load_ts']
-        print(date_start)
-        date_end = (datetime.strptime(date_start, '%Y-%m-%d %H:%M:%S') + timedelta(days=conf['depth'])).strftime('%Y-%m-%d %H:%M:%S')
-        print(date_end)
+        date_end =  conf['actual_max_tech_load_ts']
+        date_start = conf.get('last_date_cooling') or '1999-10-11 15:14:15'
+        
+        date_delete = (datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S') - timedelta(days=conf['depth'])).strftime('%Y-%m-%d %H:%M:%S')
 
-        if conf['cooling_type'] == 'time_based':
+        if conf['cooling_type'] == 'time_based' or (conf['cooling_type'] == 'fullcopy' and date_start != '1999-10-11 15:14:15'):
             if not conf['partition_expressions']:
-                sql = get_formated_file(
+
+                sql_export_without = get_formated_file(
                     export_without_partitions,
                     schema_name=conf['schema_name'],
                     table_name=conf['table_name'],
                     filter_expression=conf['filter_expression'],
-                    current_date=conf['actual_max_tech_load_ts']
+                    time_between=f'''and {conf['tech_ts_column_name']} >= '{date_start}' and {conf['tech_ts_column_name']} >= '{date_end}'''
                 )
+                sql_delete_without = get_formated_file(
+                    delete_without_partitions,
+                    schema_name=conf['schema_name'],
+                    table_name=conf['table_name'],
+                    filter_expression=conf['filter_expression'],
+                    time_between=f'''and {conf['tech_ts_column_name']} >= '{date_delete}' and {conf['tech_ts_column_name']} >= '{date_end}'''
+                )
+                sql = f'{sql_export_without};\n{sql_delete_without};'
+
             else:
-                sql = get_formated_file(
+
+                sql_export_with = get_formated_file(
                     export_with_partitions,
                     schema_name=conf['schema_name'],
                     table_name=conf['table_name'],
                     filter_expression=conf['filter_expression'],
                     partition_expressions=conf['partition_expressions'],
-                    current_date=conf['actual_max_tech_load_ts']
+                    time_between=f'''and {conf['tech_ts_column_name']} >= '{date_start}' and {conf['tech_ts_column_name']} >= '{date_end}'''
                 )
-    return sql
+                sql_delete_with = get_formated_file(
+                    delete_with_partitions,
+                    schema_name=conf['schema_name'],
+                    table_name=conf['table_name'],
+                    filter_expression=conf['filter_expression'],
+                    time_between=f'''and {conf['tech_ts_column_name']} >= '{date_delete}' and {conf['tech_ts_column_name']} >= '{date_end}'''
+                )
+                sql = f'{sql_export_with};\n{sql_delete_with};'
+            
+        elif conf['cooling_type'] == 'fullcopy':
+
+            sql_export_without = get_formated_file(
+                    export_without_partitions,
+                    schema_name=conf['schema_name'],
+                    table_name=conf['table_name'],
+                    filter_expression='',
+                    time_between=''
+                )
+            sql = f'{sql_export_without};'
+
+        conf['dml_script'] = sql
+        config_with_dml.append(conf)
+
+        return sql
 
 
 # ------------------------------------------------------------------------------------------------------------------
@@ -214,15 +245,26 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     config = config_manager.get_config()
     logging.info(config)
 
-    'Step 3 - фильтруем по частоте'
+    'Step 3 - Проверка конфига'
+    chconf(conf)
+
+    'Step 4 - фильтруем по частоте'
     filter_object = filter_objects(config, system_tz)
     logging.info(filter_object)
 
-    'Step 4 - текущая макс дата в проде'
+    'Step 5 - вывод кол. таблиц в конфиге'
+    logging.info(
+                f'''Колличество таблиц которое будеи охлаждаться - {len(filter_object)} ''',
+            )
+
+    'Step 6 - текущая макс дата в проде'
     max_tech_load_ts = get_max_load_ts(filter_object, db_connection_src, get_max_tech_load_ts)
     logging.info(max_tech_load_ts)
 
-    'Step 5 - генераия dml скриптов'
+    'Step 7 - генераия dml скриптов'
     gen_dmls = gen_dml(config, copy_to_vertica, create_external_table_hdfs, delete_without_partitions, delete_with_partitions, export_with_partitions, export_without_partitions)
     logging.info(gen_dmls)
 
+
+# 3 - лог вретике начало/конец репликации, премя запуска/завершения/продолжительность - ошибка вертики
+# 4 - кол. строк
