@@ -188,7 +188,6 @@ def gen_dml(config: list,
                 sql = f'{sql_export_with};\n{sql_delete_with};'
             
         elif conf['cooling_type'] == 'fullcopy':
-
             sql_export_without = get_formated_file(
                     export_without_partitions,
                     schema_name=conf['schema_name'],
@@ -199,8 +198,8 @@ def gen_dml(config: list,
                 )
             sql = f'{sql_export_without};'
 
-            conf['dml_script'] = sql
-            conf_with_dml.append(conf)
+        conf['dml_script'] = sql
+        conf_with_dml.append(conf)
 
         return conf_with_dml
 
@@ -271,4 +270,3 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
 
 
 # 3 - лог вретике начало/конец репликации, премя запуска/завершения/продолжительность - ошибка вертики
-# 4 - кол. строк
