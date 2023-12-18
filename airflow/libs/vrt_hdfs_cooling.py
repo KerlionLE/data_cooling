@@ -137,6 +137,8 @@ def gen_dml(config: list,
              delete_with_partitions: str,
              export_with_partitions: str,
              export_without_partitions: str) -> list:
+    
+    conf_with_dml = []
 
     for conf in config:
 
@@ -198,8 +200,9 @@ def gen_dml(config: list,
             sql = f'{sql_export_without};'
 
             conf['dml_script'] = sql
+            conf_with_dml.append(conf)
 
-        return config
+        return conf_with_dml
 
 
 # ------------------------------------------------------------------------------------------------------------------

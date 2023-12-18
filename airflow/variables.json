@@ -51,7 +51,7 @@
               "depth": 123,
               "last_date_cooling": "2023-10-13 12:23:12",
               "data_cooling_frequency": "*/2 * * * *",
-              "tech_ts_column_name": "",
+              "tech_ts_column_name": "tech_load_ts",
               "filter_expression": "",
               "partition_expressions": "substr(entity_index, 1, 1)"
             }
