@@ -11,7 +11,7 @@ def chconf(conf:list) -> None:
     """
 
     # schema_name и table_name
-    if isinstance('schema_name', str) is False or isinstance('table_name', str) is False:
+    if isinstance(conf['schema_name'], str) is False or isinstance(conf['table_name'], str) is False:
         logging.error(
                 f'''Поля schema_name или table_name должны быть в формате строки''',
             )
@@ -28,7 +28,7 @@ def chconf(conf:list) -> None:
             )
 
     # replication_policy
-    if isinstance('replication_policy', int) is False:
+    if isinstance(conf['replication_policy'], int) is False:
         logging.error(
                 f'''Неправельно заполнено поле replication_policy - должн быть в формате числа''',
             )
@@ -39,7 +39,7 @@ def chconf(conf:list) -> None:
             )
 
     #depth
-    if isinstance('depth', int) is False:
+    if isinstance(conf['depth'], int) is False:
         logging.error(
                 f'''Неправельно заполнено поле depth - должн быть в формате числа''',
             )
@@ -58,13 +58,13 @@ def chconf(conf:list) -> None:
             )
 
     #data_cooling_frequency
-    if croniter.is_valid('0 0 1 * *') is False:
+    if croniter.is_valid(conf['data_cooling_frequency']) is False:
         logging.error(
                 f'''Неправельный формат кроны''',
             )
 
     #tech_ts_column_name
-    if isinstance('tech_ts_column_name', str) is False:
+    if isinstance(conf['tech_ts_column_name'], str) is False:
         logging.error(
                 f'''Поля tech_ts_column_name должно быть в формате строки''',
             )
