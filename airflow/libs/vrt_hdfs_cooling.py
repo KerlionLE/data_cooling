@@ -202,7 +202,7 @@ def gen_dml(config: list,
         conf['dml_script'] = sql
         config_with_dml.append(conf)
 
-        return sql
+        return config_with_dml
 
 
 # ------------------------------------------------------------------------------------------------------------------
