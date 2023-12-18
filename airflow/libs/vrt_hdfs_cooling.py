@@ -155,7 +155,8 @@ def gen_dml(config: list,
                     schema_name=conf['schema_name'],
                     table_name=conf['table_name'],
                     filter_expression=conf['filter_expression'],
-                    time_between=f'''and {conf['tech_ts_column_name']} >= '{date_start}' and {conf['tech_ts_column_name']} >= '{date_end}'''
+                    time_between=f'''and {conf['tech_ts_column_name']} >= '{date_start}' and {conf['tech_ts_column_name']} >= '{date_end}''',
+                    current_date=conf['tech_ts_column_name']
                 )
                 sql_delete_without = get_formated_file(
                     delete_without_partitions,
@@ -174,7 +175,8 @@ def gen_dml(config: list,
                     table_name=conf['table_name'],
                     filter_expression=conf['filter_expression'],
                     partition_expressions=conf['partition_expressions'],
-                    time_between=f'''and {conf['tech_ts_column_name']} >= '{date_start}' and {conf['tech_ts_column_name']} >= '{date_end}'''
+                    time_between=f'''and {conf['tech_ts_column_name']} >= '{date_start}' and {conf['tech_ts_column_name']} >= '{date_end}''',
+                    current_date=conf['tech_ts_column_name']
                 )
                 sql_delete_with = get_formated_file(
                     delete_with_partitions,
@@ -192,7 +194,8 @@ def gen_dml(config: list,
                     schema_name=conf['schema_name'],
                     table_name=conf['table_name'],
                     filter_expression='',
-                    time_between=''
+                    time_between='',
+                    current_date=conf['tech_ts_column_name']
                 )
             sql = f'{sql_export_without};'
 
