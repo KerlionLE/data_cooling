@@ -11,7 +11,7 @@ def chconf(conf:list) -> None:
     """
 
     # schema_name и table_name
-    if conf['schema_name'] is not str or conf['table_name'] is not str:
+    if isinstance('schema_name', str) or isinstance('table_name', str):
         logging.error(
                 f'''Поля schema_name или table_name должны быть в формате строки''',
             )
@@ -22,13 +22,13 @@ def chconf(conf:list) -> None:
             )
 
     # cooling_type
-    if conf['cooling_type'] != 'time_based' or conf['cooling_type'] != 'fullcopy':
+    if conf['cooling_type'] is 'time_based' or conf['cooling_type'] is 'fullcopy':
         logging.error(
                 f'''Неправельно заполнено поле cooling_type - существует 2 типа - time_based, fullcopy''',
             )
 
     # replication_policy
-    if conf['replication_policy'] is not int:
+    if isinstance('replication_policy', int):
         logging.error(
                 f'''Неправельно заполнено поле replication_policy - должн быть в формате числа''',
             )
@@ -39,7 +39,7 @@ def chconf(conf:list) -> None:
             )
 
     #depth
-    if conf['depth'] is not int:
+    if isinstance('depth', int):
         logging.error(
                 f'''Неправельно заполнено поле depth - должн быть в формате числа''',
             )

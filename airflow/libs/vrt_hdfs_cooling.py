@@ -244,7 +244,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     config_manager = get_config_manager(source_type, source_config)
     config = config_manager.get_config()
     logging.info(config)
-    
+
     'Step 3 - Проверка конфига'
     for conf in config:
         chconf(conf)
@@ -263,7 +263,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(max_tech_load_ts)
 
     'Step 7 - генераия dml скриптов'
-    gen_dmls = gen_dml(config, copy_to_vertica, create_external_table_hdfs, delete_without_partitions, delete_with_partitions, export_with_partitions, export_without_partitions)
+    gen_dmls = gen_dml(config, copy_to_vertica, delete_without_partitions, delete_with_partitions, export_with_partitions, export_without_partitions)
     logging.info(gen_dmls)
 
 
