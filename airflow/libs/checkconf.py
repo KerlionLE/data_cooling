@@ -15,46 +15,46 @@ def chconf(conf:list) -> None:
         logging.error(
                 f'''Поля schema_name или table_name должны быть в формате строки''',
             )
-        return True 
+        return False 
 
     elif not conf['schema_name'] or not conf['table_name']:
         logging.error(
                 f'''Поля schema_name или table_name пустые''',
             )
-        return True
+        return False
 
     # cooling_type
     if conf['cooling_type'] is 'time_based' or conf['cooling_type'] is 'fullcopy':
         logging.error(
                 f'''Неправельно заполнено поле cooling_type - существует 2 типа - time_based, fullcopy''',
             )
-        return True
+        return False
 
     # replication_policy
     if isinstance(conf['replication_policy'], int) is False:
         logging.error(
                 f'''Неправельно заполнено поле replication_policy - должн быть в формате числа''',
             )
-        return True
+        return False
 
     elif not conf['replication_policy']:
         logging.error(
                 f'''Неправельно заполнено поле replication_policy - не может быть пустым''',
             )
-        return True
+        return False
 
     #depth
     if isinstance(conf['depth'], int) is False:
         logging.error(
                 f'''Неправельно заполнено поле depth - должн быть в формате числа''',
             )
-        return True
+        return False
  
     elif not conf['depth']:
         logging.error(
                 f'''Неправельно заполнено поле depth - не может быть пустым''',
             )
-        return True
+        return False
 
     #last_date_cooling
     try:
@@ -63,21 +63,22 @@ def chconf(conf:list) -> None:
         logging.error(
                 f'''Неправельный формат времени''',
             )
-        return True
+        return False
 
     #data_cooling_frequency
     if croniter.is_valid(conf['data_cooling_frequency']) is False:
         logging.error(
                 f'''Неправельный формат кроны''',
             )
-        return True
+        return False
 
     #tech_ts_column_name
     if isinstance(conf['tech_ts_column_name'], str) is False:
         logging.error(
                 f'''Поля tech_ts_column_name должно быть в формате строки''',
             )
-        return True
-    return False
+        return False
+    
+    return True
 
     

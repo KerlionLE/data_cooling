@@ -232,13 +232,17 @@ def run_dml(config: list, db_connection_config_src: DBConnection, conf_krb_info:
     """
 
     for conf in config:
-        date_start = datetime.now()
-        db_connection_config_src.apply_script_hdfs(conf['dml_script'], conf_krb_info)
-        date_end = datetime.now()
-        logging.info(
-                f'''Продолжительность выполнения - {date_end - date_start} ''',
-            )
-
+        try:
+            date_start = datetime.now()
+            db_connection_config_src.apply_script_hdfs(conf['dml_script'], conf_krb_info)
+            date_end = datetime.now()
+            logging.info(
+                    f'''Продолжительность выполнения - {date_end - date_start} ''',
+                )
+        except:
+            logging.error(
+                    f'''Таблица - {conf['schema_name']}.{conf['table_name']} - не будет реплицироваться''',
+                )
 # ------------------------------------------------------------------------------------------------------------------
 
 def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBConnection) -> None:
