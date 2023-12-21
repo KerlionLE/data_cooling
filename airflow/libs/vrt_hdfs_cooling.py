@@ -155,7 +155,6 @@ def gen_dml(config: list,
 
         date_end =  conf['actual_max_tech_load_ts']
         date_start = conf.get('last_date_cooling') or '1999-10-11 15:14:15'
-
         date_delete = (datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S') - timedelta(days=conf['depth'])).strftime('%Y-%m-%d %H:%M:%S')
 
         if conf['cooling_type'] == 'time_based' or (conf['cooling_type'] == 'fullcopy' and date_start != '1999-10-11 15:14:15'):
