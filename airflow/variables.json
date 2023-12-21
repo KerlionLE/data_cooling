@@ -52,8 +52,7 @@
               "last_date_cooling": "2023-10-13 12:23:12",
               "data_cooling_frequency": "*/2 * * * *",
               "tech_ts_column_name": "tech_load_ts",
-              "filter_expression": "",
-              "partition_expressions": "substr(entity_index, 1, 1)"
+              "filter_expression": ""
             }
           ]
         },
@@ -67,10 +66,7 @@
         "auxiliary_sql_paths": {
           "sql_export_without_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/export_without_partitions.sql",
           "sql_export_with_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/export_with_partitions.sql",
-          "sql_create_external_table_hdfs": "$AIRFLOW_HOME/libs/data_cooling/sqls/create_external_table_hdfs.sql",
           "sql_copy_to_vertica": "$AIRFLOW_HOME/libs/data_cooling/sqls/copy_to_vertica.sql",
-          "sql_get_last_date_cooling": "$AIRFLOW_HOME/libs/data_cooling/sqls/get_last_date_cooling.sql",
-          "sql_put_last_date_cooling": "$AIRFLOW_HOME/libs/data_cooling/sqls/put_last_date_cooling.sql",
           "sql_delete_without_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/delete_from_vertica_without_partitions.sql",
           "sql_delete_with_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/delete_from_vertica_with_partitions.sql",
           "sql_get_max_tech_load_ts": "$AIRFLOW_HOME/libs/data_cooling/sqls/get_max_tech_load_ts.sql"

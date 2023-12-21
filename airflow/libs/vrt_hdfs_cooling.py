@@ -167,7 +167,7 @@ def gen_dml(config: list,
                     table_name=conf['table_name'],
                     filter_expression=conf['filter_expression'],
                     time_between=f'''and {conf['tech_ts_column_name']} >= '{date_start}' and {conf['tech_ts_column_name']} >= '{date_end}''',
-                    current_date=conf['tech_ts_column_name']
+                    current_date='1'
                 )
                 sql_delete_without = get_formated_file(
                     delete_without_partitions,
@@ -187,7 +187,7 @@ def gen_dml(config: list,
                     filter_expression=conf['filter_expression'],
                     partition_expressions=conf['partition_expressions'],
                     time_between=f'''and {conf['tech_ts_column_name']} >= '{date_start}' and {conf['tech_ts_column_name']} >= '{date_end}''',
-                    current_date=conf['tech_ts_column_name']
+                    current_date='2'
                 )
                 sql_delete_with = get_formated_file(
                     delete_with_partitions,
@@ -196,7 +196,7 @@ def gen_dml(config: list,
                     filter_expression=conf['filter_expression'],
                     time_between=f'''and {conf['tech_ts_column_name']} >= '{date_delete}' and {conf['tech_ts_column_name']} >= '{date_end}'''
                 )
-                sql = f'{sql_export_with}\n{sql_delete_with}'
+                sql = f'{sql_export_with}'#\n{sql_delete_with}'
             
         elif conf['cooling_type'] == 'fullcopy':
             sql_export_without = get_formated_file(
@@ -214,7 +214,7 @@ def gen_dml(config: list,
                     filter_expression='',
                     time_between=''
                 )
-            sql = f'{sql_export_without}\n{sql_delete_without}'
+            sql = f'{sql_export_without}'#\n{sql_delete_without}'
 
         conf['dml_script'] = sql
         conf_with_dml.append(conf)
@@ -232,7 +232,12 @@ def run_dml(config: list, db_connection_config_src: DBConnection, conf_krb_info:
     """
 
     for conf in config:
-        print(conf)
+        date_start = datetime.now()
+        db_connection_config_src.apply_script_hdfs(conf['dml_script'], conf_krb_info)
+        date_end = datetime.now()
+        logging.info(
+                f'''Продолжительность выполнения - {date_end - date_start} ''',
+            )
 
 # ------------------------------------------------------------------------------------------------------------------
 
@@ -280,11 +285,15 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(config)
 
     'Step 3 - Проверка конфига'
+    config_check = []
     for conf in config:
-        chconf(conf)
+        a = chconf(conf)
+        if a != 1: 
+            config_check.append(conf)
+    logging.info(config_check)
 
     'Step 4 - фильтруем по частоте'
-    filter_object = filter_objects(config, system_tz)
+    filter_object = filter_objects(config_check, system_tz)
     logging.info(filter_object)
 
     'Step 5 - вывод кол. таблиц в конфиге'
@@ -297,11 +306,11 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(max_tech_load_ts)
 
     'Step 7 - генераия dml скриптов'
-    gen_dmls = gen_dml(config, copy_to_vertica, delete_without_partitions, delete_with_partitions, export_with_partitions, export_without_partitions)
+    gen_dmls = gen_dml(max_tech_load_ts, copy_to_vertica, delete_without_partitions, delete_with_partitions, export_with_partitions, export_without_partitions)
     logging.info(gen_dmls)
 
     'Step 8 - запусе dml скриптов'
-    run_dml(config, db_connection_config_src, conf_krb_info)
+    run_dml(gen_dmls, db_connection_config_src, conf_krb_info)
 
 
-# 3 - лог вретике начало/конец репликации, премя запуска/завершения/продолжительность - ошибка вертики
+# 4 - параметры зауска скрипта 
