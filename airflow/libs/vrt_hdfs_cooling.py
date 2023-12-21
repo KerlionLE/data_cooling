@@ -254,7 +254,6 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     """
 
     copy_to_vertica = conf['auxiliary_sql_paths']['sql_copy_to_vertica']
-    create_external_table_hdfs = conf['auxiliary_sql_paths']['sql_create_external_table_hdfs']
     delete_without_partitions = conf['auxiliary_sql_paths']['sql_delete_without_partitions']
     delete_with_partitions = conf['auxiliary_sql_paths']['sql_delete_with_partitions']
     export_with_partitions = conf['auxiliary_sql_paths']['sql_export_with_partitions']
@@ -312,4 +311,4 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     run_dml(gen_dmls, db_connection_config_src, conf_krb_info)
 
 
-# 4 - параметры зауска скрипта 
+# параметры зауска скрипта 
