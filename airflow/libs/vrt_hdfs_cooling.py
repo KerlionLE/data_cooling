@@ -220,7 +220,7 @@ def gen_dml(config: list,
 
     return conf_with_dml
 
-def run_dml(config: list, db_connection_config_src: DBConnection, conf_krb_info: list):
+def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list):
     """
     Запуск DML скриптов
     :param config: конфиг
@@ -233,7 +233,7 @@ def run_dml(config: list, db_connection_config_src: DBConnection, conf_krb_info:
     for conf in config:
         try:
             date_start = datetime.now()
-            db_connection_config_src.apply_script_hdfs(conf['dml_script'], conf_krb_info)
+            db_connection_src.apply_script_hdfs(conf['dml_script'], conf_krb_info)
             date_end = datetime.now()
             logging.info(
                     f'''Продолжительность выполнения - {date_end - date_start} ''',
@@ -311,7 +311,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(gen_dmls)
 
     'Step 8 - запусе dml скриптов'
-    run_dml(gen_dmls, db_connection_config_src, conf_krb_info)
+    run_dml(gen_dmls, db_connection_src, conf_krb_info)
 
 
 # параметры зауска скрипта 
