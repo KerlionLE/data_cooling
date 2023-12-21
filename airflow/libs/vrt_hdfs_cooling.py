@@ -287,8 +287,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     'Step 3 - Проверка конфига'
     config_check = []
     for conf in config:
-        a = chconf(conf)
-        if a != 1: 
+        if chconf(conf):
             config_check.append(conf)
     logging.info(config_check)
 
