@@ -165,7 +165,7 @@ def gen_dml(config: list,
                     schema_name=conf['schema_name'],
                     table_name=conf['table_name'],
                     filter_expression=conf['filter_expression'],
-                    time_between=f'''and {conf['tech_ts_column_name']} >= '{date_start}' and {conf['tech_ts_column_name']} >= '{date_end}''',
+                    time_between=f'''and {conf['tech_ts_column_name']} > '{date_start}' and {conf['tech_ts_column_name']} <= '{date_end}' ''',
                     current_date='1'
                 )
                 sql_delete_without = get_formated_file(
@@ -173,9 +173,9 @@ def gen_dml(config: list,
                     schema_name=conf['schema_name'],
                     table_name=conf['table_name'],
                     filter_expression=conf['filter_expression'],
-                    time_between=f'''and {conf['tech_ts_column_name']} >= '{date_delete}' and {conf['tech_ts_column_name']} >= '{date_end}'''
+                    time_between=f'''and {conf['tech_ts_column_name']} >= '{date_delete}' and {conf['tech_ts_column_name']} <= '{date_end}' '''
                 )
-                sql = f'{sql_export_without}\n{sql_delete_without}'
+                sql = f'{sql_export_without}' #\n{sql_delete_without}'
 
             else:
 
@@ -185,7 +185,7 @@ def gen_dml(config: list,
                     table_name=conf['table_name'],
                     filter_expression=conf['filter_expression'],
                     partition_expressions=conf['partition_expressions'],
-                    time_between=f'''and {conf['tech_ts_column_name']} >= '{date_start}' and {conf['tech_ts_column_name']} >= '{date_end}''',
+                    time_between=f'''and {conf['tech_ts_column_name']} > '{date_start}' and {conf['tech_ts_column_name']} <= '{date_end}' ''',
                     current_date='2'
                 )
                 sql_delete_with = get_formated_file(
@@ -193,7 +193,7 @@ def gen_dml(config: list,
                     schema_name=conf['schema_name'],
                     table_name=conf['table_name'],
                     filter_expression=conf['filter_expression'],
-                    time_between=f'''and {conf['tech_ts_column_name']} >= '{date_delete}' and {conf['tech_ts_column_name']} >= '{date_end}'''
+                    time_between=f'''and {conf['tech_ts_column_name']} > '{date_delete}' and {conf['tech_ts_column_name']} <= '{date_end}' '''
                 )
                 sql = f'{sql_export_with}'#\n{sql_delete_with}'
             
