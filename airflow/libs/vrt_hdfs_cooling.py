@@ -238,9 +238,9 @@ def run_dml(config: list, db_connection_config_src: DBConnection, conf_krb_info:
             logging.info(
                     f'''Продолжительность выполнения - {date_end - date_start} ''',
                 )
-        except:
+        except Exception as e:
             logging.error(
-                    f'''Таблица - {conf['schema_name']}.{conf['table_name']} - не будет реплицироваться''',
+                    f'''Таблица - {conf['schema_name']}.{conf['table_name']} - не будет реплицироваться, ошибка - {e}''',
                 )
 # ------------------------------------------------------------------------------------------------------------------
 
