@@ -71,7 +71,13 @@ def chconf(conf:list) -> None:
                 f'''Неправельный формат кроны''',
             )
         return False
-
+    
+    elif conf['data_cooling_frequency'] is None:
+        logging.error(
+                f''' Репликация таблицы - {conf['schema_name']}.{conf['table_name']}, не будет выполнена, так как в config нет указание шедулера ''',
+            )
+        return False
+    
     #tech_ts_column_name
     if isinstance(conf['tech_ts_column_name'], str) is False:
         logging.error(

@@ -62,12 +62,6 @@ def filter_objects(config: dict, system_tz: str) -> list:
         last_date_cooling = conf.get('last_date_cooling')
         update_freq = conf.get('data_cooling_frequency')
 
-        if update_freq is None:
-            logging.error(
-                f''' Репликация таблицы - {conf['schema_name']}.{conf['table_name']}, не будет выполнена, так как в config нет указание шедулера ''',
-            )
-            continue
-
         if not last_date_cooling:
             conf['is_new'] = True
             conf['last_tech_load_ts'] = None
@@ -298,9 +292,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(filter_object)
 
     'Step 5 - вывод кол. таблиц в конфиге'
-    logging.info(
-                f'''Колличество таблиц которое будеи охлаждаться - {len(filter_object)} ''',
-            )
+    logging.info(f'''Колличество таблиц которое будеи охлаждаться - {len(filter_object)} ''')
 
     'Step 6 - текущая макс дата в проде'
     max_tech_load_ts = get_max_load_ts(filter_object, db_connection_src, get_max_tech_load_ts)
@@ -312,6 +304,3 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
 
     'Step 8 - запусе dml скриптов'
     run_dml(gen_dmls, db_connection_src, conf_krb_info)
-
-
-# параметры зауска скрипта 
