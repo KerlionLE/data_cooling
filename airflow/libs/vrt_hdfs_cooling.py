@@ -142,7 +142,7 @@ def gen_dml(config: list,
                     filter_expression=conf['filter_expression'],
                     partition_expressions=conf['partition_expressions'],
                     time_between=f'''and {conf['tech_ts_column_name']} > '{date_start}' and {conf['tech_ts_column_name']} <= '{date_end}' ''',
-                    current_date='2'
+                    current_date='2023-10-19'
                 )
                 sql_delete_with = get_formated_file(
                     delete_with_partitions,
