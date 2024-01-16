@@ -226,6 +226,14 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
 
     conf_krb_info = conf['target_system']['system_config']['connection_config']['connection_conf']
 
+    db_connection_config_src = {
+            'host': 's001cd-db-vr01.dev002.local',
+            'port': '5433',
+            'database': 'devdb',
+            'user': 'romanovskiimv',
+            'password': 'Max110299110299',
+        }
+    
     logging.info(db_connection_config_src)
 
     'Step 1 - создание conn'
