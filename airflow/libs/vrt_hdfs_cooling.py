@@ -93,7 +93,7 @@ def get_max_load_ts(config: list,
         )
         try:
             with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
-                with vertica_python.connect(db_connection_config_src) as conn:
+                with vertica_python.connect(**db_connection_config_src) as conn:
                     result = []
                     with conn.cursor() as cur:
 
