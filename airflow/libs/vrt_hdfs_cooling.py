@@ -94,18 +94,12 @@ def get_max_load_ts(config: list,
         try:
             with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
                 with vertica_python.connect(**db_connection_config_src) as conn:
-                    result = []
                     with conn.cursor() as cur:
-
-                        cur.execute(sql_select)
-                        result.append(cur.fetchall())
-                        while cur.nextset():
-                            result.append(cur.fetchall())
-
-                    if not conn.autocommit:
-                        conn.commit()
-
+                        with conn.cursor() as cur:
+                            cur.execute(sql_select)
+                            result = cur.fetchone()
                     return result
+
                 #max_date = db_connection_src.apply_script_hdfs(sql_select, conf_krb_info)
         except Exception as e:
             logging.error(
