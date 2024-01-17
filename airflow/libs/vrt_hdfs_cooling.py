@@ -240,7 +240,6 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
             'port': '5433',
             'database': 'devdb',
             'user': 'a001cd-etl-vrt-hdp',
-            "autocommit":True,
         }
     
     logging.info(db_connection_config_src)
