@@ -232,7 +232,6 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
             'port': '5433',
             'database': 'devdb',
             'user': 'romanovskiimv',
-            'password': 'Max110299110299',
         }
     
     db_connection_config_src = {
