@@ -48,7 +48,8 @@ def filter_objects(config: dict, system_tz: str) -> list:
 
 def get_max_load_ts(config: list,
                          db_connection_src: DBConnection,
-                         sql_scripts_path_select: str) -> list:
+                         sql_scripts_path_select: str,
+                         conf_krb_info: list) -> list:
     """
     Select из основных таблиц выборки. Забираем max(tech_load_ts)
     :param filtered_objects: лист - отфильтрованный конфиг с учётом частоты
@@ -68,7 +69,7 @@ def get_max_load_ts(config: list,
             table_name=conf['table_name'],
         )
         try:
-            max_date = db_connection_src.apply_script_vrt(sql_select)[0]
+            max_date = db_connection_src.apply_script_hdfs(sql_select, conf_krb_info)
         except Exception as e:
             logging.error(
                 f'''Таблица {conf['schema_name']}.{conf['table_name']} не существует или столца tech_ts нет - {e}''',
@@ -267,7 +268,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(f'''Колличество таблиц которое будеи охлаждаться - {len(filter_object)} ''')
 
     'Step 6 - текущая макс дата в проде'
-    max_tech_load_ts = get_max_load_ts(filter_object, db_connection_src, get_max_tech_load_ts)
+    max_tech_load_ts = get_max_load_ts(filter_object, db_connection_src, get_max_tech_load_ts, conf_krb_info)
     logging.info(max_tech_load_ts)
 
     'Step 7 - генераия dml скриптов'
