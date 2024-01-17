@@ -47,6 +47,7 @@ class VerticaConnection(DBConnection):
         """
 
         with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
+            print('Привет')
             with vertica_python.connect(**self.__conn_info) as conn:
                 result = []
                 with conn.cursor() as cur:
