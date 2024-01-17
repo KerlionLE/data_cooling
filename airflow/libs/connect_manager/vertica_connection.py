@@ -1,7 +1,7 @@
 import vertica_python
 from  ..utils import Kerberos
 
-from .db_connection import DBConnection
+from db_connection import DBConnection
 
 
 class VerticaConnection(DBConnection):
