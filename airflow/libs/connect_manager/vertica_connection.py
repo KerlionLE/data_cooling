@@ -1,5 +1,5 @@
 import vertica_python
-from krbticket import KrbCommand, KrbConfig
+from  ..utils import Kerberos
 
 from .db_connection import DBConnection
 
@@ -45,25 +45,6 @@ class VerticaConnection(DBConnection):
         :param conf_krb_info: конфиг подключения к через кебрерос
 
         """
-        class Kerberos:
-            def __init__(self, principal, keytab, **kwargs):
-                self.principal = principal
-                self.keytab = keytab
-
-            def kinit(self):
-                kconfig = KrbConfig(principal=self.principal, keytab=self.keytab)
-                KrbCommand.kinit(kconfig)
-
-            def destroy(self):
-                kconfig = KrbConfig(principal=self.principal, keytab=self.keytab)
-                KrbCommand.kdestroy(kconfig)
-
-            def __enter__(self):
-                self.kinit()
-                return self
-
-            def __exit__(self, exc_type, exc_val, exc_tb):
-                self.destroy()
 
         with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
             with vertica_python.connect(**self.__conn_info) as conn:

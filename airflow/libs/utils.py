@@ -1,6 +1,8 @@
 import os
 import json
 
+from krbticket import KrbCommand, KrbConfig
+
 from .config_manager import AVAILABLE_FORMAT_MANAGER
 from .connect_manager import AVAILABLE_DB_CONNECTIONS, DBConnection
 
@@ -62,3 +64,23 @@ def get_connect_manager(con_type: str,
             f'''UNKNOWN DB_TYPE: {con_type}. AVAILABLE TYPES: {','.join([c_name for c_name in AVAILABLE_DB_CONNECTIONS])}''',
         )
     return db_connection_cls(**con_config)
+
+class Kerberos:
+    def __init__(self, principal, keytab, **kwargs):
+        self.principal = principal
+        self.keytab = keytab
+
+    def kinit(self):
+        kconfig = KrbConfig(principal=self.principal, keytab=self.keytab)
+        KrbCommand.kinit(kconfig)
+
+    def destroy(self):
+        kconfig = KrbConfig(principal=self.principal, keytab=self.keytab)
+        KrbCommand.kdestroy(kconfig)
+
+    def __enter__(self):
+        self.kinit()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.destroy()
