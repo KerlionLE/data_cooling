@@ -3,8 +3,8 @@ import json
 
 from krbticket import KrbCommand, KrbConfig
 
-from config_manager import AVAILABLE_FORMAT_MANAGER
-from connect_manager import AVAILABLE_DB_CONNECTIONS, DBConnection
+from .config_manager import AVAILABLE_FORMAT_MANAGER
+from .connect_manager import AVAILABLE_DB_CONNECTIONS, DBConnection
 
 def get_formated_file(path: str, **params) -> str:
     """
