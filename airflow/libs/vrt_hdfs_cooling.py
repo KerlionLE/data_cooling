@@ -239,7 +239,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
             'host': 's001cd-db-vr01.dev002.local',
             'port': '5433',
             'database': 'devdb',
-            'user': 'a001cd-etl-vrt-hdp',
+            'user': 'a001cd-etl-hdp-vrt',
             "autocommit":True,
         }
     
