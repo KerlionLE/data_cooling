@@ -1,12 +1,34 @@
 import logging
 import pytz
+import vertica_python
 
+from krbticket import KrbCommand, KrbConfig
 from datetime import datetime, timedelta
 from croniter import croniter
 
 from .connect_manager import DBConnection
 from .utils import get_formated_file, get_connect_manager, get_config_manager
 from .checkconf import chconf
+
+class Kerberos:
+            def __init__(self, principal, keytab, **kwargs):
+                self.principal = principal
+                self.keytab = keytab
+
+            def kinit(self):
+                kconfig = KrbConfig(principal=self.principal, keytab=self.keytab)
+                KrbCommand.kinit(kconfig)
+
+            def destroy(self):
+                kconfig = KrbConfig(principal=self.principal, keytab=self.keytab)
+                KrbCommand.kdestroy(kconfig)
+
+            def __enter__(self):
+                self.kinit()
+                return self
+
+            def __exit__(self, exc_type, exc_val, exc_tb):
+                self.destroy()
 
 # ------------------------------------------------------------------------------------------------------------------
 
@@ -49,7 +71,8 @@ def filter_objects(config: dict, system_tz: str) -> list:
 def get_max_load_ts(config: list,
                          db_connection_src: DBConnection,
                          sql_scripts_path_select: str,
-                         conf_krb_info: list) -> list:
+                         conf_krb_info: list,
+                         db_connection_config_src) -> list:
     """
     Select из основных таблиц выборки. Забираем max(tech_load_ts)
     :param filtered_objects: лист - отфильтрованный конфиг с учётом частоты
@@ -69,21 +92,35 @@ def get_max_load_ts(config: list,
             table_name=conf['table_name'],
         )
         try:
-            max_date = db_connection_src.apply_script_hdfs(sql_select, conf_krb_info)
+            with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
+                with vertica_python.connect(db_connection_config_src) as conn:
+                    result = []
+                    with conn.cursor() as cur:
+
+                        cur.execute(sql_select)
+                        result.append(cur.fetchall())
+                        while cur.nextset():
+                            result.append(cur.fetchall())
+
+                    if not conn.autocommit:
+                        conn.commit()
+
+                    return result
+                #max_date = db_connection_src.apply_script_hdfs(sql_select, conf_krb_info)
         except Exception as e:
             logging.error(
                 f'''Таблица {conf['schema_name']}.{conf['table_name']} не существует или столца tech_ts нет - {e}''',
             )
             continue
 
-        if max_date and max_date[0][0] is not None:
-            conf['actual_max_tech_load_ts'] = max_date[0][0].strftime('%Y-%m-%d %H:%M:%S')
-            filtered_objects_with_maxdate.append(conf)
+        #if max_date and max_date[0][0] is not None:
+        #    conf['actual_max_tech_load_ts'] = max_date[0][0].strftime('%Y-%m-%d %H:%M:%S')
+        #    filtered_objects_with_maxdate.append(conf)
 
-        else:
-            logging.warning(
-                f'''Таблица {conf['schema_name']}.{conf['table_name']} пустая или нет доступа''',
-            )
+        #else:
+        #    logging.warning(
+        #        f'''Таблица {conf['schema_name']}.{conf['table_name']} пустая или нет доступа''',
+        #    )
     return filtered_objects_with_maxdate
 
 # ------------------------------------------------------------------------------------------------------------------
@@ -240,6 +277,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
             'port': '5433',
             'database': 'devdb',
             'user': 'a001cd-etl-vrt-hdp',
+            "autocommit":True,
         }
     
     logging.info(db_connection_config_src)
@@ -267,7 +305,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(f'''Колличество таблиц которое будеи охлаждаться - {len(filter_object)} ''')
 
     'Step 6 - текущая макс дата в проде'
-    max_tech_load_ts = get_max_load_ts(filter_object, db_connection_src, get_max_tech_load_ts, conf_krb_info)
+    max_tech_load_ts = get_max_load_ts(filter_object, db_connection_src, get_max_tech_load_ts, conf_krb_info, db_connection_config_src)
     logging.info(max_tech_load_ts)
 
     'Step 7 - генераия dml скриптов'
