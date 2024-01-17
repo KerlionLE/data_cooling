@@ -268,7 +268,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(f'''Колличество таблиц которое будеи охлаждаться - {len(filter_object)} ''')
 
     'Step 6 - текущая макс дата в проде'
-    max_tech_load_ts = get_max_load_ts(filter_object, db_connection_src, get_max_tech_load_ts)
+    max_tech_load_ts = get_max_load_ts(filter_object, db_connection_src, get_max_tech_load_ts, conf_krb_info)
     logging.info(max_tech_load_ts)
 
     'Step 7 - генераия dml скриптов'
