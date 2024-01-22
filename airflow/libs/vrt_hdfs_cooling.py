@@ -10,6 +10,7 @@ from .checkconf import chconf
 
 # ------------------------------------------------------------------------------------------------------------------
 
+
 def filter_objects(config: dict, system_tz: str) -> list:
     """
     Фильтрует словарь относительно частоты загрузки данных, сравнивая его с config timezone - airflow в utc, вертика в utc +3
@@ -31,9 +32,11 @@ def filter_objects(config: dict, system_tz: str) -> list:
             continue
 
         conf['is_new'] = False
-        last_tech_load_ts = datetime.strptime(last_date_cooling, '%Y-%m-%d %H:%M:%S')
+        last_tech_load_ts = datetime.strptime(
+            last_date_cooling, '%Y-%m-%d %H:%M:%S')
         now = datetime.now(pytz.timezone(system_tz)).replace(tzinfo=None)
-        update_freq = croniter(update_freq, last_tech_load_ts).get_next(datetime)
+        update_freq = croniter(
+            update_freq, last_tech_load_ts).get_next(datetime)
 
         if now >= update_freq:
             filtered_objects.append(conf)
@@ -46,10 +49,11 @@ def filter_objects(config: dict, system_tz: str) -> list:
 
 # ------------------------------------------------------------------------------------------------------------------
 
+
 def get_max_load_ts(config: list,
-                         db_connection_src: DBConnection,
-                         sql_scripts_path_select: str,
-                         conf_krb_info: list) -> list:
+                    db_connection_src: DBConnection,
+                    sql_scripts_path_select: str,
+                    conf_krb_info: list) -> list:
     """
     Select из основных таблиц выборки. Забираем max(tech_load_ts)
     :param filtered_objects: лист - отфильтрованный конфиг с учётом частоты
@@ -69,15 +73,17 @@ def get_max_load_ts(config: list,
             table_name=conf['table_name'],
         )
         try:
-            max_date = db_connection_src.apply_script_hdfs(sql_select, conf_krb_info)[0]
+            max_date = db_connection_src.apply_script_hdfs(
+                sql_select, conf_krb_info)[0]
         except Exception as e:
             logging.error(
-            f'''Таблица {conf['schema_name']}.{conf['table_name']} не существует или столца tech_ts нет - {e}''',
+                f'''Таблица {conf['schema_name']}.{conf['table_name']} не существует или столца tech_ts нет - {e}''',
             )
             continue
 
         if max_date and max_date[0][0] is not None:
-            conf['actual_max_tech_load_ts'] = max_date[0][0].strftime('%Y-%m-%d %H:%M:%S')
+            conf['actual_max_tech_load_ts'] = max_date[0][0].strftime(
+                '%Y-%m-%d %H:%M:%S')
             filtered_objects_with_maxdate.append(conf)
 
         else:
@@ -88,12 +94,13 @@ def get_max_load_ts(config: list,
 
 # ------------------------------------------------------------------------------------------------------------------
 
+
 def gen_dml(config: list,
-             copy_to_vertica: str,
-             delete_without_partitions: str,
-             delete_with_partitions: str,
-             export_with_partitions: str,
-             export_without_partitions: str) -> list:
+            copy_to_vertica: str,
+            delete_without_partitions: str,
+            delete_with_partitions: str,
+            export_with_partitions: str,
+            export_without_partitions: str) -> list:
     """
     Генерирует DML скрипт
     :param config: конфиг
@@ -105,14 +112,15 @@ def gen_dml(config: list,
 
     :return: возвращает конфиог с dml сриптом
     """
-    
+
     conf_with_dml = []
 
     for conf in config:
 
-        date_end =  conf['actual_max_tech_load_ts']
+        date_end = conf['actual_max_tech_load_ts']
         date_start = conf.get('last_date_cooling') or '1999-10-11 15:14:15'
-        date_delete = (datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S') - timedelta(days=conf['depth'])).strftime('%Y-%m-%d %H:%M:%S')
+        date_delete = (datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S') -
+                       timedelta(days=conf['depth'])).strftime('%Y-%m-%d %H:%M:%S')
 
         if conf['cooling_type'] == 'time_based' or (conf['cooling_type'] == 'fullcopy' and date_start != '1999-10-11 15:14:15'):
             if not conf['partition_expressions']:
@@ -131,7 +139,7 @@ def gen_dml(config: list,
                     filter_expression=conf['filter_expression'],
                     time_between=f'''and {conf['tech_ts_column_name']} >= '{date_delete}' and {conf['tech_ts_column_name']} <= '{date_end}' '''
                 )
-                sql = f'{sql_export_without}' #\n{sql_delete_without}'
+                sql = f'{sql_export_without}'  # \n{sql_delete_without}'
 
             else:
 
@@ -150,24 +158,24 @@ def gen_dml(config: list,
                     filter_expression=conf['filter_expression'],
                     time_between=f'''and {conf['tech_ts_column_name']} > '{date_delete}' and {conf['tech_ts_column_name']} <= '{date_end}' '''
                 )
-                sql = f'{sql_export_with}'#\n{sql_delete_with}'
-            
+                sql = f'{sql_export_with}'  # \n{sql_delete_with}'
+
         elif conf['cooling_type'] == 'fullcopy':
             sql_export_without = get_formated_file(
-                    export_without_partitions,
-                    schema_name=conf['schema_name'],
-                    table_name=conf['table_name'],
-                    filter_expression='',
-                    time_between='',
-                )
+                export_without_partitions,
+                schema_name=conf['schema_name'],
+                table_name=conf['table_name'],
+                filter_expression='',
+                time_between='',
+            )
             sql_delete_without = get_formated_file(
-                    delete_without_partitions,
-                    schema_name=conf['schema_name'],
-                    table_name=conf['table_name'],
-                    filter_expression='',
-                    time_between=''
-                )
-            sql = f'{sql_export_without}'#\n{sql_delete_without}'
+                delete_without_partitions,
+                schema_name=conf['schema_name'],
+                table_name=conf['table_name'],
+                filter_expression='',
+                time_between=''
+            )
+            sql = f'{sql_export_without}'  # \n{sql_delete_without}'
 
         conf['dml_script'] = sql
         conf_with_dml.append(conf)
@@ -175,6 +183,7 @@ def gen_dml(config: list,
     return conf_with_dml
 
 # ------------------------------------------------------------------------------------------------------------------
+
 
 def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list):
     """
@@ -189,18 +198,17 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list):
     for conf in config:
         try:
             date_start = datetime.now()
-            db_connection_src.apply_script_hdfs(conf['dml_script'], conf_krb_info)
+            db_connection_src.apply_script_hdfs(
+                conf['dml_script'], conf_krb_info)
             date_end = datetime.now()
             logging.info(
-                    f'''Продолжительность выполнения - {date_end - date_start} ''',
-                )
+                f'''Продолжительность выполнения - {date_end - date_start} ''',
+            )
         except Exception as e:
             logging.error(
-                    f'''Таблица - {conf['schema_name']}.{conf['table_name']} - не будет реплицироваться, ошибка - {e}''',
-                )
+                f'''Таблица - {conf['schema_name']}.{conf['table_name']} - не будет реплицироваться, ошибка - {e}''',
+            )
 # ------------------------------------------------------------------------------------------------------------------
-            
-
 
 
 # ------------------------------------------------------------------------------------------------------------------
@@ -230,26 +238,26 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     system_tz = conf['source_system']['system_config']['system_tz']
 
     conf_krb_info = conf['target_system']['system_config']['connection_config']['connection_conf']
-    
+
     db_connection_config_src = {
-            'host': 's001cd-db-vr01.dev002.local',
-            'port': '5433',
-            'database': 'devdb',
-            'user': 'a001cd-etl-vrt-hdp',
-            "autocommit":True,
-        }
-    
+        'host': 's001cd-db-vr01.dev002.local',
+        'port': '5433',
+        'database': 'devdb',
+        'user': 'a001cd-etl-vrt-hdp',
+        "autocommit": True,
+    }
+
     hdfs_connection_config = {
-    "HDFS_PATH" : "/data/vertica/ODS_LEAD_GEN",
-    "HDFS_URL" : "http://172.21.6.36:50070/webhdfs/v1",
-    "OPS" : "?op=GETFILESTATUS",
+        "HDFS_PATH": "/data/vertica/ODS_LEAD_GEN",
+        "HDFS_URL": "http://172.21.6.36:50070/webhdfs/v1",
+        "OPS": "?op=GETFILESTATUS",
     }
 
     'Step 0 - создание conn к hdfs'
     db_connection_src = get_connect_manager('hdfs', hdfs_connection_config)
     a = db_connection_src.apply_script_airflow_hdfs()
     print(a)
-    
+
     logging.info(db_connection_config_src)
 
     'Step 1 - создание conn к vertica'
@@ -272,14 +280,17 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(filter_object)
 
     'Step 5 - вывод кол. таблиц в конфиге'
-    logging.info(f'''Колличество таблиц которое будеи охлаждаться - {len(filter_object)} ''')
+    logging.info(
+        f'''Колличество таблиц которое будеи охлаждаться - {len(filter_object)} ''')
 
     'Step 6 - текущая макс дата в проде'
-    max_tech_load_ts = get_max_load_ts(filter_object, db_connection_src, get_max_tech_load_ts, conf_krb_info)
+    max_tech_load_ts = get_max_load_ts(
+        filter_object, db_connection_src, get_max_tech_load_ts, conf_krb_info)
     logging.info(max_tech_load_ts)
 
     'Step 7 - генераия dml скриптов'
-    gen_dmls = gen_dml(max_tech_load_ts, copy_to_vertica, delete_without_partitions, delete_with_partitions, export_with_partitions, export_without_partitions)
+    gen_dmls = gen_dml(max_tech_load_ts, copy_to_vertica, delete_without_partitions,
+                       delete_with_partitions, export_with_partitions, export_without_partitions)
     logging.info(gen_dmls)
 
     'Step 8 - запусе dml скриптов'
