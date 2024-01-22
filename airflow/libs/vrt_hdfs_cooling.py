@@ -68,13 +68,13 @@ def get_max_load_ts(config: list,
             schema_name=conf['schema_name'],
             table_name=conf['table_name'],
         )
-        # try:
-        max_date = db_connection_src.apply_script_hdfs(sql_select, conf_krb_info)[0]
-        # except Exception as e:
-        #     logging.error(
-        #         f'''Таблица {conf['schema_name']}.{conf['table_name']} не существует или столца tech_ts нет - {e}''',
-        #     )
-        #     continue
+        try:
+            max_date = db_connection_src.apply_script_hdfs(sql_select, conf_krb_info)[0]
+        except Exception as e:
+            logging.error(
+            f'''Таблица {conf['schema_name']}.{conf['table_name']} не существует или столца tech_ts нет - {e}''',
+            )
+            continue
 
         if max_date and max_date[0][0] is not None:
             conf['actual_max_tech_load_ts'] = max_date[0][0].strftime('%Y-%m-%d %H:%M:%S')
@@ -174,6 +174,8 @@ def gen_dml(config: list,
 
     return conf_with_dml
 
+# ------------------------------------------------------------------------------------------------------------------
+
 def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list):
     """
     Запуск DML скриптов
@@ -196,6 +198,11 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list):
             logging.error(
                     f'''Таблица - {conf['schema_name']}.{conf['table_name']} - не будет реплицироваться, ошибка - {e}''',
                 )
+# ------------------------------------------------------------------------------------------------------------------
+            
+
+
+
 # ------------------------------------------------------------------------------------------------------------------
 
 def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBConnection) -> None:
@@ -223,13 +230,6 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     system_tz = conf['source_system']['system_config']['system_tz']
 
     conf_krb_info = conf['target_system']['system_config']['connection_config']['connection_conf']
-
-    db_connection_config_src_1 = {
-            'host': 's001cd-db-vr01.dev002.local',
-            'port': '5433',
-            'database': 'devdb',
-            'user': 'romanovskiimv',
-        }
     
     db_connection_config_src = {
             'host': 's001cd-db-vr01.dev002.local',
@@ -239,9 +239,20 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
             "autocommit":True,
         }
     
+    hdfs_connection_config = {
+    "HDFS_PATH" : "/data/vertica/ODS_LEAD_GEN/",
+    "HDFS_URL" : "http://172.21.6.36:50070/webhdfs/v1/{HDFS_PATH}",
+    "OPS" : "?op=GETFILESTATUS",
+    }
+
+    'Step 0 - создание conn к hdfs'
+    db_connection_src = get_connect_manager('hdfs', hdfs_connection_config)
+    a = db_connection_src.apply_script_airflow_hdfs()
+    print(a)
+    
     logging.info(db_connection_config_src)
 
-    'Step 1 - создание conn'
+    'Step 1 - создание conn к vertica'
     db_connection_src = get_connect_manager(con_type, db_connection_config_src)
 
     'Step 2 - берём конфиг'
@@ -273,3 +284,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
 
     'Step 8 - запусе dml скриптов'
     run_dml(gen_dmls, db_connection_src, conf_krb_info)
+
+    'stg_hdfs -> hdfs'
+
+    'Описанме параметров'
