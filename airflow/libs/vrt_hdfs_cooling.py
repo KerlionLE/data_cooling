@@ -240,8 +240,8 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
         }
     
     hdfs_connection_config = {
-    "HDFS_PATH" : "/data/vertica/ODS_LEAD_GEN/",
-    "HDFS_URL" : "http://172.21.6.36:50070/webhdfs/v1/{HDFS_PATH}",
+    "HDFS_PATH" : "/data/vertica/ODS_LEAD_GEN",
+    "HDFS_URL" : "http://172.21.6.36:50070/webhdfs/v1",
     "OPS" : "?op=GETFILESTATUS",
     }
 

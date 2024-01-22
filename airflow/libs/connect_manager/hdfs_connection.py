@@ -20,7 +20,6 @@ class HdfsConnection(DBConnection):
 
         :return: результат sql запроса
         """
-        print(self.__conn_info['HDFS_PATH'])
-        url = self.__conn_info['HDFS_URL'] + self.__conn_info['OPS']
+        url = self.__conn_info['HDFS_URL'] + self.__conn_info['HDFS_PATH'] + self.__conn_info['OPS']
         res = requests.get(url)
         print(res)
