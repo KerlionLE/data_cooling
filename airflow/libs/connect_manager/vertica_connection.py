@@ -3,25 +3,41 @@ import vertica_python
 from .db_connection import DBConnection
 from krbticket import KrbCommand, KrbConfig
 
-class Kerberos:
-    def __init__(self, principal, keytab, **kwargs):
+from typing import Protocol, runtime_checkable
+
+@runtime_checkable
+class KerberosAuthProtocol(Protocol):
+    def kinit(self):
+        ...
+
+    def kdestroy(self):
+        ...
+
+
+class KerberosAuth:
+    def __init__(self, principal: str, keytab_path: str):
         self.principal = principal
-        self.keytab = keytab
+        self.keytab_path = keytab_path
+        self._krb_config = None
+
+    @property
+    def krb_config(self) -> KrbConfig:
+        if self._krb_config is None:
+            self._krb_config = KrbConfig(principal=self.principal, keytab=self.keytab_path)
+
+        return self._krb_config
 
     def kinit(self):
-        kconfig = KrbConfig(principal=self.principal, keytab=self.keytab)
-        KrbCommand.kinit(kconfig)
+        KrbCommand.kinit(self.krb_config)
 
-    def destroy(self):
-        kconfig = KrbConfig(principal=self.principal, keytab=self.keytab)
-        KrbCommand.kdestroy(kconfig)
+    def kdestroy(self):
+        KrbCommand.kdestroy(self.krb_config)
 
     def __enter__(self):
         self.kinit()
-        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.destroy()
+        self.kdestroy()
 
 
 class VerticaConnection(DBConnection):
@@ -66,7 +82,7 @@ class VerticaConnection(DBConnection):
 
         """
 
-        with Kerberos(conf_krb_info['principal'], conf_krb_info['keytab']):
+        with KerberosAuth(conf_krb_info['principal'], conf_krb_info['keytab']):
             with vertica_python.connect(**self.__conn_info) as conn:
                 result = []
                 with conn.cursor() as cur:

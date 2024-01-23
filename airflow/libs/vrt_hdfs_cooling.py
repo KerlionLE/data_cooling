@@ -253,10 +253,10 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
         "OPS": "?op=GETFILESTATUS",
     }
 
-    'Step 0 - создание conn к hdfs'
-    db_connection_src = get_connect_manager('hdfs', hdfs_connection_config)
-    a = db_connection_src.apply_script_airflow_hdfs()
-    print(a)
+    #'Step 0 - создание conn к hdfs'
+    #db_connection_src = get_connect_manager('hdfs', hdfs_connection_config)
+    #a = db_connection_src.apply_script_airflow_hdfs()
+    #print(a)
 
     logging.info(db_connection_config_src)
 
