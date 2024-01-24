@@ -97,18 +97,14 @@ def get_max_load_ts(config: list,
 
 def gen_dml(config: list,
             copy_to_vertica: str,
-            delete_without_partitions: str,
             delete_with_partitions: str,
-            export_with_partitions: str,
-            export_without_partitions: str) -> list:
+            export_with_partitions: str) -> list:
     """
     Генерирует DML скрипт
     :param config: конфиг
     :param copy_to_vertica: путь к sql скрипт 
-    :param delete_without_partitions: путь к sql скрипт
     :param delete_with_partitions: путь к sql скрипт
     :param export_with_partitions: путь к sql скрипт
-    :param export_without_partitions: путь к sql скрипт
 
     :return: возвращает конфиог с dml сриптом
     """
@@ -121,61 +117,73 @@ def gen_dml(config: list,
         date_start = conf.get('last_date_cooling') or '1999-10-11 15:14:15'
         date_delete = (datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S') -
                        timedelta(days=conf['depth'])).strftime('%Y-%m-%d %H:%M:%S')
+        partition = conf.get('partition_expressions') or conf['tech_ts_column_name']
 
-        if conf['cooling_type'] == 'time_based' or (conf['cooling_type'] == 'fullcopy' and date_start != '1999-10-11 15:14:15'):
-            if not conf['partition_expressions']:
 
-                sql_export_without = get_formated_file(
-                    export_without_partitions,
+        if conf['replication_policy'] == 1:
+            if conf['cooling_type'] == 'time_based' or (conf['cooling_type'] == 'fullcopy' and date_start != '1999-10-11 15:14:15'):
+
+                sql_export = get_formated_file(
+                    export_with_partitions,
                     schema_name=conf['schema_name'],
                     table_name=conf['table_name'],
                     filter_expression=conf['filter_expression'],
+                    partition_expressions=partition,
                     time_between=f'''and {conf['tech_ts_column_name']} > '{date_start}' and {conf['tech_ts_column_name']} <= '{date_end}' ''',
+                    cur_date=date_end,
                 )
-                sql_delete_without = get_formated_file(
-                    delete_without_partitions,
+                sql_delete = get_formated_file(
+                    delete_with_partitions,
                     schema_name=conf['schema_name'],
                     table_name=conf['table_name'],
                     filter_expression=conf['filter_expression'],
                     time_between=f'''and {conf['tech_ts_column_name']} >= '{date_delete}' and {conf['tech_ts_column_name']} <= '{date_end}' '''
                 )
-                sql = f'{sql_export_without}'  # \n{sql_delete_without}'
+                sql = f'{sql_export}\n{sql_delete}'
 
-            else:
+            elif conf['cooling_type'] == 'fullcopy':
+                sql_export = get_formated_file(
+                    export_with_partitions,
+                    schema_name=conf['schema_name'],
+                    table_name=conf['table_name'],
+                    filter_expression='',
+                    partition_expressions=partition,
+                    time_between='',
+                    cur_date=date_end,
+                )
+                sql_delete = get_formated_file(
+                    delete_with_partitions,
+                    schema_name=conf['schema_name'],
+                    table_name=conf['table_name'],
+                    filter_expression='',
+                    time_between='',
+                )
+                sql = f'{sql_export}\n{sql_delete}'
+        elif  conf['replication_policy'] == 0:
+            if conf['cooling_type'] == 'time_based' or (conf['cooling_type'] == 'fullcopy' and date_start != '1999-10-11 15:14:15'):
 
-                sql_export_with = get_formated_file(
+                sql_export = get_formated_file(
                     export_with_partitions,
                     schema_name=conf['schema_name'],
                     table_name=conf['table_name'],
                     filter_expression=conf['filter_expression'],
-                    partition_expressions=conf['partition_expressions'],
+                    partition_expressions=partition,
                     time_between=f'''and {conf['tech_ts_column_name']} > '{date_start}' and {conf['tech_ts_column_name']} <= '{date_end}' ''',
+                    cur_date=date_end,
                 )
-                sql_delete_with = get_formated_file(
-                    delete_with_partitions,
+                sql = f'{sql_export}'
+
+            elif conf['cooling_type'] == 'fullcopy':
+                sql_export = get_formated_file(
+                    export_with_partitions,
                     schema_name=conf['schema_name'],
                     table_name=conf['table_name'],
-                    filter_expression=conf['filter_expression'],
-                    time_between=f'''and {conf['tech_ts_column_name']} > '{date_delete}' and {conf['tech_ts_column_name']} <= '{date_end}' '''
+                    filter_expression='',
+                    partition_expressions=partition,
+                    time_between='',
+                    cur_date=date_end,
                 )
-                sql = f'{sql_export_with}'  # \n{sql_delete_with}'
-
-        elif conf['cooling_type'] == 'fullcopy':
-            sql_export_without = get_formated_file(
-                export_without_partitions,
-                schema_name=conf['schema_name'],
-                table_name=conf['table_name'],
-                filter_expression='',
-                time_between='',
-            )
-            sql_delete_without = get_formated_file(
-                delete_without_partitions,
-                schema_name=conf['schema_name'],
-                table_name=conf['table_name'],
-                filter_expression='',
-                time_between=''
-            )
-            sql = f'{sql_export_without}'  # \n{sql_delete_without}'
+                sql = f'{sql_export}'
 
         conf['dml_script'] = sql
         conf_with_dml.append(conf)
@@ -211,8 +219,6 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list):
 # ------------------------------------------------------------------------------------------------------------------
 
 
-# ------------------------------------------------------------------------------------------------------------------
-
 def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBConnection) -> None:
     """
     :param con_type: тип con к базе
@@ -226,10 +232,8 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     """
 
     copy_to_vertica = conf['auxiliary_sql_paths']['sql_copy_to_vertica']
-    delete_without_partitions = conf['auxiliary_sql_paths']['sql_delete_without_partitions']
     delete_with_partitions = conf['auxiliary_sql_paths']['sql_delete_with_partitions']
     export_with_partitions = conf['auxiliary_sql_paths']['sql_export_with_partitions']
-    export_without_partitions = conf['auxiliary_sql_paths']['sql_export_without_partitions']
     get_max_tech_load_ts = conf['auxiliary_sql_paths']['sql_get_max_tech_load_ts']
 
     con_type = conf['source_system']['system_type']
@@ -246,19 +250,6 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
         'user': 'a001cd-etl-vrt-hdp',
         "autocommit": True,
     }
-
-    hdfs_connection_config = {
-        "HDFS_PATH": "/data/vertica/ODS_LEAD_GEN",
-        "HDFS_URL": "http://172.21.6.36:50070/webhdfs/v1",
-        "OPS": "?op=GETFILESTATUS",
-    }
-
-    #'Step 0 - создание conn к hdfs'
-    #db_connection_src = get_connect_manager('hdfs', hdfs_connection_config)
-    #a = db_connection_src.apply_script_airflow_hdfs()
-    #print(a)
-
-    logging.info(db_connection_config_src)
 
     'Step 1 - создание conn к vertica'
     db_connection_src = get_connect_manager(con_type, db_connection_config_src)
@@ -289,13 +280,9 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(max_tech_load_ts)
 
     'Step 7 - генераия dml скриптов'
-    gen_dmls = gen_dml(max_tech_load_ts, copy_to_vertica, delete_without_partitions,
-                       delete_with_partitions, export_with_partitions, export_without_partitions)
+    gen_dmls = gen_dml(max_tech_load_ts, copy_to_vertica,
+                       delete_with_partitions, export_with_partitions)
     logging.info(gen_dmls)
 
     'Step 8 - запусе dml скриптов'
     run_dml(gen_dmls, db_connection_src, conf_krb_info)
-
-    'stg_hdfs -> hdfs'
-
-    'Описанме параметров'
