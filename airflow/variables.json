@@ -38,7 +38,7 @@
               "replication_policy": 0,
               "depth": 123,
               "last_date_cooling": "2023-10-13 12:23:12",
-              "data_cooling_frequency": "*/1 * * * *",
+              "data_cooling_frequency": "0 1 * * *",
               "tech_ts_column_name": "tech_load_ts",
               "filter_expression": "",
               "partition_expressions": "substr(entity_index, 1, 1)"
@@ -50,7 +50,7 @@
               "replication_policy": 0,
               "depth": 123,
               "last_date_cooling": "2023-10-13 12:23:12",
-              "data_cooling_frequency": "*/1 * * * *",
+              "data_cooling_frequency": "0 1 * * *",
               "tech_ts_column_name": "tech_load_ts",
               "filter_expression": "",
               "partition_expressions": ""
@@ -62,7 +62,7 @@
               "replication_policy": 0,
               "depth": 123,
               "last_date_cooling": "2023-10-13 12:23:12",
-              "data_cooling_frequency": "*/1 * * * *",
+              "data_cooling_frequency": "0 1 * * *",
               "tech_ts_column_name": "tech_load_ts",
               "filter_expression": "",
               "partition_expressions": ""
