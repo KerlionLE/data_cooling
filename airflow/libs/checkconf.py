@@ -37,7 +37,7 @@ def chconf(conf:list) -> None:
             )
         return False
 
-    elif not conf['replication_policy']:
+    elif conf['replication_policy'] is None:
         logging.error(
                 f'''Неправельно заполнено поле replication_policy - не может быть пустым''',
             )
