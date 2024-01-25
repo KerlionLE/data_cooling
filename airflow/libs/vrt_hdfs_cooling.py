@@ -117,7 +117,7 @@ def gen_dml(config: list,
         date_start = conf.get('last_date_cooling') or '1999-10-11 15:14:15'
         date_delete = (datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S') -
                        timedelta(days=conf['depth'])).strftime('%Y-%m-%d %H:%M:%S')
-        partition = conf.get('partition_expressions') or conf['DATE(tech_ts_column_name)']
+        partition = conf.get('partition_expressions') or f'''DATE({conf['tech_ts_column_name']})'''
         current_date = datetime.now().strftime('%Y%m%d')
 
 
