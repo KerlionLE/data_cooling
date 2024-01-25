@@ -118,6 +118,7 @@ def gen_dml(config: list,
         date_delete = (datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S') -
                        timedelta(days=conf['depth'])).strftime('%Y-%m-%d %H:%M:%S')
         partition = conf.get('partition_expressions') or conf['tech_ts_column_name']
+        current_date = datetime.now().strftime('%Y%m%d')
 
 
         if conf['replication_policy'] == 1:
@@ -130,7 +131,7 @@ def gen_dml(config: list,
                     filter_expression=conf['filter_expression'],
                     partition_expressions=partition,
                     time_between=f'''and {conf['tech_ts_column_name']} > '{date_start}' and {conf['tech_ts_column_name']} <= '{date_end}' ''',
-                    cur_date=date_end,
+                    cur_date=current_date,
                 )
                 sql_delete = get_formated_file(
                     delete_with_partitions,
@@ -149,7 +150,7 @@ def gen_dml(config: list,
                     filter_expression='',
                     partition_expressions=partition,
                     time_between='',
-                    cur_date=date_end,
+                    cur_date=current_date,
                 )
                 sql_delete = get_formated_file(
                     delete_with_partitions,
@@ -159,6 +160,7 @@ def gen_dml(config: list,
                     time_between='',
                 )
                 sql = f'{sql_export}\n{sql_delete}'
+
         elif  conf['replication_policy'] == 0:
             if conf['cooling_type'] == 'time_based' or (conf['cooling_type'] == 'fullcopy' and date_start != '1999-10-11 15:14:15'):
 
@@ -169,7 +171,7 @@ def gen_dml(config: list,
                     filter_expression=conf['filter_expression'],
                     partition_expressions=partition,
                     time_between=f'''and {conf['tech_ts_column_name']} > '{date_start}' and {conf['tech_ts_column_name']} <= '{date_end}' ''',
-                    cur_date=date_end,
+                    cur_date=current_date,
                 )
                 sql = f'{sql_export}'
 
@@ -181,7 +183,7 @@ def gen_dml(config: list,
                     filter_expression='',
                     partition_expressions=partition,
                     time_between='',
-                    cur_date=date_end,
+                    cur_date=current_date,
                 )
                 sql = f'{sql_export}'
 
