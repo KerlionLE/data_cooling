@@ -115,27 +115,23 @@ def gen_dml(config: list,
 
         actual_max_tech_load_ts = conf['actual_max_tech_load_ts']
         depth_cooling = conf['depth']
-        depth_heating = conf['temporary_heating']['depth']
         tech_ts_column_name = conf['tech_ts_column_name']
 
         date_start = conf.get('last_date_cooling') or '1999-10-01 15:14:15'
-        partition = conf.get(
-            'partition_expressions') or f'''DATE({tech_ts_column_name})'''
+        partition = conf.get('partition_expressions') or f'''DATE({tech_ts_column_name})'''
 
         current_date = datetime.now().strftime('%Y%m%d')
-        date_end_heating = datetime.strptime(
-            conf['temporary_heating']['date_end'], '%Y-%m-%d %H:%M:%S')
-        date_start_heating = datetime.strptime(
-            conf['temporary_heating']['date_end'], '%Y-%m-%d %H:%M:%S')
-
-        date_end_cooling_depth = (datetime.strptime(
-            actual_max_tech_load_ts, '%Y-%m-%d %H:%M:%S') - timedelta(days=depth_cooling)).strftime('%Y-%m-%d %H:%M:%S')
-        date_end_heating_depth = (datetime.strptime(
-            actual_max_tech_load_ts, '%Y-%m-%d %H:%M:%S') - timedelta(days=depth_heating)).strftime('%Y-%m-%d %H:%M:%S')
+        date_end_cooling_depth = (datetime.strptime(actual_max_tech_load_ts, '%Y-%m-%d %H:%M:%S') - timedelta(days=depth_cooling)).strftime('%Y-%m-%d %H:%M:%S')
 
         if conf['cooling_type'] == 'time_based':
             if conf['replication_policy'] == 1:
                 if conf['temporary_heating']:
+
+                    depth_heating = ['temporary_heating']['depth']
+                    date_end_heating_depth = (datetime.strptime(actual_max_tech_load_ts, '%Y-%m-%d %H:%M:%S') - timedelta(days=depth_heating)).strftime('%Y-%m-%d %H:%M:%S')
+                    date_end_heating = datetime.strptime(conf['temporary_heating']['date_end'], '%Y-%m-%d %H:%M:%S')
+                    date_start_heating = datetime.strptime(conf['temporary_heating']['date_end'], '%Y-%m-%d %H:%M:%S')
+        
                     if conf['temporary_heating']['already_heat'] == 0 and current_date >= date_start_heating:
 
                         sql_copy_to_vertica = get_formated_file(
