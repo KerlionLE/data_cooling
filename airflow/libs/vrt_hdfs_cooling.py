@@ -113,16 +113,116 @@ def gen_dml(config: list,
 
     for conf in config:
 
-        date_end = conf['actual_max_tech_load_ts']
-        date_start = conf.get('last_date_cooling') or '1999-10-11 15:14:15'
-        date_delete = (datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S') -
-                       timedelta(days=conf['depth'])).strftime('%Y-%m-%d %H:%M:%S')
-        partition = conf.get('partition_expressions') or f'''DATE({conf['tech_ts_column_name']})'''
+        actual_max_tech_load_ts = conf['actual_max_tech_load_ts']
+        depth_cooling = conf['depth']
+        depth_heating = conf['temporary_heating']['depth']
+        tech_ts_column_name = conf['tech_ts_column_name']
+
+        date_start = conf.get('last_date_cooling') or '1999-10-01 15:14:15'
+        partition = conf.get(
+            'partition_expressions') or f'''DATE({tech_ts_column_name})'''
+
         current_date = datetime.now().strftime('%Y%m%d')
+        date_end_heating = datetime.strptime(
+            conf['temporary_heating']['date_end'], '%Y-%m-%d %H:%M:%S')
+        date_start_heating = datetime.strptime(
+            conf['temporary_heating']['date_end'], '%Y-%m-%d %H:%M:%S')
 
+        date_end_cooling_depth = (datetime.strptime(
+            actual_max_tech_load_ts, '%Y-%m-%d %H:%M:%S') - timedelta(days=depth_cooling)).strftime('%Y-%m-%d %H:%M:%S')
+        date_end_heating_depth = (datetime.strptime(
+            actual_max_tech_load_ts, '%Y-%m-%d %H:%M:%S') - timedelta(days=depth_heating)).strftime('%Y-%m-%d %H:%M:%S')
 
-        if conf['replication_policy'] == 1:
-            if conf['cooling_type'] == 'time_based' or (conf['cooling_type'] == 'fullcopy' and date_start != '1999-10-11 15:14:15'):
+        if conf['cooling_type'] == 'time_based':
+            if conf['replication_policy'] == 1:
+                if conf['temporary_heating']:
+                    if conf['temporary_heating']['already_heat'] == 0 and current_date >= date_start_heating:
+
+                        sql_copy_to_vertica = get_formated_file(
+                            copy_to_vertica,
+                            schema_name=conf['schema_name'],
+                            table_name=conf['table_name'],
+                            cur_date=current_date,
+                        )
+                        sql_export = get_formated_file(
+                            export_with_partitions,
+                            schema_name=conf['schema_name'],
+                            table_name=conf['table_name'],
+                            filter_expression=conf['filter_expression'],
+                            partition_expressions=partition,
+                            time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' ''',
+                            cur_date=current_date,
+                        )
+                        sql_delete = get_formated_file(
+                            delete_with_partitions,
+                            schema_name=conf['schema_name'],
+                            table_name=conf['table_name'],
+                            filter_expression=conf['filter_expression'],
+                            time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_heating_depth}' '''
+                        )
+                        sql = f'{sql_copy_to_vertica}\n{sql_export}\n{sql_delete}'
+
+                    elif conf['temporary_heating']['already_heat'] == 1 and current_date < date_end_heating and current_date > date_start_heating:
+
+                        sql_export = get_formated_file(
+                            export_with_partitions,
+                            schema_name=conf['schema_name'],
+                            table_name=conf['table_name'],
+                            filter_expression=conf['filter_expression'],
+                            partition_expressions=partition,
+                            time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' ''',
+                            cur_date=current_date,
+                        )
+                        sql_delete = get_formated_file(
+                            delete_with_partitions,
+                            schema_name=conf['schema_name'],
+                            table_name=conf['table_name'],
+                            filter_expression=conf['filter_expression'],
+                            time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_heating_depth}' '''
+                        )
+                        sql = f'{sql_copy_to_vertica}\n{sql_export}\n{sql_delete}'
+
+                    elif conf['temporary_heating']['already_heat'] == 1 and current_date > date_end_heating:
+
+                        sql_export = get_formated_file(  # Дублируетья можно вынести выше
+                            export_with_partitions,
+                            schema_name=conf['schema_name'],
+                            table_name=conf['table_name'],
+                            filter_expression=conf['filter_expression'],
+                            partition_expressions=partition,
+                            time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' ''',
+                            cur_date=current_date,
+                        )
+                        sql_delete = get_formated_file(
+                            delete_with_partitions,
+                            schema_name=conf['schema_name'],
+                            table_name=conf['table_name'],
+                            filter_expression=conf['filter_expression'],
+                            time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' '''
+                        )
+                        sql = f'{sql_export}\n{sql_delete}'
+
+                else:
+
+                    sql_export = get_formated_file(
+                        export_with_partitions,
+                        schema_name=conf['schema_name'],
+                        table_name=conf['table_name'],
+                        filter_expression=conf['filter_expression'],
+                        partition_expressions=partition,
+                        time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' ''',
+                        cur_date=current_date,
+                    )
+                    sql_delete = get_formated_file(
+                        delete_with_partitions,
+                        schema_name=conf['schema_name'],
+                        table_name=conf['table_name'],
+                        filter_expression=conf['filter_expression'],
+                        time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' '''
+                    )
+                    sql = f'{sql_export}\n{sql_delete}'
+
+            elif conf['replication_policy'] == 0:
 
                 sql_export = get_formated_file(
                     export_with_partitions,
@@ -130,52 +230,14 @@ def gen_dml(config: list,
                     table_name=conf['table_name'],
                     filter_expression=conf['filter_expression'],
                     partition_expressions=partition,
-                    time_between=f'''and {conf['tech_ts_column_name']} > '{date_start}' and {conf['tech_ts_column_name']} <= '{date_end}' ''',
-                    cur_date=current_date,
-                )
-                sql_delete = get_formated_file(
-                    delete_with_partitions,
-                    schema_name=conf['schema_name'],
-                    table_name=conf['table_name'],
-                    filter_expression=conf['filter_expression'],
-                    time_between=f'''and {conf['tech_ts_column_name']} >= '{date_delete}' and {conf['tech_ts_column_name']} <= '{date_end}' '''
-                )
-                sql = f'{sql_export}\n{sql_delete}'
-
-            elif conf['cooling_type'] == 'fullcopy':
-                sql_export = get_formated_file(
-                    export_with_partitions,
-                    schema_name=conf['schema_name'],
-                    table_name=conf['table_name'],
-                    filter_expression='',
-                    partition_expressions=partition,
-                    time_between='',
-                    cur_date=current_date,
-                )
-                sql_delete = get_formated_file(
-                    delete_with_partitions,
-                    schema_name=conf['schema_name'],
-                    table_name=conf['table_name'],
-                    filter_expression='',
-                    time_between='',
-                )
-                sql = f'{sql_export}\n{sql_delete}'
-
-        elif  conf['replication_policy'] == 0:
-            if conf['cooling_type'] == 'time_based' or (conf['cooling_type'] == 'fullcopy' and date_start != '1999-10-11 15:14:15'):
-
-                sql_export = get_formated_file(
-                    export_with_partitions,
-                    schema_name=conf['schema_name'],
-                    table_name=conf['table_name'],
-                    filter_expression=conf['filter_expression'],
-                    partition_expressions=partition,
-                    time_between=f'''and {conf['tech_ts_column_name']} > '{date_start}' and {conf['tech_ts_column_name']} <= '{date_end}' ''',
+                    time_between=f'''and {conf['tech_ts_column_name']} > '{date_start}' and {conf['tech_ts_column_name']} <= '{date_end_cooling_depth}' ''',
                     cur_date=current_date,
                 )
                 sql = f'{sql_export}'
 
-            elif conf['cooling_type'] == 'fullcopy':
+        elif conf['cooling_type'] == 'fullcopy':
+            if conf['replication_policy'] == 0:
+
                 sql_export = get_formated_file(
                     export_with_partitions,
                     schema_name=conf['schema_name'],

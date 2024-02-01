@@ -41,7 +41,18 @@
               "data_cooling_frequency": "0 1 * * *",
               "tech_ts_column_name": "tech_load_ts",
               "filter_expression": "",
-              "partition_expressions": "substr(entity_index, 1, 1)"
+              "partition_expressions": "substr(entity_index, 1, 1)",
+              "temporary_heating": [
+                {
+                  "schema_name": "ODS_LEAD_GEN",
+                  "table_name": "KW_WORD_ENTITY_FRAME",
+                  "heating_type": "external",
+                  "depth": 12,
+                  "already_heat": 1,
+                  "date_start": "2024-01-01 12:23:12",
+                  "date_end": "2024-01-31 12:23:12"
+                }
+              ]
             },
             {
               "schema_name": "ODS_LEAD_GEN",
