@@ -87,7 +87,7 @@ def get_max_load_ts(config: list,
             filtered_objects_with_maxdate.append(conf)
 
         else:
-            logging.warning(
+            logging.error(
                 f'''Таблица {conf['schema_name']}.{conf['table_name']} пустая или нет доступа''',
             )
     return filtered_objects_with_maxdate
@@ -181,7 +181,7 @@ def gen_dml(config: list,
                     elif conf['temporary_heating']['already_heat'] == 1 and current_date > date_end_heating:
 
                         sql = f'{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_cooling_depth}'
-                        
+
                 elif not conf['temporary_heating']: 
         
                     sql = f'{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_cooling_depth}'
