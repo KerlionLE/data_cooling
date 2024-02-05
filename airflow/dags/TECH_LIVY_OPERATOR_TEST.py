@@ -65,8 +65,8 @@ with DAG(**DAG_CONFIG) as dag:
         },
         livy_conn_id='spark3_livy',
         polling_interval=30,
-        keytab_path='{{ conn.spark3_livy.extra_dejson.keytab }}',
-        principal='{{ conn.spark3_livy.extra_dejson.principal }}',
+        keytab_path='a001cd-etl-vrt-hdp@DEV002.LOCAL',
+        principal='/usr/local/airflow/data/data_cooling/vrt_hdp.keytab',
         extra_options={
             'verify': '/usr/local/airflow/certs/DevRootCA.pem',
         },
