@@ -8,22 +8,23 @@ from operators.krb_livy_operator import KrbLivyOperator
 DAG_NAME = os.path.splitext(os.path.basename(__file__))[0]
 
 DEFAULT_ARGS = {
-    'owner': 'talgarbaevg',
+    'owner': 'romanovskiimv',
     'start_date': datetime(2024, 2, 4),
-    'retries': 1,
-    'retry_delay': timedelta(seconds=60),
-    'max_active_tis_per_dag': 1,
+    'retries': 0,
+    'task_concurrency': 5,
+    'pool': 'tech_pool',
+    'queue': 'afk8s_tech_queue',
 }
 
 DAG_CONFIG = {
     'dag_id': DAG_NAME,
-    'default_args': DEFAULT_ARGS,
     'schedule_interval': '0 0 * * *',
-    'template_searchpath': os.path.expandvars('$AIRFLOW_HOME'),
-    'concurrency': 1,
+    'concurrency': 5,
     'max_active_runs': 1,
     'catchup': False,
     'render_template_as_native_obj': True,
+    'default_args': DEFAULT_ARGS,
+    'doc_md': __doc__,
 }
 
 
