@@ -33,7 +33,7 @@ def get_last_tech_load_ts(schemas: list,
     )
     return {
         (schema_name, table_name): {'tech_load_ts': tech_load_ts}
-        for schema_name, table_name, tech_load_ts in db_connection_src.apply_sql(sql)[0]}
+        for schema_name, table_name, tech_load_ts in db_connection_src.apply_script_hdfs(sql)[0]}
 
 # ------------------------------------------------------------------------------------------------------------------
 
