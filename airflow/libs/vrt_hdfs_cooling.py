@@ -63,7 +63,7 @@ def filter_objects(config: dict, system_tz: str, objects) -> list:
         #last_tech_load_ts = datetime.strptime(
             #last_date_cooling, '%Y-%m-%d %H:%M:%S')
         last_tech_load_ts = db_data['tech_load_ts'].replace(tzinfo=None)
-        conf['last_tech_load_ts'] = last_tech_load_ts.strftime(
+        conf['last_date_cooling'] = last_tech_load_ts.strftime(
             '%Y-%m-%d %H:%M:%S')
         now = datetime.now(pytz.timezone(system_tz)).replace(tzinfo=None)
         update_freq = croniter(
