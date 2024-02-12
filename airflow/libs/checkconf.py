@@ -57,13 +57,13 @@ def chconf(conf:list) -> None:
         return False
 
     #last_date_cooling
-    try:
-        datetime.datetime.strptime(conf['last_date_cooling'], '%Y-%m-%d %H:%M:%S')  
-    except Exception:
-        logging.error(
-                f'''Неправельный формат времени''',
-            )
-        return False
+    #try:
+    #    datetime.datetime.strptime(conf['last_date_cooling'], '%Y-%m-%d %H:%M:%S')  
+    #except Exception:
+    #    logging.error(
+    #            f'''Неправельный формат времени''',
+    #        )
+    #    return False
 
     #data_cooling_frequency
     if croniter.is_valid(conf['data_cooling_frequency']) is False:
