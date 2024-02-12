@@ -49,7 +49,7 @@ def filter_objects(config: dict, system_tz: str, objects) -> list:
     for conf in config:
 
         db_data = objects.get((conf['schema_name'], conf['table_name'])) # для тестов
-        last_date_cooling = conf.get('last_date_cooling') or '2999-12-31 12:59:59' # для тестов
+        last_date_cooling = conf.get('last_date_cooling')
         update_freq = conf.get('data_cooling_frequency')
 
         if not db_data:
@@ -59,8 +59,11 @@ def filter_objects(config: dict, system_tz: str, objects) -> list:
             continue
 
         conf['is_new'] = False
-        last_tech_load_ts = datetime.strptime(
-            last_date_cooling, '%Y-%m-%d %H:%M:%S')
+        #last_tech_load_ts = datetime.strptime(
+            #last_date_cooling, '%Y-%m-%d %H:%M:%S')
+        last_tech_load_ts = db_data['tech_load_ts'].replace(tzinfo=None)
+        conf['last_tech_load_ts'] = last_tech_load_ts.strftime(
+            '%Y-%m-%d %H:%M:%S')
         now = datetime.now(pytz.timezone(system_tz)).replace(tzinfo=None)
         update_freq = croniter(
             update_freq, last_tech_load_ts).get_next(datetime)
