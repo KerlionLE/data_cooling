@@ -267,6 +267,8 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, 
             table_name=conf['table_name'],
             actual_max_tech_load_ts=conf['actual_max_tech_load_ts'],
         )
+            db_connection_src.apply_script_hdfs(
+                sql_insert, conf_krb_info)
             logging.info(
                 f'''Продолжительность выполнения - {date_end - date_start} ''',
             )
@@ -344,10 +346,10 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
 
     'Step 7 - генераия dml скриптов'
     gen_dmls = gen_dml(max_tech_load_ts, copy_to_vertica,
-                       delete_with_partitions, export_with_partitions, load_max_tech_load_ts_insert, schema_table_name_registry)
+                       delete_with_partitions, export_with_partitions)
     logging.info(gen_dmls)
 
     'Step 8 - запусе dml скриптов'
-    run_dml(gen_dmls, db_connection_src, conf_krb_info)
+    run_dml(gen_dmls, db_connection_src, conf_krb_info, load_max_tech_load_ts_insert, schema_table_name_registry)
 
     'Step FOR TEST - загрузка данных в тех таблицу'
