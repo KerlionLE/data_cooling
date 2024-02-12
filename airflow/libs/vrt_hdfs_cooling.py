@@ -97,7 +97,7 @@ def get_max_load_ts(config: list,
     filtered_objects_with_maxdate = []
 
     for conf in config:
-        col_name = conf.get('tech_ts_column_name')
+        col_name = conf.get('tech_ts_column_name') or 'tech_load_ts'
         sql_select = get_formated_file(
             sql_scripts_path_select,
             column_name=col_name,
@@ -147,7 +147,7 @@ def gen_dml(config: list,
 
         actual_max_tech_load_ts = conf['actual_max_tech_load_ts']
         depth_cooling = conf['depth']
-        tech_ts_column_name = conf['tech_ts_column_name']
+        tech_ts_column_name = conf.get('tech_ts_column_name') or 'tech_load_ts'
 
         date_start = conf.get('last_date_cooling') or '1000-10-01 15:14:15'
         partition = conf.get(
