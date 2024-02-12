@@ -322,7 +322,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(last_tech_load_ts)
 
     'Step 4 - фильтруем по частоте'
-    filter_object = filter_objects(config_check, system_tz, get_last_tech_load_ts_sql)
+    filter_object = filter_objects(config_check, system_tz, last_tech_load_ts)
     logging.info(filter_object)
 
     'Step 5 - вывод кол. таблиц в конфиге'
