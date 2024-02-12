@@ -244,7 +244,7 @@ def gen_dml(config: list,
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list):
+def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, load_max_tech_load_ts_insert, schema_table_name_registry):
     """
     Запуск DML скриптов
     :param config: конфиг
@@ -260,6 +260,13 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list):
             db_connection_src.apply_script_hdfs(
                 conf['dml_script'], conf_krb_info)
             date_end = datetime.now()
+            sql_insert = get_formated_file(
+            load_max_tech_load_ts_insert,
+            schema_table_name_registry=schema_table_name_registry,
+            schema_name=conf['schema_name'],
+            table_name=conf['table_name'],
+            actual_max_tech_load_ts=conf['actual_max_tech_load_ts'],
+        )
             logging.info(
                 f'''Продолжительность выполнения - {date_end - date_start} ''',
             )
@@ -283,6 +290,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     get_max_tech_load_ts = conf['auxiliary_sql_paths']['sql_get_max_tech_load_ts']
 
     get_last_tech_load_ts_sql = conf['auxiliary_sql_paths']['get_last_tech_load_ts'] # Тесты
+    load_max_tech_load_ts_insert = conf['auxiliary_sql_paths']['load_max_tech_load_ts_insert'] # Тесты
 
     con_type = conf['source_system']['system_type']
     source_type = conf['replication_objects_source']['source_type']
@@ -336,8 +344,10 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
 
     'Step 7 - генераия dml скриптов'
     gen_dmls = gen_dml(max_tech_load_ts, copy_to_vertica,
-                       delete_with_partitions, export_with_partitions)
+                       delete_with_partitions, export_with_partitions, load_max_tech_load_ts_insert, schema_table_name_registry)
     logging.info(gen_dmls)
 
     'Step 8 - запусе dml скриптов'
     run_dml(gen_dmls, db_connection_src, conf_krb_info)
+
+    'Step FOR TEST - загрузка данных в тех таблицу'
