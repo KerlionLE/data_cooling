@@ -240,7 +240,7 @@ def gen_dml(config: list,
                 sql = f'{sql_export}'
 
         conf['dml_script'] = sql
-        print9(sql)
+        print(sql)
         conf_with_dml.append(conf)
 
     return conf_with_dml
