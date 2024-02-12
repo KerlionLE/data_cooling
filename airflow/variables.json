@@ -39,7 +39,7 @@
               "depth": 123,
               "last_date_cooling": "",
               "data_cooling_frequency": "0 1 * * *",
-              "tech_ts_column_name": "tech_load_ts",
+              "tech_ts_column_name": "last_tech_load_ts",
               "filter_expression": "",
               "partition_expressions": "",
               "temporary_heating": [
@@ -62,7 +62,7 @@
               "depth": 123,
               "last_date_cooling": "",
               "data_cooling_frequency": "0 1 * * *",
-              "tech_ts_column_name": "tech_load_ts",
+              "tech_ts_column_name": "",
               "filter_expression": "",
               "partition_expressions": ""
             },
