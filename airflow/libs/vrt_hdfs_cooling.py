@@ -10,8 +10,34 @@ from .checkconf import chconf
 
 # ------------------------------------------------------------------------------------------------------------------
 
+def get_last_tech_load_ts(schemas: list,
+                          tables: list,
+                          schema_table_name_registry: str,
+                          db_connection_src: DBConnection,
+                          sql_scripts_path: str) -> dict:
+    """
+    Забираем max дату из технической таблицы - записываем в словарь с 2-мя ключами
+    :param schemas: название схем, которые нужно реплицировать
+    :param tables: название таблиц, которые нужно реплицировать
+    :param schema_table_name_registry: название технической схемы-таблицы с историей работы репликации
+    :param db_connection_src: объект соединения
+    :param sql_scripts_path: путь к sql скрипту
 
-def filter_objects(config: dict, system_tz: str) -> list:
+    :return: возвращает словарь с 2-мя ключами - схема, таблица
+    """
+    sql = get_formated_file(
+        sql_scripts_path,
+        schema_table_name=schema_table_name_registry,
+        schema_names=', '.join("'" + element + "'" for element in schemas),
+        table_names=', '.join("'" + element + "'" for element in tables),
+    )
+    return {
+        (schema_name, table_name): {'tech_load_ts': tech_load_ts}
+        for schema_name, table_name, tech_load_ts in db_connection_src.apply_sql(sql)[0]}
+
+# ------------------------------------------------------------------------------------------------------------------
+
+def filter_objects(config: dict, system_tz: str, objects) -> list:
     """
     Фильтрует словарь относительно частоты загрузки данных, сравнивая его с config timezone - airflow в utc, вертика в utc +3
     :param config: конфиг репликации
@@ -22,10 +48,11 @@ def filter_objects(config: dict, system_tz: str) -> list:
     filtered_objects = []
     for conf in config:
 
-        last_date_cooling = conf.get('last_date_cooling')
+        db_data = objects.get((conf['schema_name'], conf['table_name'])) # для тестов
+        last_date_cooling = conf.get('last_date_cooling') or '2999-12-31 12:59:59' # для тестов
         update_freq = conf.get('data_cooling_frequency')
 
-        if not last_date_cooling:
+        if not db_data:
             conf['is_new'] = True
             conf['last_tech_load_ts'] = None
             filtered_objects.append(conf)
@@ -56,9 +83,10 @@ def get_max_load_ts(config: list,
                     conf_krb_info: list) -> list:
     """
     Select из основных таблиц выборки. Забираем max(tech_load_ts)
-    :param filtered_objects: лист - отфильтрованный конфиг с учётом частоты
+    :param config: конфиг
     :param db_connection_src: объект соединения
     :param sql_scripts_path_select: путь к sql скрипт
+    :param conf_krb_info: конфиг кон к керберосу
 
     :return: возвращает лист - с максимальной датой(tech_load_ts) в схема-таблица
     """
@@ -117,7 +145,7 @@ def gen_dml(config: list,
         depth_cooling = conf['depth']
         tech_ts_column_name = conf['tech_ts_column_name']
 
-        date_start = conf.get('last_date_cooling') or '1999-10-01 15:14:15'
+        date_start = conf.get('last_date_cooling') or '1000-10-01 15:14:15'
         partition = conf.get(
             'partition_expressions') or f'''DATE({tech_ts_column_name})'''
 
@@ -240,13 +268,8 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list):
 
 def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBConnection) -> None:
     """
-    :param con_type: тип con к базе
-    :param schema_name_regestry: название схемы технической с историей
-    :param table_name_regestry: название таблицы технической с историей
-    :param auxiliary_sql_paths: пути всех sql файлов
+    :param conf: конфиг запуска охлаждения
     :param db_connection_config_src: config src con
-    :param db_connection_config_tgt: config trg con
-    :param system_tz: таймзаона в конфиге
 
     """
 
@@ -285,8 +308,16 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
             config_check.append(conf)
     logging.info(config_check)
 
+    'Step FOR TEST - берём макс дату последней репликации'
+    tables = [el['table_name'] for el in config_check]
+    schemas = [el['schema_name'] for el in config_check]
+    schema_table_name_registry = 'AUX_COOLING.COOLING_TABLE'
+    get_last_tech_load_ts_sql = conf['auxiliary_sql_paths']['get_last_tech_load_ts']
+    last_tech_load_ts = get_last_tech_load_ts(schemas, tables, schema_table_name_registry, db_connection_src, get_last_tech_load_ts_sql)
+    logging.info(last_tech_load_ts)
+
     'Step 4 - фильтруем по частоте'
-    filter_object = filter_objects(config_check, system_tz)
+    filter_object = filter_objects(config_check, system_tz, get_last_tech_load_ts_sql)
     logging.info(filter_object)
 
     'Step 5 - вывод кол. таблиц в конфиге'
