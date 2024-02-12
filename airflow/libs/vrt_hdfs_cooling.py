@@ -104,6 +104,9 @@ def get_max_load_ts(config: list,
             schema_name=conf['schema_name'],
             table_name=conf['table_name'],
         )
+        logging.info(
+                f'''------- {sql_select}''',
+            ) 
         try:
             max_date = db_connection_src.apply_script_hdfs(
                 sql_select, conf_krb_info)[0]
