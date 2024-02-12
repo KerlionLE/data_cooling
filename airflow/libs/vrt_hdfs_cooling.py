@@ -14,7 +14,8 @@ def get_last_tech_load_ts(schemas: list,
                           tables: list,
                           schema_table_name_registry: str,
                           db_connection_src: DBConnection,
-                          sql_scripts_path: str) -> dict:
+                          sql_scripts_path: str,
+                          conf_krb_info) -> dict:
     """
     Забираем max дату из технической таблицы - записываем в словарь с 2-мя ключами
     :param schemas: название схем, которые нужно реплицировать
@@ -33,7 +34,7 @@ def get_last_tech_load_ts(schemas: list,
     )
     return {
         (schema_name, table_name): {'tech_load_ts': tech_load_ts}
-        for schema_name, table_name, tech_load_ts in db_connection_src.apply_script_hdfs(sql)[0]}
+        for schema_name, table_name, tech_load_ts in db_connection_src.apply_script_hdfs(sql, conf_krb_info)[0]}
 
 # ------------------------------------------------------------------------------------------------------------------
 
@@ -317,7 +318,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     tables = [el['table_name'] for el in config_check]
     schemas = [el['schema_name'] for el in config_check]
     schema_table_name_registry = 'AUX_COOLING.COOLING_TABLE'
-    last_tech_load_ts = get_last_tech_load_ts(schemas, tables, schema_table_name_registry, db_connection_src, get_last_tech_load_ts_sql)
+    last_tech_load_ts = get_last_tech_load_ts(schemas, tables, schema_table_name_registry, db_connection_src, get_last_tech_load_ts_sql, conf_krb_info)
     logging.info(last_tech_load_ts)
 
     'Step 4 - фильтруем по частоте'
