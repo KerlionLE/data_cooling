@@ -107,13 +107,16 @@ def get_max_load_ts(config: list,
         try:
             max_date = db_connection_src.apply_script_hdfs(
                 sql_select, conf_krb_info)[0]
+            logging.info(
+                f'''------- {max_date}''',
+            ) 
         except Exception as e:
             logging.error(
                 f'''Таблица {conf['schema_name']}.{conf['table_name']} не существует или столца tech_ts нет - {e}''',
             )
             continue
 
-        if max_date[0][0] is not None:
+        if max_date and max_date[0][0] is not None:
             conf['actual_max_tech_load_ts'] = max_date[0][0].strftime(
                 '%Y-%m-%d %H:%M:%S')
             filtered_objects_with_maxdate.append(conf)
