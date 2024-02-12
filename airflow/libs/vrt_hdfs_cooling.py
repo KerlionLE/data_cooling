@@ -317,7 +317,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     'Step FOR TEST - берём макс дату последней репликации'
     tables = [el['table_name'] for el in config_check]
     schemas = [el['schema_name'] for el in config_check]
-    schema_table_name_registry = 'AUX_COOLING.COOLING_TABLE'
+    schema_table_name_registry = 'AUX_REPLICATION.COOLING_TABLE'
     last_tech_load_ts = get_last_tech_load_ts(schemas, tables, schema_table_name_registry, db_connection_src, get_last_tech_load_ts_sql, conf_krb_info)
     logging.info(last_tech_load_ts)
 
