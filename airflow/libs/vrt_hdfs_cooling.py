@@ -217,7 +217,7 @@ def gen_dml(config: list,
 
                         sql = f'{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_cooling_depth}'
 
-                elif not conf['temporary_heating']: 
+                else: 
         
                     sql = f'{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_cooling_depth}'
 
