@@ -281,6 +281,8 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     export_with_partitions = conf['auxiliary_sql_paths']['sql_export_with_partitions']
     get_max_tech_load_ts = conf['auxiliary_sql_paths']['sql_get_max_tech_load_ts']
 
+    get_last_tech_load_ts_sql = conf['auxiliary_sql_paths']['get_last_tech_load_ts'] # Тесты
+
     con_type = conf['source_system']['system_type']
     source_type = conf['replication_objects_source']['source_type']
     source_config = conf['replication_objects_source']['source_config']
@@ -315,7 +317,6 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     tables = [el['table_name'] for el in config_check]
     schemas = [el['schema_name'] for el in config_check]
     schema_table_name_registry = 'AUX_COOLING.COOLING_TABLE'
-    get_last_tech_load_ts_sql = conf['auxiliary_sql_paths']['get_last_tech_load_ts']
     last_tech_load_ts = get_last_tech_load_ts(schemas, tables, schema_table_name_registry, db_connection_src, get_last_tech_load_ts_sql)
     logging.info(last_tech_load_ts)
 
