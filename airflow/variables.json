@@ -32,7 +32,7 @@
           "source_type": "json",
           "source_config": [
             {
-              "schema_name": "AUX_COOLING",
+              "schema_name": "AUX_REPLICATION",
               "table_name": "TEST1",
               "cooling_type": "time_based",
               "replication_policy": 0,
@@ -55,7 +55,7 @@
               ]
             },
             {
-              "schema_name": "AUX_COOLING",
+              "schema_name": "AUX_REPLICATION",
               "table_name": "TEST2",
               "cooling_type": "fullcopy",
               "replication_policy": 0,
@@ -67,7 +67,7 @@
               "partition_expressions": ""
             },
             {
-              "schema_name": "AUX_COOLING",
+              "schema_name": "AUX_REPLICATION",
               "table_name": "TEST3",
               "cooling_type": "fullcopy",
               "replication_policy": 0,
