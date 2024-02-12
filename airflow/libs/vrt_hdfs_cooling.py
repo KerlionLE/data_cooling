@@ -104,15 +104,10 @@ def get_max_load_ts(config: list,
             schema_name=conf['schema_name'],
             table_name=conf['table_name'],
         )
-        logging.info(
-                f'''------- {sql_select}''',
-            ) 
         try:
             max_date = db_connection_src.apply_script_hdfs(
                 sql_select, conf_krb_info)[0]
-            logging.info(
-                f'''------- {max_date}''',
-            ) 
+
         except Exception as e:
             logging.error(
                 f'''Таблица {conf['schema_name']}.{conf['table_name']} не существует или столца tech_ts нет - {e}''',
@@ -155,6 +150,8 @@ def gen_dml(config: list,
         depth_cooling = conf['depth']
         tech_ts_column_name = conf.get('tech_ts_column_name') or 'tech_load_ts'
 
+        temporary_heating = conf.get('temporary_heating') or False
+
         date_start = conf.get('last_date_cooling') or '1000-10-01 15:14:15'
         partition = conf.get(
             'partition_expressions') or f'''DATE({tech_ts_column_name})'''
@@ -183,7 +180,7 @@ def gen_dml(config: list,
 
         if conf['cooling_type'] == 'time_based':
             if conf['replication_policy'] == 1:
-                if conf['temporary_heating']:
+                if temporary_heating:
 
                     depth_heating = ['temporary_heating']['depth']
                     date_end_heating_depth = (datetime.strptime(
