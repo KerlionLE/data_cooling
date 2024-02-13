@@ -25,7 +25,7 @@ DAG_NAME = get_dag_name(__file__)
 
 DAG_CONFIG = {
     'dag_id': DAG_NAME,
-    'schedule_interval': '0 0 * * *',
+    'schedule_interval': '*/5 * * * *',
     'concurrency': 5,
     'max_active_runs': 1,
     'catchup': False,
