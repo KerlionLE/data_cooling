@@ -264,6 +264,7 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, 
             db_connection_src.apply_script_hdfs(
                 conf['dml_script'], conf_krb_info)
             date_end = datetime.now()
+
             sql_insert = get_formated_file(
             load_max_tech_load_ts_insert,
             schema_table_name_registry=schema_table_name_registry,
