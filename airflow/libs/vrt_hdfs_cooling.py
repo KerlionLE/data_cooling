@@ -185,7 +185,7 @@ def gen_dml(config: list,
             if conf['replication_policy'] == 1:
                 if temporary_heating:
 
-                    depth_heating = ['temporary_heating']['depth']
+                    depth_heating = conf['temporary_heating']['depth']
                     date_end_heating_depth = (datetime.strptime(
                         actual_max_tech_load_ts, '%Y-%m-%d %H:%M:%S') - timedelta(days=depth_heating)).strftime('%Y-%m-%d %H:%M:%S')
                     date_end_heating = datetime.strptime(
