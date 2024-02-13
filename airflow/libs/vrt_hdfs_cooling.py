@@ -170,7 +170,7 @@ def gen_dml(config: list,
             filter_expression=conf['filter_expression'],
             partition_expressions=partition,
             time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' ''',
-            cur_date=current_date,
+            cur_date=datetime.now().strftime('%Y%m%d'),
         )
 
         sql_delete_date_start_date_end_cooling_depth = get_formated_file(
@@ -207,7 +207,7 @@ def gen_dml(config: list,
                             copy_to_vertica,
                             schema_name=conf['schema_name'],
                             table_name=conf['table_name'],
-                            cur_date=current_date,
+                            cur_date=datetime.now().strftime('%Y%m%d'),
                         )
 
                         sql = f'{sql_copy_to_vertica}\n{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_heating_depth}'
@@ -238,7 +238,7 @@ def gen_dml(config: list,
                     filter_expression='',
                     partition_expressions=partition,
                     time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{actual_max_tech_load_ts}' ''',
-                    cur_date=current_date,
+                    cur_date=datetime.now().strftime('%Y%m%d'),
                 )
                 sql = f'{sql_export}'
 
