@@ -191,7 +191,7 @@ def gen_dml(config: list,
                     date_end_heating = datetime.strptime(
                         conf['temporary_heating']['date_end'], '%Y-%m-%d %H:%M:%S')
                     date_start_heating = datetime.strptime(
-                        conf['temporary_heating']['date_end'], '%Y-%m-%d %H:%M:%S')
+                        conf['temporary_heating']['date_start'], '%Y-%m-%d %H:%M:%S')
 
                     sql_delete_date_start_date_end_heating_depth = get_formated_file(
                         delete_with_partitions,
