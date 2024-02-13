@@ -4,29 +4,29 @@
       "data_cooling": {
         "workers": 2,
         "source_system": {
-            "system_type": "vertica",
-            "system_config": {
-                "connection_config": {
-                    "connection": "airflow_conn",
-                    "connection_conf": {
-                        "conn_id":  "vertica_staging"
-                    }
-                },
-                "system_tz": "Europe/Moscow"
-            }
+          "system_type": "vertica",
+          "system_config": {
+            "connection_config": {
+              "connection": "airflow_conn",
+              "connection_conf": {
+                "conn_id": "vertica_staging"
+              }
+            },
+            "system_tz": "Europe/Moscow"
+          }
         },
         "target_system": {
-            "system_type": "hdfs",
-            "system_config": {
-                "connection_config": {
-                    "connection": "airflow_conn",
-                    "connection_conf": {
-                      "principal": "a001cd-etl-vrt-hdp@DEV002.LOCAL",
-                      "keytab": "/usr/local/airflow/data/data_cooling/vrt_hdp.keytab"
-                    }
-                },
-                "system_tz": "Europe/Moscow"
-            }
+          "system_type": "hdfs",
+          "system_config": {
+            "connection_config": {
+              "connection": "airflow_conn",
+              "connection_conf": {
+                "principal": "a001cd-etl-vrt-hdp@DEV002.LOCAL",
+                "keytab": "/usr/local/airflow/data/data_cooling/vrt_hdp.keytab"
+              }
+            },
+            "system_tz": "Europe/Moscow"
+          }
         },
         "replication_objects_source": {
           "source_type": "json",
@@ -66,26 +66,24 @@
               "tech_ts_column_name": "tech_load_ts",
               "filter_expression": "",
               "partition_expressions": "",
-              "temporary_heating": [
-                {
-                  "schema_name": "AUX_REPLICATION",
-                  "table_name": "TEST3",
-                  "heating_type": "external",
-                  "depth": 3,
-                  "already_heat": 0,
-                  "date_start": "2024-01-01 12:23:12",
-                  "date_end": "2024-01-31 12:23:12"
-                }
-              ]
+              "temporary_heating": {
+                "schema_name": "AUX_REPLICATION",
+                "table_name": "TEST3",
+                "heating_type": "external",
+                "depth": 3,
+                "already_heat": 0,
+                "date_start": "2024-01-01 12:23:12",
+                "date_end": "2024-01-31 12:23:12"
+              }
             }
           ]
         },
         "registry": {
-            "registry_type": "vertica",
-            "registry_config": {
-                "schema_name": "AUX_REPLICATION",
-                "table_name": "REPLICATION_TABLE"
-            }
+          "registry_type": "vertica",
+          "registry_config": {
+            "schema_name": "AUX_REPLICATION",
+            "table_name": "REPLICATION_TABLE"
+          }
         },
         "auxiliary_sql_paths": {
           "sql_export_without_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/export_without_partitions.sql",
@@ -99,5 +97,5 @@
         }
       }
     }
-  }  
+  }
 }
