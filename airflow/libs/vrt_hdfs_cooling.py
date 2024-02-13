@@ -10,6 +10,7 @@ from .checkconf import chconf
 
 # ------------------------------------------------------------------------------------------------------------------
 
+
 def get_last_tech_load_ts(schemas: list,
                           tables: list,
                           schema_table_name_registry: str,
@@ -38,6 +39,7 @@ def get_last_tech_load_ts(schemas: list,
 
 # ------------------------------------------------------------------------------------------------------------------
 
+
 def filter_objects(config: dict, system_tz: str, objects) -> list:
     """
     Фильтрует словарь относительно частоты загрузки данных, сравнивая его с config timezone - airflow в utc, вертика в utc +3
@@ -49,7 +51,8 @@ def filter_objects(config: dict, system_tz: str, objects) -> list:
     filtered_objects = []
     for conf in config:
 
-        db_data = objects.get((conf['schema_name'], conf['table_name'])) # для тестов
+        db_data = objects.get(
+            (conf['schema_name'], conf['table_name']))  # для тестов
         last_date_cooling = conf.get('last_date_cooling')
         update_freq = conf.get('data_cooling_frequency')
 
@@ -60,8 +63,8 @@ def filter_objects(config: dict, system_tz: str, objects) -> list:
             continue
 
         conf['is_new'] = False
-        #last_tech_load_ts = datetime.strptime(
-            #last_date_cooling, '%Y-%m-%d %H:%M:%S')
+        # last_tech_load_ts = datetime.strptime(
+        # last_date_cooling, '%Y-%m-%d %H:%M:%S')
         last_tech_load_ts = db_data['tech_load_ts'].replace(tzinfo=None)
         conf['last_date_cooling'] = last_tech_load_ts.strftime(
             '%Y-%m-%d %H:%M:%S')
@@ -217,8 +220,8 @@ def gen_dml(config: list,
 
                         sql = f'{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_cooling_depth}'
 
-                else: 
-        
+                else:
+
                     sql = f'{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_cooling_depth}'
 
             elif conf['replication_policy'] == 0:
@@ -266,12 +269,12 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, 
             date_end = datetime.now()
 
             sql_insert = get_formated_file(
-            load_max_tech_load_ts_insert,
-            schema_table_name_registry=schema_table_name_registry,
-            schema_name=conf['schema_name'],
-            table_name=conf['table_name'],
-            actual_max_tech_load_ts=conf['actual_max_tech_load_ts'],
-        )
+                load_max_tech_load_ts_insert,
+                schema_table_name_registry=schema_table_name_registry,
+                schema_name=conf['schema_name'],
+                table_name=conf['table_name'],
+                actual_max_tech_load_ts=conf['actual_max_tech_load_ts'],
+            )
             db_connection_src.apply_script_hdfs(
                 sql_insert, conf_krb_info)
             logging.info(
@@ -296,8 +299,10 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     export_with_partitions = conf['auxiliary_sql_paths']['sql_export_with_partitions']
     get_max_tech_load_ts = conf['auxiliary_sql_paths']['sql_get_max_tech_load_ts']
 
-    get_last_tech_load_ts_sql = conf['auxiliary_sql_paths']['get_last_tech_load_ts'] # Тесты
-    load_max_tech_load_ts_insert = conf['auxiliary_sql_paths']['load_max_tech_load_ts_insert'] # Тесты
+    # Тесты
+    get_last_tech_load_ts_sql = conf['auxiliary_sql_paths']['get_last_tech_load_ts']
+    # Тесты
+    load_max_tech_load_ts_insert = conf['auxiliary_sql_paths']['load_max_tech_load_ts_insert']
 
     con_type = conf['source_system']['system_type']
     source_type = conf['replication_objects_source']['source_type']
@@ -333,7 +338,8 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     tables = [el['table_name'] for el in config_check]
     schemas = [el['schema_name'] for el in config_check]
     schema_table_name_registry = 'AUX_REPLICATION.COOLING_TABLE'
-    last_tech_load_ts = get_last_tech_load_ts(schemas, tables, schema_table_name_registry, db_connection_src, get_last_tech_load_ts_sql, conf_krb_info)
+    last_tech_load_ts = get_last_tech_load_ts(
+        schemas, tables, schema_table_name_registry, db_connection_src, get_last_tech_load_ts_sql, conf_krb_info)
     logging.info(last_tech_load_ts)
 
     'Step 4 - фильтруем по частоте'
@@ -355,6 +361,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(gen_dmls)
 
     'Step 8 - запусе dml скриптов'
-    run_dml(gen_dmls, db_connection_src, conf_krb_info, load_max_tech_load_ts_insert, schema_table_name_registry)
+    run_dml(gen_dmls, db_connection_src, conf_krb_info,
+            load_max_tech_load_ts_insert, schema_table_name_registry)
 
     'Step FOR TEST - загрузка данных в тех таблицу'
