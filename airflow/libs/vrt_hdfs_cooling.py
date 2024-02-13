@@ -159,7 +159,7 @@ def gen_dml(config: list,
         partition = conf.get(
             'partition_expressions') or f'''DATE({tech_ts_column_name})'''
 
-        current_date = datetime.now().strftime('%Y%m%d')
+        current_date = datetime.now()
         date_end_cooling_depth = (datetime.strptime(
             actual_max_tech_load_ts, '%Y-%m-%d %H:%M:%S') - timedelta(days=depth_cooling)).strftime('%Y-%m-%d %H:%M:%S')
 
