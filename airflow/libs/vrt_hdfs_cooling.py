@@ -291,7 +291,7 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, 
 def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBConnection) -> None:
     """
     :param conf: конфиг запуска охлаждения
-    :param db_connection_config_src: config src con
+    :param db_connection_config_src: config src conn
 
     """
 
