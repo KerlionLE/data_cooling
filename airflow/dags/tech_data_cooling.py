@@ -36,12 +36,12 @@ DAG_CONFIG = {
 
 def get_replication_config(dag_name: str, env_name: str, replication_names: str) -> dict:
     """
-    Из Variable Airflow забираем конфиг
+    Функция реализована для получения из Variable Airflow конфига
     :param dag_name: название дага
     :param env_name: название среды
-    :param replication_names: конфиг
+    :param replication_names: название конфига в Variable Airflow
 
-    :return: возвращает лист - отфильтрованный конфиг с учётом частоты
+    :return: возвращает конфиг
     """
     variables = Variable.get(dag_name, deserialize_json=True)
 
@@ -59,13 +59,13 @@ def get_replication_config(dag_name: str, env_name: str, replication_names: str)
 
 def get_conn(dag_name: str, env_name: str, replication_names: str, system_type: str) -> dict:
     """
-    Из get_replication_config забираем конфиг con
+    Функция реализована для получения конфига(con) с помощью BaseHook
     :param dag_name: название дага
     :param env_name: название среды
-    :param replication_names: конфиг
-    :param system_type: название среды
+    :param replication_names: название конфига
+    :param system_type: тип системы
 
-    :return: конфиг
+    :return: возвращает конфиг(con) - ввиде('host' - 'port' - 'database' - 'user' - 'password')
     """
     replication_config = get_replication_config(
         dag_name, env_name, replication_names)
@@ -85,12 +85,12 @@ def get_conn(dag_name: str, env_name: str, replication_names: str, system_type: 
 
 def get_qty_worker(dag_name: str, env_name: str, replication_names: str) -> dict:
     """
-    Забираем из кофига кол. воркеров для airflow
+    Функция реализована для получения из кофига кол. воркеров для airflow (для того чтобы запускать паралельно несколько конфига охлаждения)
     :param dag_name: название дага
     :param env_name: название среды
-    :param replication_names: конфиг
+    :param replication_names: название конфига
 
-    :return: возвращает лист - количесво воркеров, которое будем использлвать
+    :return: Возвращает колличесво воркеров airflow на которых будет рабоать ran_dml
     """
 
     replication_config = get_replication_config(

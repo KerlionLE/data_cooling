@@ -25,10 +25,3 @@ class DBConnection:
 
         """
         raise NotImplementedError
-    
-    def apply_script_airflow_hdfs(self) -> str:
-        """
-        apply_script_airflow_hdfs - запуск скипта
-
-        """
-        raise NotImplementedError
