@@ -65,7 +65,7 @@
               "data_cooling_frequency": "* * * * *",
               "tech_ts_column_name": "tech_load_ts",
               "filter_expression": "",
-              "partition_expressions": "and tech_load_ts > '20231012 and '",
+              "partition_expressions": "and tech_load_ts > '20231012' and num > 2",
               "temporary_heating": {
                 "schema_name": "AUX_REPLICATION",
                 "table_name": "TEST3",
