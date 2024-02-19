@@ -127,6 +127,10 @@ class DataCatalogConfManager(ConfigManager):
             payload=request_heating_results
         )
 
+        data_list_heat_results = []
+        for d in get_heat_results['items']:
+            data_list_heat_results.append(params_to_dict(d))
+
         #2.2 Объединение PhysicalObjectHeatParams и PhysicalObjectHeatResult
         data_list_heat = []
         for a in data_list_heat_parms: 
