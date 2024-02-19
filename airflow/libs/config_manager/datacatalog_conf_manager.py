@@ -103,7 +103,7 @@ class DataCatalogConfManager(ConfigManager):
         #1.2 Объединение PhysicalObjectCoolParams и PhysicalObjectCoolResult
         data_list_cool = []
         for a in data_list_cool_parms:
-            if len(data_list_heat_results) != 0:
+            if len(data_list_cool_results) != 0:
                 for b in data_list_cool_results:
                     if a['id'] == b['physicalObjectCoolParamsId']:
                         a['coolingLastDate'] = b['coolingLastDate']
