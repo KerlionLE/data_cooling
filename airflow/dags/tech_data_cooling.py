@@ -7,7 +7,6 @@ from airflow.operators.python import PythonOperator
 from airflow.hooks.base import BaseHook
 from airflow.models import Variable
 
-from dg_vertica_sync.dg_vertica_sync_api_ods.dc_object_to_db import load_to_stg
 from operators.python_virtualenv_artifactory_operator import PythonVirtualenvCurlOperator
 from data_cooling.vrt_hdfs_cooling import preprocess_config_checks_con_dml
 from dwh_utils.airflow.common import get_dag_name
@@ -132,11 +131,11 @@ with DAG(**DAG_CONFIG) as dag:
             'extra-url-password': r'{{ conn.artifactory_pypi_rc.password }}',
             'extra-url-login': r'{{ conn.artifactory_pypi_rc.login }}',
         },
-        python_callable=load_to_stg,
+        python_callable=preprocess_config_checks_con_dml,
         op_kwargs={
             'conf': f'{{{{ var.json.{DAG_NAME}.{AIRFLOW_ENV}.{inegration_name} }}}}',
             'db_connection_config_src': get_conn(dag_name=DAG_NAME, env_name=AIRFLOW_ENV, replication_names=inegration_name, system_type='source_system'),
         },
     )
-    
+
     preprocess_config_checks_con_dml
