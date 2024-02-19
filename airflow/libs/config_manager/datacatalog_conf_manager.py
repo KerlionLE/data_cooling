@@ -7,75 +7,13 @@ from pydg.data_catalog.repo import Repo
 from pydg.data_catalog.model.dicts import DataCatalogEntityType
 
 
-class PhysicalObjectCoolParams:
-    def __init__(self,
-                 id,
-                 uuid,
-                 physicalObjectId,
-                 coolingType,
-                 shouldDeleteSourceData,
-                 coolingDepthDays,
-                 coolingFrequency,
-                 coolingFilterTimeColumnId,
-                 coolingFilterTimeColumnName,
-                 coolingFilterExpression,
-                 coolingPartitionExpression,
-                 coolingIsActive
-                 ):
-        self.id = id
-        self.uuid = uuid
-        self.physicalObjectId = physicalObjectId
-        self.coolingType = coolingType
-        self.shouldDeleteSourceData = shouldDeleteSourceData
-        self.coolingDepthDays = coolingDepthDays
-        self.coolingFrequency = coolingFrequency
-        self.coolingFilterTimeColumnId = coolingFilterTimeColumnId
-        self.coolingFilterTimeColumnName = coolingFilterTimeColumnName
-        self.coolingFilterExpression = coolingFilterExpression
-        self.coolingPartitionExpression = coolingPartitionExpression
-        self.coolingIsActive = coolingIsActive
-
-class PhysicalObjectCoolResult:
-    def __init__(self,
-                 id,
-                 uuid,
-                 physicalObjectCoolParamsId,
-                 coolingLastDate,
-                 coolingHdfsTarget
-                 ):
-        self.id = id
-        self.uuid = uuid
-        self.physicalObjectCoolParamsId = physicalObjectCoolParamsId
-        self.coolingLastDate = coolingLastDate
-        self.coolingHdfsTarget = coolingHdfsTarget
-
-class PhysicalObjectHeatParams:
-    def __init__(self,
-                 id,
-                 uuid,
-                 physicalObjectId,
-                 heatingType,
-                 heatingDepthDays,
-                 heatingStartDate,
-                 heatingEndDate,
-                 heatingIsActive
-                 ):
-        self.id = id
-        self.uuid = uuid
-        self.physicalObjectId = physicalObjectId
-        self.heatingType = heatingType
-        self.heatingDepthDays = heatingDepthDays
-        self.heatingStartDate = heatingStartDate
-        self.heatingEndDate = heatingEndDate
-        self.heatingIsActive = heatingIsActive
-
-def cooling_type_to_dict(obj):
+def type_to_dict(obj):
     return 'FULLCOPY'
 
-def cool_params_to_dict(obj):
+def params_to_dict(obj):
     d = {}
     for name, value in obj.__dict__.items():
-        d[name] = value if name != 'coolingType' or name != 'heatingType' else cooling_type_to_dict(value)
+        d[name] = value if name != 'coolingType' or name != 'heatingType' else type_to_dict(value)
     return d
 
 class DataCatalogConfManager(ConfigManager):
@@ -141,7 +79,7 @@ class DataCatalogConfManager(ConfigManager):
             "pageSize": 300
         }
 
-        # Работа с обектом PhysicalObjectCoolParams
+        #1 Работа с обектом PhysicalObjectCoolParams
         get_cool_parms = repo.readEntity(
             entityType=DataCatalogEntityType.PhysicalObjectCoolParams.value,
             payload=request_cool_parms
@@ -149,24 +87,33 @@ class DataCatalogConfManager(ConfigManager):
 
         data_list_cool_parms = []
         for d in get_cool_parms['items']:
-            data_list_cool_parms.append(cool_params_to_dict(d))
+            data_list_cool_parms.append(params_to_dict(d))
         
-        print(data_list_cool_parms)
         id_objs_cool_parms = [d.get('physicalObjectId') for d in data_list_cool_parms]
-        print(id_objs_cool_parms)
 
-        # Работа с обектом PhysicalObjectCoolResult
+        #1.1 Работа с обектом PhysicalObjectCoolResult
         get_cool_results = repo.readEntity(
             entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
             payload=request_cool_results
         )
         data_list_cool_results = []
         for d in get_cool_results['items']:
-            data_list_cool_results.append(cool_params_to_dict(d))
+            data_list_cool_results.append(params_to_dict(d))
         
         print(data_list_cool_results)
 
-        # Работа с обектом PhysicalObjectHeatParams
+        #1.2 Объединение PhysicalObjectCoolParams и PhysicalObjectCoolResult
+        data_list_cool = []
+        
+        for a in id_objs_cool_parms: 
+            for b in data_list_cool_results:
+                if int(a['id']) == int(b['physicalObjectCoolParamsId']):
+                   a['coolingLastDate'] = b['coolingLastDate']
+                   a['coolingHdfsTarget'] = b['coolingHdfsTarget']
+
+        print(a)
+
+        #2 Работа с обектом PhysicalObjectHeatParams
         get_heat_param = repo.readEntity(
             entityType=DataCatalogEntityType.PhysicalObjectHeatParams.value,
             payload=request_heating_parms
@@ -174,14 +121,17 @@ class DataCatalogConfManager(ConfigManager):
 
         data_list_heat_parms = []
         for d in get_heat_param['items']:
-            data_list_heat_parms.append(cool_params_to_dict(d))
+            data_list_heat_parms.append(params_to_dict(d))
         print(data_list_heat_parms)
 
-        # Работа с обектом PhysicalObjectHeatResult
+        #2.1 Работа с обектом PhysicalObjectHeatResult
         get_heat_results = repo.readEntity(
             entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
             payload=request_heating_results
         )
         print(get_heat_results)
+
+        #2.2 Объединение PhysicalObjectHeatParams и PhysicalObjectHeatResult
+        
 
         return get_cool_parms, get_cool_results
