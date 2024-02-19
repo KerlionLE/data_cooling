@@ -1,4 +1,4 @@
-import logging 
+import logging
 
 from .conf_manager import ConfigManager
 
@@ -25,19 +25,28 @@ class DataCatalogConfManager(ConfigManager):
         logger = logging.getLogger('data_catalog')
         logger.setLevel(logging.DEBUG)
         sh = logging.StreamHandler()
-        sh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+        sh.setFormatter(logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
         logger.addHandler(sh)
         logger.info('Start')
 
-        session = Session(logger) # create and start API session
+        session = Session(logger)  # create and start API session
         if not session.start(baseUrl=BASE_URL, username=USERNAME, password=PASSWORD, rootCA=ROOT_CA_PATH):
             logger.error('Failed to start session')
             return
-        
+
         repo = Repo(session, logger)
         logger.info('Execute query')
 
-        request = {
+        request_cool_parms = {
+            "query": {
+                "coolingIsActive": True
+            },
+            "page": 1,
+            "pageSize": 300
+        }
+
+        request_cool_results = {
             "query": {
                 "physicalObjectCoolParamsId": 39
             },
@@ -45,9 +54,14 @@ class DataCatalogConfManager(ConfigManager):
             "pageSize": 300
         }
 
-        get_result = repo.readEntity(
-        entityType=DataCatalogEntityType.PhysicalObjectCoolParams.value,
-        payload=request
+        get_cool_parms = repo.readEntity(
+            entityType=DataCatalogEntityType.PhysicalObjectCoolParams.value,
+            payload=request_cool_parms
         )
 
-        return get_result
+        get_cool_results = repo.readEntity(
+            entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
+            payload=request_cool_results
+        )
+
+        return get_cool_parms, get_cool_results
