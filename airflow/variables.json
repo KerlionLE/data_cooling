@@ -29,60 +29,11 @@
           }
         },
         "replication_objects_source": {
-          "source_type": "json",
-          "source_config": [
-            {
-              "schema_name": "AUX_REPLICATION",
-              "table_name": "TEST1",
-              "cooling_type": "time_based",
-              "replication_policy": 1,
-              "depth": 1,
-              "last_date_cooling": "",
-              "data_cooling_frequency": "* * * * *",
-              "tech_ts_column_name": "last_tech_load_ts",
-              "filter_expression": "",
-              "partition_expressions": ""
-            },
-            {
-              "schema_name": "AUX_REPLICATION",
-              "table_name": "TEST2",
-              "cooling_type": "fullcopy",
-              "replication_policy": 0,
-              "depth": 123,
-              "last_date_cooling": "",
-              "data_cooling_frequency": "* * * * *",
-              "tech_ts_column_name": "",
-              "filter_expression": "",
-              "partition_expressions": ""
-            },
-            {
-              "schema_name": "AUX_REPLICATION",
-              "table_name": "TEST3",
-              "cooling_type": "time_based",
-              "replication_policy": 1,
-              "depth": 1,
-              "last_date_cooling": "",
-              "data_cooling_frequency": "* * * * *",
-              "tech_ts_column_name": "tech_load_ts",
-              "filter_expression": "and tech_load_ts > '20231012' and num > 2",
-              "partition_expressions": "",
-              "temporary_heating": {
-                "schema_name": "AUX_REPLICATION",
-                "table_name": "TEST3",
-                "heating_type": "external",
-                "depth": 3,
-                "already_heat": 0,
-                "date_start": "2024-01-01 12:23:12",
-                "date_end": "2024-02-27 12:23:12"
-              }
-            }
-          ]
-        },
-        "registry": {
-          "registry_type": "vertica",
-          "registry_config": {
-            "schema_name": "AUX_REPLICATION",
-            "table_name": "REPLICATION_TABLE"
+          "source_type": "data_catalog",
+          "source_config": {
+            "root_ca_path": "/Users/elyalin/Documents/data_cooling/DevRootCA.cer",
+            "username": "a001cd-dg-cool-bot",
+            "password": "rx2RTBTZoLH0FweLvPBl"
           }
         },
         "auxiliary_sql_paths": {

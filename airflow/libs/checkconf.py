@@ -6,7 +6,8 @@ from croniter import croniter
 
 def chconf(conf:list) -> None:
     """
-    :param conf: конфиг
+    Проверка каждого конфыига на входные данные
+    :param conf: конфиг со всеми таблицами
 
     """
 

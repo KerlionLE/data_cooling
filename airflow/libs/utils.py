@@ -10,7 +10,7 @@ def get_formated_file(path: str, **params) -> str:
     :param path: путь к файлу
     :param **params: конфигурации, которые вставляеются в файл
 
-    :return: list corresponding Vertica column names
+    :return: Файл со вставленными параметрами
     """
 
     with open(os.path.expandvars(path)) as f:
@@ -32,7 +32,7 @@ def save_file(path: str, conf_info: list) -> None:
 def get_config_manager(source_type: str,
                        source_config: list) -> dict:
     """
-    get_config_manager - ConfigManager
+    get_config_manager - для проверки и запуска ConfigManager
     :param source_type: тип конфига
     :param source_config: источник
 
@@ -49,7 +49,8 @@ def get_config_manager(source_type: str,
 def get_connect_manager(con_type: str,
                         con_config: list) -> DBConnection:
     """
-    Соединение с источником (реализован) через класс
+    get_connect_manager - для проверки и запуска DBConnection:
+
     :param con_type: тип con
     :param con_config: источник
 
