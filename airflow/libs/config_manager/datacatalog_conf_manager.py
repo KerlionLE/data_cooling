@@ -4,7 +4,7 @@ from .conf_manager import ConfigManager
 
 from pydg.core.session import Session
 from pydg.data_catalog.repo import Repo
-from pydg.data_catalog.model.dicts import DataCatalogEntityType, EntityStatus
+from pydg.data_catalog.model.dicts import DataCatalogEntityType
 
 
 class PhysicalObjectCoolParams:
@@ -49,13 +49,33 @@ class PhysicalObjectCoolResult:
         self.coolingLastDate = coolingLastDate
         self.coolingHdfsTarget = coolingHdfsTarget
 
+class PhysicalObjectHeatParams:
+    def __init__(self,
+                 id,
+                 uuid,
+                 physicalObjectId,
+                 heatingType,
+                 heatingDepthDays,
+                 heatingStartDate,
+                 heatingEndDate,
+                 heatingIsActive
+                 ):
+        self.id = id
+        self.uuid = uuid
+        self.physicalObjectId = physicalObjectId
+        self.heatingType = heatingType
+        self.heatingDepthDays = heatingDepthDays
+        self.heatingStartDate = heatingStartDate
+        self.heatingEndDate = heatingEndDate
+        self.heatingIsActive = heatingIsActive
+
 def cooling_type_to_dict(obj):
     return 'FULLCOPY'
 
 def cool_params_to_dict(obj):
     d = {}
     for name, value in obj.__dict__.items():
-        d[name] = value if name != 'coolingType' else cooling_type_to_dict(value)
+        d[name] = value if name != 'coolingType' or name != 'heatingType' else cooling_type_to_dict(value)
     return d
 
 class DataCatalogConfManager(ConfigManager):
@@ -147,14 +167,17 @@ class DataCatalogConfManager(ConfigManager):
         print(data_list_cool_results)
 
         # Работа с обектом PhysicalObjectHeatParams
-
         get_heat_param = repo.readEntity(
             entityType=DataCatalogEntityType.PhysicalObjectHeatParams.value,
             payload=request_heating_parms
         )
-        print(get_heat_param)
-        # Работа с обектом PhysicalObjectHeatResult
 
+        data_list_heat_parms = []
+        for d in get_heat_param['items']:
+            data_list_heat_parms.append(cool_params_to_dict(d))
+        print(data_list_heat_parms)
+
+        # Работа с обектом PhysicalObjectHeatResult
         get_heat_results = repo.readEntity(
             entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
             payload=request_heating_results
