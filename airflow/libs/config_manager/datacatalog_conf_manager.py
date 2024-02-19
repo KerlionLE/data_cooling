@@ -10,7 +10,7 @@ from pydg.data_catalog.model.dicts import DataCatalogEntityType, EntityStatus
 class DataCatalogConfManager(ConfigManager):
     """Класс Обработки конфига - включает в себя get и save"""
 
-    def get_config(self, conf: list) -> dict:
+    def get_config(self, conf: list = None) -> dict:
         """
         Обработка конфига - json формата из data catalog
         :param path: путь к конфигу
