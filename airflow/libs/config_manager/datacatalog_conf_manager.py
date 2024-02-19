@@ -102,14 +102,15 @@ class DataCatalogConfManager(ConfigManager):
 
         #1.2 Объединение PhysicalObjectCoolParams и PhysicalObjectCoolResult
         data_list_cool = []
-        for a in data_list_cool_parms: 
-            for b in data_list_cool_results:
-                if a['id'] == b['physicalObjectCoolParamsId']:
-                   a['coolingLastDate'] = b['coolingLastDate']
-                   a['coolingHdfsTarget'] = b['coolingHdfsTarget']
-                   data_list_cool.append(a)
-                else: 
-                   data_list_cool.append(a)
+        for a in data_list_cool_parms:
+            if len(data_list_heat_results) != 0:
+                for b in data_list_cool_results:
+                    if a['id'] == b['physicalObjectCoolParamsId']:
+                        a['coolingLastDate'] = b['coolingLastDate']
+                        a['coolingHdfsTarget'] = b['coolingHdfsTarget']
+                        data_list_cool.append(a)
+            else: 
+                data_list_cool.append(a)
 
         print(data_list_cool)
 
@@ -135,14 +136,15 @@ class DataCatalogConfManager(ConfigManager):
 
         #2.2 Объединение PhysicalObjectHeatParams и PhysicalObjectHeatResult
         data_list_heat = []
-        for a in data_list_heat_parms: 
-            for b in data_list_heat_results:
-                if a['id'] == b['physicalObjectCoolParamsId']:
-                   a['coolingLastDate'] = b['coolingLastDate']
-                   a['coolingHdfsTarget'] = b['coolingHdfsTarget']
-                   data_list_heat.append(a)
-                else: 
-                    data_list_heat.append(a)
+        for a in data_list_heat_parms:
+            if len(data_list_heat_results) != 0:
+                for b in data_list_heat_results:
+                    if a['id'] == b['physicalObjectCoolParamsId']:
+                        a['coolingLastDate'] = b['coolingLastDate']
+                        a['coolingHdfsTarget'] = b['coolingHdfsTarget']
+                        data_list_heat.append(a)
+            else: 
+                data_list_heat.append(a)
 
         print(data_list_heat)
 
