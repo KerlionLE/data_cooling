@@ -18,9 +18,9 @@ class DataCatalogConfManager(ConfigManager):
         :return: лист внутри json
         """
         BASE_URL = 'https://dg.dev002.local/dc-blue'  # URL прода, теста или дева
-        ROOT_CA_PATH = conf["root_ca_path"]
-        USERNAME = conf["username"]
-        PASSWORD = conf["password"]
+        ROOT_CA_PATH = self.config["root_ca_path"]
+        USERNAME = self.config["username"]
+        PASSWORD = self.config["password"]
 
         logger = logging.getLogger('data_catalog')
         logger.setLevel(logging.DEBUG)
