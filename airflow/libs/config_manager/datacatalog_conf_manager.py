@@ -99,15 +99,11 @@ class DataCatalogConfManager(ConfigManager):
         data_list_cool_results = []
         for d in get_cool_results['items']:
             data_list_cool_results.append(params_to_dict(d))
-        
-        print(data_list_cool_results)
 
         #1.2 Объединение PhysicalObjectCoolParams и PhysicalObjectCoolResult
         data_list_cool = []
         for a in data_list_cool_parms: 
-            print(a)
             for b in data_list_cool_results:
-                print(b)
                 if a['id'] == b['physicalObjectCoolParamsId']:
                    a['coolingLastDate'] = b['coolingLastDate']
                    a['coolingHdfsTarget'] = b['coolingHdfsTarget']
@@ -124,16 +120,36 @@ class DataCatalogConfManager(ConfigManager):
         data_list_heat_parms = []
         for d in get_heat_param['items']:
             data_list_heat_parms.append(params_to_dict(d))
-        print(data_list_heat_parms)
 
         #2.1 Работа с обектом PhysicalObjectHeatResult
         get_heat_results = repo.readEntity(
             entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
             payload=request_heating_results
         )
-        print(get_heat_results)
 
         #2.2 Объединение PhysicalObjectHeatParams и PhysicalObjectHeatResult
-        
+        data_list_heat = []
+        for a in data_list_heat_parms: 
+            for b in get_heat_results:
+                if a['id'] == b['physicalObjectCoolParamsId']:
+                   a['coolingLastDate'] = b['coolingLastDate']
+                   a['coolingHdfsTarget'] = b['coolingHdfsTarget']
+                   data_list_heat.append(a)
+
+        print(data_list_heat)
+
+        #3 Объединение Heat и Cool
+        data_list = []
+        for a in data_list_cool: 
+            for b in data_list_heat:
+                if a['physicalObjectId'] == b['physicalObjectId']:
+                   a['heatingType'] = b['heatingType']
+                   a['heatingDepthDays'] = b['heatingDepthDays']
+                   a['heatingStartDate'] = b['heatingStartDate']
+                   a['heatingEndDate'] = b['heatingEndDate']
+                   a['heatingIsActive'] = b['heatingIsActive']
+                   data_list.append(a)
+
+        print(data_list)
 
         return get_cool_parms, get_cool_results
