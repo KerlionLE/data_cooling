@@ -7,6 +7,57 @@ from pydg.data_catalog.repo import Repo
 from pydg.data_catalog.model.dicts import DataCatalogEntityType, EntityStatus
 
 
+class PhysicalObjectCoolParams:
+    def __init__(self,
+                 id,
+                 uuid,
+                 physicalObjectId,
+                 coolingType,
+                 shouldDeleteSourceData,
+                 coolingDepthDays,
+                 coolingFrequency,
+                 coolingFilterTimeColumnId,
+                 coolingFilterTimeColumnName,
+                 coolingFilterExpression,
+                 coolingPartitionExpression,
+                 coolingIsActive
+                 ):
+        self.id = id
+        self.uuid = uuid
+        self.physicalObjectId = physicalObjectId
+        self.coolingType = coolingType
+        self.shouldDeleteSourceData = shouldDeleteSourceData
+        self.coolingDepthDays = coolingDepthDays
+        self.coolingFrequency = coolingFrequency
+        self.coolingFilterTimeColumnId = coolingFilterTimeColumnId
+        self.coolingFilterTimeColumnName = coolingFilterTimeColumnName
+        self.coolingFilterExpression = coolingFilterExpression
+        self.coolingPartitionExpression = coolingPartitionExpression
+        self.coolingIsActive = coolingIsActive
+
+class PhysicalObjectCoolResult:
+    def __init__(self,
+                 id,
+                 uuid,
+                 physicalObjectCoolParamsId,
+                 coolingLastDate,
+                 coolingHdfsTarget
+                 ):
+        self.id = id
+        self.uuid = uuid
+        self.physicalObjectCoolParamsId = physicalObjectCoolParamsId
+        self.coolingLastDate = coolingLastDate
+        self.coolingHdfsTarget = coolingHdfsTarget
+
+def cooling_type_to_dict(obj):
+    return 'FULLCOPY'
+
+def cool_params_to_dict(obj):
+    d = {}
+    for name, value in obj.__dict__.items():
+        d[name] = value if name != 'coolingType' else cooling_type_to_dict(value)
+    return d
+
 class DataCatalogConfManager(ConfigManager):
     """Класс Обработки конфига - включает в себя get и save"""
 
@@ -58,11 +109,23 @@ class DataCatalogConfManager(ConfigManager):
             entityType=DataCatalogEntityType.PhysicalObjectCoolParams.value,
             payload=request_cool_parms
         )
-        print(get_cool_parms)
+
+        data_list_cool_parms = []
+        for d in get_cool_parms['items']:
+            data_list_cool_parms.append(cool_params_to_dict(d))
+        
+        print(data_list_cool_parms)
+        id_objs_cool_parms = [d.get('obj_id') for d in data_list_cool_parms]
+        print(id_objs_cool_parms)
+
         get_cool_results = repo.readEntity(
             entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
             payload=request_cool_results
         )
-        print(get_cool_results)
+        data_list_cool_results = []
+        for d in get_cool_results['items']:
+            data_list_cool_results.append(cool_params_to_dict(d))
+        
+        print(data_list_cool_results)
 
         return get_cool_parms, get_cool_results
