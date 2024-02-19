@@ -107,7 +107,7 @@ class DataCatalogConfManager(ConfigManager):
         
         for a in id_objs_cool_parms: 
             for b in data_list_cool_results:
-                if str(a['id']) == str(b['physicalObjectCoolParamsId']):
+                if a['id'] == b['physicalObjectCoolParamsId']:
                    a['coolingLastDate'] = b['coolingLastDate']
                    a['coolingHdfsTarget'] = b['coolingHdfsTarget']
 
