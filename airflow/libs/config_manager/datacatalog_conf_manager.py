@@ -108,6 +108,8 @@ class DataCatalogConfManager(ConfigManager):
                    a['coolingLastDate'] = b['coolingLastDate']
                    a['coolingHdfsTarget'] = b['coolingHdfsTarget']
                    data_list_cool.append(a)
+                else: 
+                   data_list_cool.append(a)
 
         print(data_list_cool)
 
@@ -139,6 +141,8 @@ class DataCatalogConfManager(ConfigManager):
                    a['coolingLastDate'] = b['coolingLastDate']
                    a['coolingHdfsTarget'] = b['coolingHdfsTarget']
                    data_list_heat.append(a)
+                else: 
+                    data_list_heat.append(a)
 
         print(data_list_heat)
 
@@ -153,6 +157,8 @@ class DataCatalogConfManager(ConfigManager):
                    a['heatingEndDate'] = b['heatingEndDate']
                    a['heatingIsActive'] = b['heatingIsActive']
                    data_list.append(a)
+                else: 
+                   data_list.append(a) 
 
         print(data_list)
 
