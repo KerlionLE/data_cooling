@@ -105,8 +105,10 @@ class DataCatalogConfManager(ConfigManager):
         #1.2 Объединение PhysicalObjectCoolParams и PhysicalObjectCoolResult
         data_list_cool = []
         for a in id_objs_cool_parms: 
+            print(a)
             for b in data_list_cool_results:
-                if a.get('id') == b.get('physicalObjectCoolParamsId'):
+                print(b)
+                if a['id'] == b['physicalObjectCoolParamsId']:
                    a['coolingLastDate'] = b['coolingLastDate']
                    a['coolingHdfsTarget'] = b['coolingHdfsTarget']
                    data_list_cool.append(a)
