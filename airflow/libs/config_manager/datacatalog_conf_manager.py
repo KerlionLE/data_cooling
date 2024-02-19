@@ -105,6 +105,23 @@ class DataCatalogConfManager(ConfigManager):
             "pageSize": 300
         }
 
+        request_heating_parms = {
+            "query": {
+                "heatingIsActive": True
+            },
+            "page": 1,
+            "pageSize": 300
+        }
+
+        request_heating_results = {
+            "query": {
+                "physicalObjectHeatParamsId": 39
+            },
+            "page": 1,
+            "pageSize": 300
+        }
+
+        # Работа с обектом PhysicalObjectCoolParams
         get_cool_parms = repo.readEntity(
             entityType=DataCatalogEntityType.PhysicalObjectCoolParams.value,
             payload=request_cool_parms
@@ -115,9 +132,10 @@ class DataCatalogConfManager(ConfigManager):
             data_list_cool_parms.append(cool_params_to_dict(d))
         
         print(data_list_cool_parms)
-        id_objs_cool_parms = [d.get('obj_id') for d in data_list_cool_parms]
+        id_objs_cool_parms = [d.get('physicalObjectId') for d in data_list_cool_parms]
         print(id_objs_cool_parms)
 
+        # Работа с обектом PhysicalObjectCoolResult
         get_cool_results = repo.readEntity(
             entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
             payload=request_cool_results
@@ -127,5 +145,20 @@ class DataCatalogConfManager(ConfigManager):
             data_list_cool_results.append(cool_params_to_dict(d))
         
         print(data_list_cool_results)
+
+        # Работа с обектом PhysicalObjectHeatParams
+
+        get_heat_param = repo.readEntity(
+            entityType=DataCatalogEntityType.PhysicalObjectHeatParams.value,
+            payload=request_heating_parms
+        )
+        print(get_heat_param)
+        # Работа с обектом PhysicalObjectHeatResult
+
+        get_heat_results = repo.readEntity(
+            entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
+            payload=request_heating_results
+        )
+        print(get_heat_results)
 
         return get_cool_parms, get_cool_results
