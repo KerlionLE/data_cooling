@@ -58,10 +58,11 @@ class DataCatalogConfManager(ConfigManager):
             entityType=DataCatalogEntityType.PhysicalObjectCoolParams.value,
             payload=request_cool_parms
         )
-
+        print(get_cool_parms)
         get_cool_results = repo.readEntity(
             entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
             payload=request_cool_results
         )
+        print(get_cool_results)
 
         return get_cool_parms, get_cool_results
