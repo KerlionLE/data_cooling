@@ -134,7 +134,7 @@ class DataCatalogConfManager(ConfigManager):
         #2.2 Объединение PhysicalObjectHeatParams и PhysicalObjectHeatResult
         data_list_heat = []
         for a in data_list_heat_parms: 
-            for b in get_heat_results:
+            for b in data_list_heat_results:
                 if a['id'] == b['physicalObjectCoolParamsId']:
                    a['coolingLastDate'] = b['coolingLastDate']
                    a['coolingHdfsTarget'] = b['coolingHdfsTarget']
