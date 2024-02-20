@@ -113,8 +113,6 @@ class DataCatalogConfManager(ConfigManager):
             else: 
                 data_list_cool.append(a)
 
-        print(data_list_cool)
-
         #2 Работа с обектом PhysicalObjectHeatParams
         get_heat_param = repo.readEntity(
             entityType=DataCatalogEntityType.PhysicalObjectHeatParams.value,
@@ -147,8 +145,6 @@ class DataCatalogConfManager(ConfigManager):
             else: 
                 data_list_heat.append(a)
 
-        print(data_list_heat)
-
         #3 Объединение Heat и Cool
         data_list = []
         for a in data_list_cool: 
@@ -164,8 +160,6 @@ class DataCatalogConfManager(ConfigManager):
                    data_list.append(a)
                 else: 
                    data_list.append(a) 
-
-        print(data_list)
 
         #4 Работа с обектом PhysicalObject
         request_objects = {
@@ -184,8 +178,6 @@ class DataCatalogConfManager(ConfigManager):
         data_list_oblects = []
         for d in get_objects['items']:
             data_list_oblects.append(params_to_dict(d))
-
-        print(data_list_oblects)
 
         #4.1.1 Берём список таблиц для того не тащить имена схем
         id_objs_objects = [d.get('group') for d in data_list_oblects]
@@ -224,7 +216,5 @@ class DataCatalogConfManager(ConfigManager):
                     a['physicalName'] = b['physicalName']
                     a['physicalNameGroup'] = b['physicalNameGroup']
                     data_list_all.append(a) 
-        
-        print(data_list_all)
 
         return get_cool_parms, get_cool_results
