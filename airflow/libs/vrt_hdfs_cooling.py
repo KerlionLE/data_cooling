@@ -308,16 +308,9 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     config = config_manager.get_config()
     logging.info(config)
 
-    'Step 3 - Проверка конфига'
-    config_check = []
-    for conf in config:
-        if chconf(conf):
-            config_check.append(conf)
-    logging.info(config_check)
-
     'Step FOR TEST - берём макс дату последней репликации'
-    tables = [el['table_name'] for el in config_check]
-    schemas = [el['schema_name'] for el in config_check]
+    tables = [el['table_name'] for el in config]
+    schemas = [el['schema_name'] for el in config]
     schema_table_name_registry = 'AUX_REPLICATION.COOLING_TABLE'
     last_tech_load_ts = get_last_tech_load_ts(
         schemas, tables, schema_table_name_registry, db_connection_src, get_last_tech_load_ts_sql, conf_krb_info)
