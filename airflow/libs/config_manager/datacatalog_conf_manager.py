@@ -186,7 +186,7 @@ class DataCatalogConfManager(ConfigManager):
             data_list_oblects.append(params_to_dict(d))
 
         #4.1.1 Берём список таблиц для того не тащить имена схем
-        id_objs_objects = [d.get('physicalObjectId') for d in data_list_oblects]
+        id_objs_objects = [d.get('group') for d in data_list_oblects]
         print(id_objs_objects)
 
         #5 Работа с обектом PhysicalGroup
