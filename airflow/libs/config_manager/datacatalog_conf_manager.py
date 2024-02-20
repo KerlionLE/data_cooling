@@ -165,6 +165,21 @@ class DataCatalogConfManager(ConfigManager):
 
         print(data_list)
 
-        #4 Объединение PhysicalObjectHeatParams и PhysicalObjectHeatResult
+        #4 Работа с обектом PhysicalObject
+
+        request_object = {
+            "query": {
+                "id": {id_objs_cool_parms}
+            },
+            "page": 1,
+            "pageSize": 300
+        }
+
+        get_heat_results = repo.readEntity(
+            entityType=DataCatalogEntityType.PhysicalObject.value,
+            payload=request_object
+        )
+        print(id_objs_cool_parms)
+        print(get_heat_results)
 
         return get_cool_parms, get_cool_results
