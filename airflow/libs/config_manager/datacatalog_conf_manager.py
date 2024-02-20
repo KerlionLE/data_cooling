@@ -159,13 +159,14 @@ class DataCatalogConfManager(ConfigManager):
                    a['temporary_heating']['heatingStartDate'] = b['heatingStartDate']
                    a['temporary_heating']['heatingEndDate'] = b['heatingEndDate']
                    a['temporary_heating']['heatingIsActive'] = b['heatingIsActive']
+                   a['temporary_heating']['heatingExternalTableName'] = b['heatingExternalTableName']
+                   a['temporary_heating']['isAlreadyHeating'] = b['isAlreadyHeating']
                    data_list.append(a)
                 else: 
                    data_list.append(a) 
 
         print(data_list)
 
-        print(id_objs_cool_parms)
         #4 Работа с обектом PhysicalObject
         request_object = {
             "query": {
@@ -174,6 +175,8 @@ class DataCatalogConfManager(ConfigManager):
             "page": 1,
             "pageSize": 300
         }
+
+        print(request_object)
 
         get_heat_results = repo.readEntity(
             entityType=DataCatalogEntityType.PhysicalObject.value,
