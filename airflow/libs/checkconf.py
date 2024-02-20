@@ -25,7 +25,7 @@ def chconf(conf: list) -> None:
         return False
 
     # cooling_type
-    if conf['cooling_type'] != 'time_based' or conf['cooling_type'] != 'fullcopy':
+    if conf['cooling_type'] is not 'time_based' or conf['cooling_type'] is not 'fullcopy':
         logging.error(
                 'Неправельно заполнено поле cooling_type - существует 2 типа - time_based, fullcopy',
             )

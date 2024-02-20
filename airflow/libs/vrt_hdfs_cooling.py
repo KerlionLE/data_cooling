@@ -305,9 +305,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
 
     'Step 2 - берём конфиг'
     config_manager = get_config_manager(source_type, source_config)
-    print(config_manager)
     config = config_manager.get_config()
-    print(config)
     logging.info(config)
 
     'Step 3 - Проверка конфига'
