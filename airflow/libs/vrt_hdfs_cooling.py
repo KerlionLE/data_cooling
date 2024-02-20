@@ -200,38 +200,31 @@ def gen_dml(config: list,
                         filter_expression=conf['filter_expression'],
                         time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_heating_depth}' '''
                     )
-                    print("------1-------")
 
                     if conf['temporary_heating']['already_heat'] == 0 and current_date >= date_start_heating and current_date < date_end_heating:
                         sql_copy_to_vertica = get_formated_file(
                             copy_to_vertica,
                             schema_name=conf['schema_name'],
                             table_name=conf['table_name'],
-                            cur_date=(datetime.now() - timedelta(days=7)).strftime('%Y%m%d'),
+                            cur_date=(datetime.now() - timedelta(days=2)).strftime('%Y%m%d'),
                         )
-                        print("------2-------")
 
                         sql = f'{sql_copy_to_vertica}\n{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_heating_depth}'
 
                     elif conf['temporary_heating']['already_heat'] == 1 and current_date >= date_start_heating and current_date < date_end_heating:
-                        print("------2.1-------")
                         sql = f'{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_heating_depth}'
 
                     elif conf['temporary_heating']['already_heat'] == 1 and current_date > date_end_heating:
-                        print("------2.2-------")
                         sql = f'{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_cooling_depth}'
 
                 else:
-                    print("------3-------")
                     sql = f'{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_cooling_depth}'
 
             elif conf['replication_policy'] == 0:
-                print("------4-------")
                 sql = f'{sql_export_date_start_date_end_cooling_depth}'
 
         elif conf['cooling_type'] == 'fullcopy':
             if conf['replication_policy'] == 0:
-                print("------5-------")
                 sql_export = get_formated_file(
                     export_with_partitions,
                     schema_name=conf['schema_name'],
@@ -244,7 +237,6 @@ def gen_dml(config: list,
                 sql = f'{sql_export}'
 
         conf['dml_script'] = sql
-        print(sql)
         conf_with_dml.append(conf)
 
     return conf_with_dml
