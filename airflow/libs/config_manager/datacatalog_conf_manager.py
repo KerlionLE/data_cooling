@@ -168,19 +168,19 @@ class DataCatalogConfManager(ConfigManager):
         print(data_list)
 
         #4 Работа с обектом PhysicalObject
-        request_object = {
+        request_objects = {
             "query": {
-                "id": f'{id_objs_cool_parms}'
+                "id": id_objs_cool_parms
             },
             "page": 1,
             "pageSize": 300
         }
 
-        print(request_object)
+        print(request_objects)
 
         get_heat_results = repo.readEntity(
             entityType=DataCatalogEntityType.PhysicalObject.value,
-            payload=request_object
+            payload=request_objects
         )
         print(get_heat_results)
 
