@@ -89,6 +89,7 @@ class DataCatalogConfManager(ConfigManager):
         for d in get_cool_parms['items']:
             data_list_cool_parms.append(params_to_dict(d))
         
+        #1.1.1 Берём список таблиц для того не тащить 
         id_objs_cool_parms = [d.get('physicalObjectId') for d in data_list_cool_parms]
 
         #1.1 Работа с обектом PhysicalObjectCoolResult
@@ -153,11 +154,11 @@ class DataCatalogConfManager(ConfigManager):
         for a in data_list_cool: 
             for b in data_list_heat:
                 if a['physicalObjectId'] == b['physicalObjectId']:
-                   a['heatingType'] = b['heatingType']
-                   a['heatingDepthDays'] = b['heatingDepthDays']
-                   a['heatingStartDate'] = b['heatingStartDate']
-                   a['heatingEndDate'] = b['heatingEndDate']
-                   a['heatingIsActive'] = b['heatingIsActive']
+                   a['temporary_heating']['heatingType'] = b['heatingType']
+                   a['temporary_heating']['heatingDepthDays'] = b['heatingDepthDays']
+                   a['temporary_heating']['heatingStartDate'] = b['heatingStartDate']
+                   a['temporary_heating']['heatingEndDate'] = b['heatingEndDate']
+                   a['temporary_heating']['heatingIsActive'] = b['heatingIsActive']
                    data_list.append(a)
                 else: 
                    data_list.append(a) 
