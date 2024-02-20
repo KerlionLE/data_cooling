@@ -12,23 +12,25 @@ def type_to_dict(obj: str) -> str:
     Функция реализована для работы со структурой обект в объекте
     :param obj: объект для изменения
 
-    :return: возвращает правильное значение 
+    :return: возвращает правильное значение
     """
 
     return 'FULLCOPY'
 
+
 def params_to_dict(obj) -> dict:
     """
     Функция превращения класса в словарь
-    :param obj: Класс обекта 
+    :param obj: Класс обекта
 
-    :return: словарь 
+    :return: словарь
     """
 
     d = {}
     for name, value in obj.__dict__.items():
         d[name] = value if name != 'coolingType' or name != 'heatingType' else type_to_dict(value)
     return d
+
 
 class DataCatalogConfManager(ConfigManager):
     """Класс Обработки конфига - включает в себя get и save"""
@@ -63,34 +65,34 @@ class DataCatalogConfManager(ConfigManager):
 
         request_cool_parms = {
             'quer': {
-                'coolingIsActive': True
+                'coolingIsActive': True,
             },
             'page': 1,
-            'pageSize': 300
+            'pageSize': 300,
         },
 
         request_cool_results = {
             'query': {
-                'physicalObjectCoolParamsId': 39
+                'physicalObjectCoolParamsId': 39,
             },
             'page': 1,
-            'pageSize': 300
+            'pageSize': 300,
         },
 
         request_heating_parms = {
             'query': {
-                'heatingIsActive': True
+                'heatingIsActive': True,
             },
             'page': 1,
-            'pageSize': 300
+            'pageSize': 300,
         },
 
         request_heating_results = {
             'query': {
-                'physicalObjectHeatParamsId': 39
+                'physicalObjectHeatParamsId': 39,
             },
             'page': 1,
-            'pageSize': 300
+            'pageSize': 300,
         },
 
         #1 Работа с обектом PhysicalObjectCoolParams
@@ -178,10 +180,10 @@ class DataCatalogConfManager(ConfigManager):
         #4 Работа с обектом PhysicalObject
         request_objects = {
             'query': {
-                'id': id_objs_cool_parms
+                'id': id_objs_cool_parms,
             },
             'page': 1,
-            'pageSize': 300
+            'pageSize': 300,
         },
 
         get_objects = repo.readEntity(
@@ -199,10 +201,10 @@ class DataCatalogConfManager(ConfigManager):
         #5 Работа с обектом PhysicalGroup
         request_group = {
             'query': {
-                'id': id_objs_objects
+                'id': id_objs_objects,
             },
             'page': 1,
-            'pageSize': 300
+            'pageSize': 300,
         },
 
         get_group = repo.readEntity(

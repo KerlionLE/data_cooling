@@ -4,5 +4,5 @@ from .datacatalog_conf_manager import DataCatalogConfManager
 
 AVAILABLE_FORMAT_MANAGER = {
     'json': JsonConfManager,
-    'data_catalog': DataCatalogConfManager
+    'data_catalog': DataCatalogConfManager,
 }
