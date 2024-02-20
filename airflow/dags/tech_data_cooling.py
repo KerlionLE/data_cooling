@@ -6,8 +6,9 @@ from airflow import DAG
 from airflow.hooks.base import BaseHook
 from airflow.models import Variable
 
-from operators.python_virtualenv_artifactory_operator import PythonVirtualenvCurlOperator
 from dwh_utils.airflow.common import get_dag_name
+
+from operators.python_virtualenv_artifactory_operator import PythonVirtualenvCurlOperator
 
 from data_cooling.vrt_hdfs_cooling import preprocess_config_checks_con_dml
 
