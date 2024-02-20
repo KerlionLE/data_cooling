@@ -208,16 +208,23 @@ class DataCatalogConfManager(ConfigManager):
         for d in get_group['items']:
             data_list_group.append(params_to_dict(d))
     
-        print(data_list_group)
-        #5 Объединение объектов обектов PhysicalGroup и PhysicalObject
-            
+        #5 Объединение объектов обектов PhysicalGroup и PhysicalObject           
         data_list_oblects_group = []
         for a in data_list_oblects:
             for b in data_list_group:
                 if a['group'] == b['id']:
-                    a['physicalNamegroup'] = b['physicalName']
+                    a['physicalNameGroup'] = b['physicalName']
                     data_list_oblects_group.append(a) 
+
+        #6 Объединение Всего
+        data_list_all = []
+        for a in data_list:
+            for b in data_list_oblects_group:
+                if a['physicalObjectId'] == b['id']:
+                    a['physicalName'] = b['physicalName']
+                    a['physicalNameGroup'] = b['physicalNameGroup']
+                    data_list_all.append(a) 
         
-        print(data_list_oblects_group)
+        print(data_list_all)
 
         return get_cool_parms, get_cool_results
