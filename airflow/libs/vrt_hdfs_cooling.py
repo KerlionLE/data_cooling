@@ -6,7 +6,6 @@ from croniter import croniter
 
 from .connect_manager import DBConnection
 from .utils import get_formated_file, get_connect_manager, get_config_manager
-from .checkconf import chconf
 
 # ------------------------------------------------------------------------------------------------------------------
 
@@ -317,7 +316,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(last_tech_load_ts)
 
     'Step 4 - фильтруем по частоте'
-    filter_object = filter_objects(config_check, system_tz, last_tech_load_ts)
+    filter_object = filter_objects(config, system_tz, last_tech_load_ts)
     logging.info(filter_object)
 
     'Step 5 - вывод кол. таблиц в конфиге'
