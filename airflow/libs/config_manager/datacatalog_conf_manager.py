@@ -89,7 +89,7 @@ class DataCatalogConfManager(ConfigManager):
         for d in get_cool_parms['items']:
             data_list_cool_parms.append(params_to_dict(d))
         
-        #1.1.1 Берём список таблиц для того не тащить 
+        #1.1.1 Берём список таблиц для того не тащить имена таблиц
         id_objs_cool_parms = [d.get('physicalObjectId') for d in data_list_cool_parms]
 
         #1.1 Работа с обектом PhysicalObjectCoolResult
@@ -176,15 +176,38 @@ class DataCatalogConfManager(ConfigManager):
             "pageSize": 300
         }
 
-        get_objects_results = repo.readEntity(
+        get_objects = repo.readEntity(
             entityType=DataCatalogEntityType.PhysicalObject.value,
             payload=request_objects
         )
 
-        data_list_oblects_results = []
-        for d in get_objects_results['items']:
-            data_list_oblects_results.append(params_to_dict(d))
-            
-        print(data_list_oblects_results)
+        data_list_oblects = []
+        for d in get_objects['items']:
+            data_list_oblects.append(params_to_dict(d))
+
+        #4.1.1 Берём список таблиц для того не тащить имена схем
+        id_objs_objects = [d.get('physicalObjectId') for d in data_list_oblects]
+        print(id_objs_objects)
+
+        #5 Работа с обектом PhysicalGroup
+        request_group = {
+            "query": {
+                "id": id_objs_objects
+            },
+            "page": 1,
+            "pageSize": 300
+        }
+
+        get_group = repo.readEntity(
+            entityType=DataCatalogEntityType.PhysicalGroup.value,
+            payload=request_group
+        )
+    
+        data_list_group = []
+        for d in get_group['items']:
+            data_list_group.append(params_to_dict(d))
+
+        print(data_list_group)
+
 
         return get_cool_parms, get_cool_results
