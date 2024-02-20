@@ -11,5 +11,5 @@ class JsonConfManager(ConfigManager):
 
         :return: лист внутри json
         """
-        
+
         return self.config

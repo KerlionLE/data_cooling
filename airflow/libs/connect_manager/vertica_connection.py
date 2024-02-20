@@ -1,9 +1,10 @@
 import vertica_python
 
+from typing import Protocol, runtime_checkable
+
 from .db_connection import DBConnection
 from krbticket import KrbCommand, KrbConfig
 
-from typing import Protocol, runtime_checkable
 
 @runtime_checkable
 class KerberosAuthProtocol(Protocol):
@@ -73,7 +74,7 @@ class VerticaConnection(DBConnection):
                 conn.commit()
 
             return result
-    
+
     def apply_script_hdfs(self, script: str, conf_krb_info: list) -> list:
         """
         apply_script - запуск скипта.  Реализация: a = cur.fetchall() используется с select, а cur.fetchall() используется - поймать ошибку в dml(несколько скриптов) или ещё один select в файле

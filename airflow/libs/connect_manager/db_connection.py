@@ -16,7 +16,7 @@ class DBConnection:
 
         """
         raise NotImplementedError
-    
+
     def apply_script_hdfs(self, script: str, conf_krb_info: list) -> str:
         """
         apply_script - запуск скипта
