@@ -1,16 +1,30 @@
 import logging
 
-from .conf_manager import ConfigManager
-
 from pydg.core.session import Session
 from pydg.data_catalog.repo import Repo
 from pydg.data_catalog.model.dicts import DataCatalogEntityType
 
+from .conf_manager import ConfigManager
 
-def type_to_dict(obj):
+
+def type_to_dict(obj: str) -> str:
+    """
+    Функция реализована для работы со структурой обект в объекте
+    :param obj: объект для изменения
+
+    :return: возвращает правильное значение 
+    """
+
     return 'FULLCOPY'
 
-def params_to_dict(obj):
+def params_to_dict(obj) -> dict:
+    """
+    Функция превращения класса в словарь
+    :param obj: Класс обекта 
+
+    :return: словарь 
+    """
+
     d = {}
     for name, value in obj.__dict__.items():
         d[name] = value if name != 'coolingType' or name != 'heatingType' else type_to_dict(value)
@@ -22,14 +36,14 @@ class DataCatalogConfManager(ConfigManager):
     def get_config(self, conf: list = None) -> dict:
         """
         Обработка конфига - json формата из data catalog
-        :param path: путь к конфигу
+        :param conf: возможные параметры конфига
 
         :return: лист внутри json
         """
         BASE_URL = 'https://dg.dev002.local/dc-blue'  # URL прода, теста или дева
-        ROOT_CA_PATH = self.config["root_ca_path"]
-        USERNAME = self.config["username"]
-        PASSWORD = self.config["password"]
+        ROOT_CA_PATH = self.config['root_ca_path']
+        USERNAME = self.config['username']
+        PASSWORD = self.config['password']
 
         logger = logging.getLogger('data_catalog')
         logger.setLevel(logging.DEBUG)
@@ -48,36 +62,36 @@ class DataCatalogConfManager(ConfigManager):
         logger.info('Execute query')
 
         request_cool_parms = {
-            "query": {
-                "coolingIsActive": True
+            'quer': {
+                'coolingIsActive': True
             },
-            "page": 1,
-            "pageSize": 300
-        }
+            'page': 1,
+            'pageSize': 300
+        },
 
         request_cool_results = {
-            "query": {
-                "physicalObjectCoolParamsId": 39
+            'query': {
+                'physicalObjectCoolParamsId': 39
             },
-            "page": 1,
-            "pageSize": 300
-        }
+            'page': 1,
+            'pageSize': 300
+        },
 
         request_heating_parms = {
-            "query": {
-                "heatingIsActive": True
+            'query': {
+                'heatingIsActive': True
             },
-            "page": 1,
-            "pageSize": 300
-        }
+            'page': 1,
+            'pageSize': 300
+        },
 
         request_heating_results = {
-            "query": {
-                "physicalObjectHeatParamsId": 39
+            'query': {
+                'physicalObjectHeatParamsId': 39
             },
-            "page": 1,
-            "pageSize": 300
-        }
+            'page': 1,
+            'pageSize': 300
+        },
 
         #1 Работа с обектом PhysicalObjectCoolParams
         get_cool_parms = repo.readEntity(
@@ -163,12 +177,12 @@ class DataCatalogConfManager(ConfigManager):
 
         #4 Работа с обектом PhysicalObject
         request_objects = {
-            "query": {
-                "id": id_objs_cool_parms
+            'query': {
+                'id': id_objs_cool_parms
             },
-            "page": 1,
-            "pageSize": 300
-        }
+            'page': 1,
+            'pageSize': 300
+        },
 
         get_objects = repo.readEntity(
             entityType=DataCatalogEntityType.PhysicalObject.value,
@@ -184,29 +198,29 @@ class DataCatalogConfManager(ConfigManager):
 
         #5 Работа с обектом PhysicalGroup
         request_group = {
-            "query": {
-                "id": id_objs_objects
+            'query': {
+                'id': id_objs_objects
             },
-            "page": 1,
-            "pageSize": 300
-        }
+            'page': 1,
+            'pageSize': 300
+        },
 
         get_group = repo.readEntity(
             entityType=DataCatalogEntityType.PhysicalGroup.value,
             payload=request_group
         )
-    
+
         data_list_group = []
         for d in get_group['items']:
             data_list_group.append(params_to_dict(d))
-    
-        #5 Объединение объектов обектов PhysicalGroup и PhysicalObject           
+
+        #5 Объединение объектов обектов PhysicalGroup и PhysicalObject       
         data_list_oblects_group = []
         for a in data_list_oblects:
             for b in data_list_group:
                 if a['group'] == b['id']:
                     a['physicalNameGroup'] = b['physicalName']
-                    data_list_oblects_group.append(a) 
+                    data_list_oblects_group.append(a)
 
         #6 Объединение Всего
         data_list_all = []
@@ -215,6 +229,6 @@ class DataCatalogConfManager(ConfigManager):
                 if a['physicalObjectId'] == b['id']:
                     a['physicalName'] = b['physicalName']
                     a['physicalNameGroup'] = b['physicalNameGroup']
-                    data_list_all.append(a) 
+                    data_list_all.append(a)
 
         return get_cool_parms, get_cool_results
