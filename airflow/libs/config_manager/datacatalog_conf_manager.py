@@ -166,7 +166,6 @@ class DataCatalogConfManager(ConfigManager):
         print(data_list)
 
         #4 Работа с обектом PhysicalObject
-
         request_object = {
             "query": {
                 "id": {id_objs_cool_parms}
