@@ -78,9 +78,10 @@ class VerticaConnection(DBConnection):
     def apply_script_hdfs(self, script: str, conf_krb_info: list) -> list:
         """
         apply_script - запуск скипта.  Реализация: a = cur.fetchall() используется с select, а cur.fetchall() используется - поймать ошибку в dml(несколько скриптов) или ещё один select в файле
-        :param script: скрипт - sql запрос из вертики в hdfs 
+        :param script: скрипт - sql запрос из вертики в hdfs
         :param conf_krb_info: конфиг подключения к через кебрерос
 
+        :return: результат sql запроса
         """
 
         with KerberosAuth(conf_krb_info['principal'], conf_krb_info['keytab']):
