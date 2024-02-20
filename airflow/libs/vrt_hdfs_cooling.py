@@ -125,10 +125,7 @@ def get_max_load_ts(config: list, db_connection_src: DBConnection, sql_scripts_p
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def gen_dml(config: list,
-            copy_to_vertica: str,
-            delete_with_partitions: str,
-            export_with_partitions: str) -> list:
+def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, export_with_partitions: str) -> list:
     """
     Генерирует DML скрипт
     :param config: конфиг

@@ -42,10 +42,10 @@ class DataCatalogConfManager(ConfigManager):
 
         :return: лист внутри json
         """
-        BASE_URL = 'https://dg.dev002.local/dc-blue'  # URL прода, теста или дева
-        ROOT_CA_PATH = self.config['root_ca_path']
-        USERNAME = self.config['username']
-        PASSWORD = self.config['password']
+        base_url = 'https://dg.dev002.local/dc-blue'  # URL прода, теста или дева
+        root_ca_path = self.config['root_ca_path']
+        username = self.config['username']
+        password = self.config['password']
 
         logger = logging.getLogger('data_catalog')
         logger.setLevel(logging.DEBUG)
@@ -56,7 +56,7 @@ class DataCatalogConfManager(ConfigManager):
         logger.info('Start')
 
         session = Session(logger)  # create and start API session
-        if not session.start(baseUrl=BASE_URL, username=USERNAME, password=PASSWORD, rootCA=ROOT_CA_PATH):
+        if not session.start(baseUrl=base_url, username=username, password=password, rootCA=root_ca_path):
             logger.error('Failed to start session')
             return
 
