@@ -215,7 +215,7 @@ class DataCatalogConfManager(ConfigManager):
         for a in data_list_oblects:
             for b in data_list_group:
                 if a['group'] == b['id']:
-                    a['physicalName'] = b['physicalName']
+                    a['physicalNamegroup'] = b['physicalName']
                     data_list_oblects_group.append(a) 
         
         print(data_list_oblects_group)
