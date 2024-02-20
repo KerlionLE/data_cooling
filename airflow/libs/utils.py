@@ -4,6 +4,7 @@ import json
 from .config_manager import AVAILABLE_FORMAT_MANAGER
 from .connect_manager import AVAILABLE_DB_CONNECTIONS, DBConnection
 
+
 def get_formated_file(path: str, **params) -> str:
     """
     Open sql команд из папки sql
@@ -17,6 +18,7 @@ def get_formated_file(path: str, **params) -> str:
         text = f.read()
     return text.format(**params)
 
+
 def save_file(path: str, conf_info: list) -> None:
     """
     Сохранение файл
@@ -29,8 +31,8 @@ def save_file(path: str, conf_info: list) -> None:
     with open(os.path.expandvars(path), 'w') as f:
         f.write(json.dumps(conf_info))
 
-def get_config_manager(source_type: str,
-                       source_config: list) -> dict:
+
+def get_config_manager(source_type: str, source_config: list) -> dict:
     """
     get_config_manager - для проверки и запуска ConfigManager
     :param source_type: тип конфига
@@ -42,12 +44,12 @@ def get_config_manager(source_type: str,
 
     if config_manager_cls is None:
         raise Exception(
-            f'''UNKNOWN FORMAT: {source_type}. AVAILABLE TYPES: {','.join([c_name for c_name in AVAILABLE_FORMAT_MANAGER])}''',
+            f'''UNKNOWN FORMAT: {source_type}. AVAILABLE TYPES: {','.join((c_name for c_name in AVAILABLE_FORMAT_MANAGER))}''',
         )
     return config_manager_cls(config=source_config)
 
-def get_connect_manager(con_type: str,
-                        con_config: list) -> DBConnection:
+
+def get_connect_manager(con_type: str, con_config: list) -> DBConnection:
     """
     get_connect_manager - для проверки и запуска DBConnection:
 
@@ -60,6 +62,6 @@ def get_connect_manager(con_type: str,
 
     if db_connection_cls is None:
         raise Exception(
-            f'''UNKNOWN DB_TYPE: {con_type}. AVAILABLE TYPES: {','.join([c_name for c_name in AVAILABLE_DB_CONNECTIONS])}''',
+            f'''UNKNOWN DB_TYPE: {con_type}. AVAILABLE TYPES: {','.join((c_name for c_name in AVAILABLE_DB_CONNECTIONS))}''',
         )
     return db_connection_cls(**con_config)
