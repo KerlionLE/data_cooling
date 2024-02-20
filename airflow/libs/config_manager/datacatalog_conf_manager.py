@@ -140,9 +140,9 @@ class DataCatalogConfManager(ConfigManager):
         for a in data_list_heat_parms:
             if len(data_list_heat_results) != 0:
                 for b in data_list_heat_results:
-                    if a['id'] == b['physicalObjectCoolParamsId']:
-                        a['coolingLastDate'] = b['coolingLastDate']
-                        a['coolingHdfsTarget'] = b['coolingHdfsTarget']
+                    if a['id'] == b['physicalObjectHeatParamsId']:
+                        a['heatingExternalTableName'] = b['heatingExternalTableName']
+                        a['isAlreadyHeating'] = b['isAlreadyHeating']
                         data_list_heat.append(a)
             else: 
                 data_list_heat.append(a)
@@ -164,5 +164,7 @@ class DataCatalogConfManager(ConfigManager):
                    data_list.append(a) 
 
         print(data_list)
+
+        #4 Объединение PhysicalObjectHeatParams и PhysicalObjectHeatResult
 
         return get_cool_parms, get_cool_results
