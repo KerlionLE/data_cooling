@@ -290,6 +290,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     source_config = conf['replication_objects_source']['source_config']
     system_tz = conf['source_system']['system_config']['system_tz']
 
+    print(source_config)
     conf_krb_info = conf['target_system']['system_config']['connection_config']['connection_conf']
 
     db_connection_config_src = {
