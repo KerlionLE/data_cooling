@@ -169,7 +169,7 @@ class DataCatalogConfManager(ConfigManager):
         #4 Работа с обектом PhysicalObject
         request_object = {
             "query": {
-                "id": {id_objs_cool_parms}
+                "id": f'{id_objs_cool_parms}'
             },
             "page": 1,
             "pageSize": 300
