@@ -11,12 +11,7 @@ from .checkconf import chconf
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def get_last_tech_load_ts(schemas: list,
-                          tables: list,
-                          schema_table_name_registry: str,
-                          db_connection_src: DBConnection,
-                          sql_scripts_path: str,
-                          conf_krb_info) -> dict:
+def get_last_tech_load_ts(schemas: list, tables: list, schema_table_name_registry: str, db_connection_src: DBConnection, sql_scripts_path: str, conf_krb_info) -> dict:
     """
     Забираем max дату из технической таблицы - записываем в словарь с 2-мя ключами
     :param schemas: название схем, которые нужно реплицировать
@@ -24,6 +19,7 @@ def get_last_tech_load_ts(schemas: list,
     :param schema_table_name_registry: название технической схемы-таблицы с историей работы репликации
     :param db_connection_src: объект соединения
     :param sql_scripts_path: путь к sql скрипту
+    :param conf_krb_info: конфиг подключения через керберос
 
     :return: возвращает словарь с 2-мя ключами - схема, таблица
     """
@@ -40,11 +36,12 @@ def get_last_tech_load_ts(schemas: list,
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def filter_objects(config: dict, system_tz: str, objects) -> list:
+def filter_objects(config: dict, system_tz: str, objects: dict) -> list:
     """
     Фильтрует словарь относительно частоты загрузки данных, сравнивая его с config timezone - airflow в utc, вертика в utc +3
     :param config: конфиг репликации
     :param system_tz: таймзона в конфиге
+    :param : значения из технической таблицы
 
     :return: возвращает лист - отфильтрованный конфиг с учётом частоты
     """
@@ -84,10 +81,7 @@ def filter_objects(config: dict, system_tz: str, objects) -> list:
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def get_max_load_ts(config: list,
-                    db_connection_src: DBConnection,
-                    sql_scripts_path_select: str,
-                    conf_krb_info: list) -> list:
+def get_max_load_ts(config: list, db_connection_src: DBConnection, sql_scripts_path_select: str, conf_krb_info: list) -> list:
     """
     Select из основных таблиц выборки. Забираем max(tech_load_ts)
     :param config: конфиг
@@ -138,7 +132,7 @@ def gen_dml(config: list,
     """
     Генерирует DML скрипт
     :param config: конфиг
-    :param copy_to_vertica: путь к sql скрипт 
+    :param copy_to_vertica: путь к sql скрипт
     :param delete_with_partitions: путь к sql скрипт
     :param export_with_partitions: путь к sql скрипт
 
@@ -156,8 +150,7 @@ def gen_dml(config: list,
         temporary_heating = conf.get('temporary_heating') or False
 
         date_start = conf.get('last_date_cooling') or '1000-10-01 15:14:15'
-        partition = conf.get(
-            'partition_expressions') or f'''DATE({tech_ts_column_name})'''
+        partition = conf.get('partition_expressions') or f'''DATE({tech_ts_column_name})'''
 
         current_date = datetime.now()
         date_end_cooling_depth = (datetime.strptime(
@@ -178,7 +171,7 @@ def gen_dml(config: list,
             schema_name=conf['schema_name'],
             table_name=conf['table_name'],
             filter_expression=conf['filter_expression'],
-            time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' '''
+            time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' ''',
         )
 
         if conf['cooling_type'] == 'time_based':
@@ -186,19 +179,16 @@ def gen_dml(config: list,
                 if temporary_heating:
 
                     depth_heating = conf['temporary_heating']['depth']
-                    date_end_heating_depth = (datetime.strptime(
-                        actual_max_tech_load_ts, '%Y-%m-%d %H:%M:%S') - timedelta(days=depth_heating)).strftime('%Y-%m-%d %H:%M:%S')
-                    date_end_heating = datetime.strptime(
-                        conf['temporary_heating']['date_end'], '%Y-%m-%d %H:%M:%S')
-                    date_start_heating = datetime.strptime(
-                        conf['temporary_heating']['date_start'], '%Y-%m-%d %H:%M:%S')
+                    date_end_heating_depth = (datetime.strptime(actual_max_tech_load_ts, '%Y-%m-%d %H:%M:%S') - timedelta(days=depth_heating)).strftime('%Y-%m-%d %H:%M:%S')
+                    date_end_heating = datetime.strptime(conf['temporary_heating']['date_end'], '%Y-%m-%d %H:%M:%S')
+                    date_start_heating = datetime.strptime(conf['temporary_heating']['date_start'], '%Y-%m-%d %H:%M:%S')
 
                     sql_delete_date_start_date_end_heating_depth = get_formated_file(
                         delete_with_partitions,
                         schema_name=conf['schema_name'],
                         table_name=conf['table_name'],
                         filter_expression=conf['filter_expression'],
-                        time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_heating_depth}' '''
+                        time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_heating_depth}' ''',
                     )
 
                     if conf['temporary_heating']['already_heat'] == 0 and current_date >= date_start_heating and current_date < date_end_heating:
@@ -244,14 +234,15 @@ def gen_dml(config: list,
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, load_max_tech_load_ts_insert, schema_table_name_registry):
+def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, load_max_tech_load_ts_insert: str, schema_table_name_registry: str):
     """
     Запуск DML скриптов
     :param config: конфиг
-    :param db_connection_config_src: кон к базе
+    :param db_connection_src: кон к базе
     :param conf_krb_info: конфиг соединения через керберос
+    :param load_max_tech_load_ts_insert: sql скрипт
+    :param schema_table_name_registry: название тех талицы
 
-    :return: возвращает конфиог с dml сриптом
     """
 
     for conf in config:
@@ -309,7 +300,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
         'port': '5433',
         'database': 'devdb',
         'user': 'a001cd-etl-vrt-hdp',
-        "autocommit": True,
+        'autocommit': True,
     }
 
     'Step 1 - создание conn к vertica'
