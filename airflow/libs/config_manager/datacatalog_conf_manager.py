@@ -176,12 +176,15 @@ class DataCatalogConfManager(ConfigManager):
             "pageSize": 300
         }
 
-        print(request_objects)
-
-        get_heat_results = repo.readEntity(
+        get_objects_results = repo.readEntity(
             entityType=DataCatalogEntityType.PhysicalObject.value,
             payload=request_objects
         )
-        print(get_heat_results)
+
+        data_list_oblects_results = []
+        for d in get_objects_results['items']:
+            data_list_oblects_results.append(params_to_dict(d))
+            
+        print(data_list_oblects_results)
 
         return get_cool_parms, get_cool_results
