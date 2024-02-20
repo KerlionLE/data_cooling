@@ -170,7 +170,7 @@ def gen_dml(config: list,
             filter_expression=conf['filter_expression'],
             partition_expressions=partition,
             time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' ''',
-            cur_date=(datetime.now() - timedelta(days=7)).strftime('%Y%m%d'),
+            cur_date=(datetime.now() - timedelta(days=2)).strftime('%Y%m%d'),
         )
 
         sql_delete_date_start_date_end_cooling_depth = get_formated_file(
@@ -232,7 +232,7 @@ def gen_dml(config: list,
                     filter_expression='',
                     partition_expressions=partition,
                     time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{actual_max_tech_load_ts}' ''',
-                    cur_date=(datetime.now() - timedelta(days=7)).strftime('%Y%m%d')
+                    cur_date=(datetime.now() - timedelta(days=2)).strftime('%Y%m%d')
                 )
                 sql = f'{sql_export}'
 
@@ -356,5 +356,3 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     'Step 8 - запусе dml скриптов'
     run_dml(gen_dmls, db_connection_src, conf_krb_info,
             load_max_tech_load_ts_insert, schema_table_name_registry)
-
-    'Step FOR TEST - загрузка данных в тех таблицу'
