@@ -8,36 +8,66 @@ from krbticket import KrbCommand, KrbConfig
 
 @runtime_checkable
 class KerberosAuthProtocol(Protocol):
+    """Класс KerberosAuth для con к Вертике и hdfs"""
+
     def kinit(self):
+        """
+        kinit для дальнейшего масштабирования
+
+        :return: ничего
+        """
         ...
 
     def kdestroy(self):
+        """
+        kdestroy для дальнейшего масштабирования
+
+        :return: ничего
+        """
         ...
 
 
 class KerberosAuth:
+    """Класс KerberosAuth для con к Вертике и hdfs"""
+
     def __init__(self, principal: str, keytab_path: str):
+        """
+        Инициализация класса
+        :param principal: необходимый параметр для подключения через керберос
+        :param keytab_path: необходимый параметр для подключения через керберос
+
+        """
+
         self.principal = principal
         self.keytab_path = keytab_path
         self._krb_config = None
 
     @property
     def krb_config(self) -> KrbConfig:
+        """
+        krb_config
+
+        :return: возвращает krb конфиг
+        """
         if self._krb_config is None:
             self._krb_config = KrbConfig(principal=self.principal, keytab=self.keytab_path)
 
         return self._krb_config
 
     def kinit(self):
+        """kinit"""
         KrbCommand.kinit(self.krb_config)
 
     def kdestroy(self):
+        """kdestroy"""
         KrbCommand.kdestroy(self.krb_config)
 
     def __enter__(self):
+        """enter"""
         self.kinit()
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self):
+        """exit"""
         self.kdestroy()
 
 
@@ -52,28 +82,6 @@ class VerticaConnection(DBConnection):
         """
         super(VerticaConnection, self).__init__(**config)
         self.__conn_info = config
-
-    def apply_script_vrt(self, script: str) -> list:
-        """
-        apply_script_vrt создание курсора - запусе скрипта - autocommit
-        Реализация: a = cur.fetchall() используется с select, а cur.fetchall() используется - поймать ошибку в dml(несколько скриптов) или ещё один select в файле
-        :param script: sql запрос
-
-        :return: результат sql запроса
-        """
-        with vertica_python.connect(**self.__conn_info) as conn:
-            result = []
-            with conn.cursor() as cur:
-
-                cur.execute(script)
-                result.append(cur.fetchall())
-                while cur.nextset():
-                    result.append(cur.fetchall())
-
-            if not conn.autocommit:
-                conn.commit()
-
-            return result
 
     def apply_script_hdfs(self, script: str, conf_krb_info: list) -> list:
         """

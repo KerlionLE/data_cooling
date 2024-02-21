@@ -10,7 +10,7 @@ from .utils import get_formated_file, get_connect_manager, get_config_manager
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def get_last_tech_load_ts(schemas: list, tables: list, schema_table_name_registry: str, db_connection_src: DBConnection, sql_scripts_path: str, conf_krb_info) -> dict:
+def get_last_tech_load_ts(schemas: list, tables: list, schema_table_name_registry: str, db_connection_src: DBConnection, sql_scripts_path: str, conf_krb_info: list) -> dict:
     """
     Забираем max дату из технической таблицы - записываем в словарь с 2-мя ключами
     :param schemas: название схем, которые нужно реплицировать
@@ -40,7 +40,7 @@ def filter_objects(config: dict, system_tz: str, objects: dict) -> list:
     Фильтрует словарь относительно частоты загрузки данных, сравнивая его с config timezone - airflow в utc, вертика в utc +3
     :param config: конфиг репликации
     :param system_tz: таймзона в конфиге
-    :param : значения из технической таблицы
+    :param objects: значения из технической таблицы
 
     :return: возвращает лист - отфильтрованный конфиг с учётом частоты
     """
@@ -49,7 +49,7 @@ def filter_objects(config: dict, system_tz: str, objects: dict) -> list:
 
         db_data = objects.get(
             (conf['schema_name'], conf['table_name']))  # для тестов
-        last_date_cooling = conf.get('last_date_cooling')
+        # last_date_cooling = conf.get('last_date_cooling')
         update_freq = conf.get('data_cooling_frequency')
 
         if not db_data:
@@ -59,8 +59,7 @@ def filter_objects(config: dict, system_tz: str, objects: dict) -> list:
             continue
 
         conf['is_new'] = False
-        # last_tech_load_ts = datetime.strptime(
-        # last_date_cooling, '%Y-%m-%d %H:%M:%S')
+        # last_tech_load_ts = datetime.strptime(last_date_cooling, '%Y-%m-%d %H:%M:%S')
         last_tech_load_ts = db_data['tech_load_ts'].replace(tzinfo=None)
         conf['last_date_cooling'] = last_tech_load_ts.strftime(
             '%Y-%m-%d %H:%M:%S')
@@ -218,9 +217,11 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                     filter_expression='',
                     partition_expressions=partition,
                     time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{actual_max_tech_load_ts}' ''',
-                    cur_date=(datetime.now() - timedelta(days=2)).strftime('%Y%m%d')
+                    cur_date=(datetime.now() - timedelta(days=2)).strftime('%Y%m%d'),
                 )
                 sql = f'{sql_export}'
+            else: 
+                sql = ''
 
         conf['dml_script'] = sql
         conf_with_dml.append(conf)
