@@ -66,7 +66,7 @@ class KerberosAuth:
         """enter"""
         self.kinit()
 
-    def __exit__(self):
+    def __exit__(self, exc_type: str, exc_val: str, exc_tb: str):
         """exit"""
         self.kdestroy()
 
