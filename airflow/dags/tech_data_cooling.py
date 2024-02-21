@@ -5,7 +5,6 @@ from datetime import datetime
 from airflow import DAG
 from airflow.hooks.base import BaseHook
 from airflow.models import Variable
-
 from dwh_utils.airflow.common import get_dag_name
 
 from operators.python_virtualenv_artifactory_operator import PythonVirtualenvCurlOperator
