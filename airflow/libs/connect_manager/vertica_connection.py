@@ -6,27 +6,6 @@ from .db_connection import DBConnection
 from krbticket import KrbCommand, KrbConfig
 
 
-@runtime_checkable
-class KerberosAuthProtocol(Protocol):
-    """Класс KerberosAuth для con к Вертике и hdfs"""
-
-    def kinit(self):
-        """
-        kinit для дальнейшего масштабирования
-
-        :return: ничего
-        """
-        ...
-
-    def kdestroy(self):
-        """
-        kdestroy для дальнейшего масштабирования
-
-        :return: ничего
-        """
-        ...
-
-
 class KerberosAuth:
     """Класс KerberosAuth для con к Вертике и hdfs"""
 
@@ -67,7 +46,13 @@ class KerberosAuth:
         self.kinit()
 
     def __exit__(self, exc_type: str, exc_val: str, exc_tb: str):
-        """exit"""
+        """
+        exit
+        
+        :param exc_type: запуск типа
+        :param exc_val: запусе значения
+        :param exc_tb: запуск таблицы
+        """
         self.kdestroy()
 
 
