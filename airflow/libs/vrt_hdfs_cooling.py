@@ -49,7 +49,7 @@ def filter_objects(config: dict, system_tz: str, objects: dict) -> list:
 
         db_data = objects.get(
             (conf['schema_name'], conf['table_name']))  # для тестов
-        # last_date_cooling = conf.get('last_date_cooling')
+        # Для тестов - last_date_cooling = conf.get('last_date_cooling')
         update_freq = conf.get('data_cooling_frequency')
 
         if not db_data:
@@ -59,7 +59,7 @@ def filter_objects(config: dict, system_tz: str, objects: dict) -> list:
             continue
 
         conf['is_new'] = False
-        # last_tech_load_ts = datetime.strptime(last_date_cooling, '%Y-%m-%d %H:%M:%S')
+        # Для тестов - last_tech_load_ts = datetime.strptime(last_date_cooling, '%Y-%m-%d %H:%M:%S')
         last_tech_load_ts = db_data['tech_load_ts'].replace(tzinfo=None)
         conf['last_date_cooling'] = last_tech_load_ts.strftime(
             '%Y-%m-%d %H:%M:%S')
@@ -220,7 +220,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                     cur_date=(datetime.now() - timedelta(days=2)).strftime('%Y%m%d'),
                 )
                 sql = f'{sql_export}'
-            else: 
+            else:
                 sql = ''
 
         conf['dml_script'] = sql
