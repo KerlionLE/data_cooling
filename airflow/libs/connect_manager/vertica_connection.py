@@ -77,8 +77,7 @@ class VerticaConnection(DBConnection):
         :return: результат sql запроса
         """
 
-        with KerberosAuth(conf_krb_info['principal'], conf_krb_info['keytab']):
-            with vertica_python.connect(**self.__conn_info) as conn:
+        with KerberosAuth(conf_krb_info['principal'], conf_krb_info['keytab']), vertica_python.connect(**self.__conn_info) as conn:
                 result = []
                 with conn.cursor() as cur:
 
