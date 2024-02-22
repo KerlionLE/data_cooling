@@ -145,11 +145,12 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
         temporary_heating = conf.get('temporary_heating') or False
 
         date_start = conf.get('last_date_cooling') or '1000-10-01 15:14:15'
-        partition = conf.get('partition_expressions') or f'''DATE({tech_ts_column_name})'''
+        partition = conf.get('partition_expressions') or f'DATE({tech_ts_column_name})'
+        date_type = '%Y-%m-%d %H:%M:%S'
 
         current_date = datetime.now()
         date_end_cooling_depth = (datetime.strptime(
-            actual_max_tech_load_ts, '%Y-%m-%d %H:%M:%S') - timedelta(days=depth_cooling)).strftime('%Y-%m-%d %H:%M:%S')
+            actual_max_tech_load_ts,  {date_type}) - timedelta(days=depth_cooling)).strftime({date_type})
 
         sql_export_date_start_date_end_cooling_depth = get_formated_file(
             export_with_partitions,
@@ -158,7 +159,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
             filter_expression=conf['filter_expression'],
             partition_expressions=partition,
             time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' ''',
-            cur_date=(datetime.now() - timedelta(days=2)).strftime('%Y%m%d'),
+            cur_date=(datetime.now()).strftime('%Y%m%d'),
         )
 
         sql_delete_date_start_date_end_cooling_depth = get_formated_file(
@@ -174,9 +175,9 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                 if temporary_heating:
 
                     depth_heating = conf['temporary_heating']['depth']
-                    date_end_heating_depth = (datetime.strptime(actual_max_tech_load_ts, '%Y-%m-%d %H:%M:%S') - timedelta(days=depth_heating)).strftime('%Y-%m-%d %H:%M:%S')
-                    date_end_heating = datetime.strptime(conf['temporary_heating']['date_end'], '%Y-%m-%d %H:%M:%S')
-                    date_start_heating = datetime.strptime(conf['temporary_heating']['date_start'], '%Y-%m-%d %H:%M:%S')
+                    date_end_heating_depth = (datetime.strptime(actual_max_tech_load_ts, {date_type}) - timedelta(days=depth_heating)).strftime( {date_type})
+                    date_end_heating = datetime.strptime(conf['temporary_heating']['date_end'],  {date_type})
+                    date_start_heating = datetime.strptime(conf['temporary_heating']['date_start'],  {date_type})
 
                     sql_delete_date_start_date_end_heating_depth = get_formated_file(
                         delete_with_partitions,
@@ -191,7 +192,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                             copy_to_vertica,
                             schema_name=conf['schema_name'],
                             table_name=conf['table_name'],
-                            cur_date=(datetime.now() - timedelta(days=2)).strftime('%Y%m%d'),
+                            cur_date=(datetime.now()).strftime('%Y%m%d'),
                         )
 
                         sql = f'{sql_copy_to_vertica}\n{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_heating_depth}'
@@ -217,7 +218,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                     filter_expression='',
                     partition_expressions=partition,
                     time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{actual_max_tech_load_ts}' ''',
-                    cur_date=(datetime.now() - timedelta(days=2)).strftime('%Y%m%d'),
+                    cur_date=(datetime.now()).strftime('%Y%m%d'),
                 )
                 sql = f'{sql_export}'
             else:
@@ -309,9 +310,10 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(config)
 
     'Step FOR TEST - берём макс дату последней репликации'
+    test_tech_table = 'AUX_REPLICATION.COOLING_TABLE'
     tables = [el['table_name'] for el in config]
     schemas = [el['schema_name'] for el in config]
-    schema_table_name_registry = 'AUX_REPLICATION.COOLING_TABLE'
+    schema_table_name_registry = {test_tech_table}
     last_tech_load_ts = get_last_tech_load_ts(
         schemas, tables, schema_table_name_registry, db_connection_src, get_last_tech_load_ts_sql, conf_krb_info)
     logging.info(last_tech_load_ts)

@@ -43,8 +43,8 @@ def get_config_manager(source_type: str, source_config: list) -> dict:
     config_manager_cls = AVAILABLE_FORMAT_MANAGER.get(source_type)
 
     if config_manager_cls is None:
-        raise Exception(
-            f'''UNKNOWN FORMAT: {source_type}. AVAILABLE TYPES: {','.join((c_name for c_name in AVAILABLE_FORMAT_MANAGER))}''',
+        raise ValueError(
+            f'''UNKNOWN FORMAT: {source_type}. AVAILABLE TYPES:{','.join(AVAILABLE_FORMAT_MANAGER)}''',
         )
     return config_manager_cls(config=source_config)
 
@@ -61,7 +61,7 @@ def get_connect_manager(con_type: str, con_config: list) -> DBConnection:
     db_connection_cls = AVAILABLE_DB_CONNECTIONS.get(con_type)
 
     if db_connection_cls is None:
-        raise Exception(
-            f'''UNKNOWN DB_TYPE: {con_type}. AVAILABLE TYPES: {','.join((c_name for c_name in AVAILABLE_DB_CONNECTIONS))}''',
+        raise ValueError(
+            f'''UNKNOWN DB_TYPE: {con_type}. AVAILABLE TYPES:{','.join(AVAILABLE_FORMAT_MANAGER)}''',
         )
     return db_connection_cls(**con_config)

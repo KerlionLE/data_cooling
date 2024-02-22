@@ -16,7 +16,6 @@ AIRFLOW_ENV = os.environ['AIRFLOW_ENV']
 DEFAULT_ARGS = {
     'owner': 'romanovskiimv',
     'start_date': datetime(2023, 10, 17),
-    'retries': 0,
     'task_concurrency': 5,
     'pool': 'tech_pool',
     'queue': 'afk8s_tech_queue',
@@ -87,38 +86,22 @@ def get_conn(dag_name: str, env_name: str, replication_names: str, system_type: 
         logging.warning(f"The conn_id `con_id` isn't defined: {e}")
 
 
-def get_qty_worker(dag_name: str, env_name: str, replication_names: str) -> dict:
-    """
-    Функция реализована для получения из кофига кол. воркеров для airflow (для того чтобы запускать паралельно несколько конфига охлаждения)
-    :param dag_name: название дага
-    :param env_name: название среды
-    :param replication_names: название конфига
-
-    :return: Возвращает колличесво воркеров airflow на которых будет рабоать ran_dml
-    """
-
-    replication_config = get_replication_config(
-        dag_name, env_name, replication_names)
-    return replication_config['workers']
-
-
 PYPI_REQUIREMENTS = [
     'pydantic>=2.0.0',
 ]
-
-with DAG(**DAG_CONFIG) as dag:
-
-    ukd_requirements = [
+UKD_REQUIREMENTS = [
         {'lib_name': 'pydg', 'version': 'v0.3.19', 'storage': 'non-standard'},
         {'lib_name': 'dg_utils', 'version': '1.0.3', 'storage': 'standard'},
     ]
+
+with DAG(**DAG_CONFIG) as dag:
 
     inegration_name = 'data_cooling'
 
     preprocess_config_checks_con_dml = PythonVirtualenvCurlOperator(
         task_id='preprocess_config_checks_con_dml',
         pypi_requirements=PYPI_REQUIREMENTS,
-        ukd_requirements=ukd_requirements,
+        ukd_requirements=UKD_REQUIREMENTS,
         connection_params={
                 'login': r'{{ conn.artifactory_pypi_rc.login }}',
                 'password': r'{{ conn.artifactory_pypi_rc.password }}',
