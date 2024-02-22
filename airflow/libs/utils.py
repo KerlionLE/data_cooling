@@ -81,7 +81,7 @@ def save_file(path: str, conf_info: list) -> None:
 
     os.makedirs(os.path.dirname(os.path.expandvars(path)), exist_ok=True)
     with open(os.path.expandvars(path), 'w') as f:
-        f.write(json.dumps(conf_info))
+        json.dump(conf_info, f) 
 
 
 def get_config_manager(source_type: str, source_config: list) -> dict:
