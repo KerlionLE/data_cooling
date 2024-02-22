@@ -25,8 +25,8 @@ def get_last_tech_load_ts(schemas: list, tables: list, schema_table_name_registr
     sql = get_formated_file(
         sql_scripts_path,
         schema_table_name=schema_table_name_registry,
-        schema_names=', '.join("'" + element + "'" for element in schemas),
-        table_names=', '.join("'" + element + "'" for element in tables),
+        schema_names=', '.join(f'{element!r}' for element in schemas),
+        table_names=', '.join(f'{element!r}' for element in schemas),
     )
     return {
         (schema_name, table_name): {'tech_load_ts': tech_load_ts}
