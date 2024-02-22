@@ -6,6 +6,7 @@ from krbticket import KrbCommand, KrbConfig
 from .config_manager import AVAILABLE_FORMAT_MANAGER
 from .connect_manager import AVAILABLE_DB_CONNECTIONS, DBConnection
 
+
 class KerberosAuth:
     """Класс KerberosAuth для con к Вертике и hdfs"""
 
@@ -54,6 +55,7 @@ class KerberosAuth:
         :param exc_tb: запуск таблицы
         """
         self.kdestroy()
+
 
 def get_formated_file(path: str, **params) -> str:
     """

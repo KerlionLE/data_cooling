@@ -271,7 +271,7 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, 
 
 def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBConnection) -> None:
     """
-    Функция состоит из екскольких этапав: 
+    Функция состоит из екскольких этапав:
     Step 1 - создание conn к vertica
     Step 2 - берём конфиг
     Step FOR TEST - берём макс дату последней репликации
