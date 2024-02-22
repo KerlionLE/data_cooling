@@ -150,7 +150,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
 
         current_date = datetime.now()
         date_end_cooling_depth = (datetime.strptime(
-            actual_max_tech_load_ts,  {date_type}) - timedelta(days=depth_cooling)).strftime({date_type})
+            actual_max_tech_load_ts, date_type) - timedelta(days=depth_cooling)).strftime(date_type)
 
         sql_export_date_start_date_end_cooling_depth = get_formated_file(
             export_with_partitions,
@@ -175,9 +175,9 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                 if temporary_heating:
 
                     depth_heating = conf['temporary_heating']['depth']
-                    date_end_heating_depth = (datetime.strptime(actual_max_tech_load_ts, {date_type}) - timedelta(days=depth_heating)).strftime({date_type})
-                    date_end_heating = datetime.strptime(conf['temporary_heating']['date_end'],  {date_type})
-                    date_start_heating = datetime.strptime(conf['temporary_heating']['date_start'],  {date_type})
+                    date_end_heating_depth = (datetime.strptime(actual_max_tech_load_ts, date_type) - timedelta(days=depth_heating)).strftime(date_type)
+                    date_end_heating = datetime.strptime(conf['temporary_heating']['date_end'], date_type)
+                    date_start_heating = datetime.strptime(conf['temporary_heating']['date_start'], date_type)
 
                     sql_delete_date_start_date_end_heating_depth = get_formated_file(
                         delete_with_partitions,
