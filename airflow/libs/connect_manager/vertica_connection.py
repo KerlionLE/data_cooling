@@ -1,7 +1,5 @@
 import vertica_python
 
-from typing import Protocol, runtime_checkable
-
 from .db_connection import DBConnection
 from krbticket import KrbCommand, KrbConfig
 
@@ -48,7 +46,7 @@ class KerberosAuth:
     def __exit__(self, exc_type: str, exc_val: str, exc_tb: str):
         """
         exit
-        
+
         :param exc_type: запуск типа
         :param exc_val: запусе значения
         :param exc_tb: запуск таблицы
@@ -78,15 +76,15 @@ class VerticaConnection(DBConnection):
         """
 
         with KerberosAuth(conf_krb_info['principal'], conf_krb_info['keytab']), vertica_python.connect(**self.__conn_info) as conn:
-                result = []
-                with conn.cursor() as cur:
+            result = []
+            with conn.cursor() as cur:
 
-                    cur.execute(script)
+                cur.execute(script)
+                result.append(cur.fetchall())
+                while cur.nextset():
                     result.append(cur.fetchall())
-                    while cur.nextset():
-                        result.append(cur.fetchall())
 
-                if not conn.autocommit:
-                    conn.commit()
+            if not conn.autocommit:
+                conn.commit()
 
-                return result
+            return result
