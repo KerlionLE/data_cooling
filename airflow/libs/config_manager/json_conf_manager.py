@@ -7,7 +7,6 @@ class JsonConfManager(ConfigManager):
     def get_config(self) -> dict:
         """
         Обработка конфига - json формата
-        :param path: путь к конфигу
 
         :return: лист внутри json
         """

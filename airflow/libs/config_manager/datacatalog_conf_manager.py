@@ -153,6 +153,7 @@ def compound_heatparams_heatresult(repo: str) -> list:
 
     return data_list_heat
 
+
 def compound_heat_cool(data_list_cool: list, data_list_heat: list) -> list:
     """
     Обработка конфига разогрева - охлаждени и разогрева
@@ -176,6 +177,9 @@ def compound_heat_cool(data_list_cool: list, data_list_heat: list) -> list:
                 data_list.append(a)
             else:
                 data_list.append(a)
+    
+    return data_list
+
 
 def physicalobject(id_objs_cool_parms: list, repo: str) -> list:
     """
@@ -208,6 +212,7 @@ def physicalobject(id_objs_cool_parms: list, repo: str) -> list:
 
     return data_list_oblects, id_objs_objects
 
+
 def physicalgroup(id_objs_objects: list, repo: str) -> list:
     """
     Обработка конфига разогрева - json формата из data catalog берем 2 конфига объединяем
@@ -235,6 +240,7 @@ def physicalgroup(id_objs_objects: list, repo: str) -> list:
         data_list_group.append(params_to_dict(d))
 
     return data_list_group
+
 
 class DataCatalogConfManager(ConfigManager):
     """Класс Обработки конфига - включает в себя get и save"""
