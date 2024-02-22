@@ -271,6 +271,15 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, 
 
 def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBConnection) -> None:
     """
+    Функция состоит из екскольких этапав: 
+    Step 1 - создание conn к vertica
+    Step 2 - берём конфиг
+    Step FOR TEST - берём макс дату последней репликации
+    Step 4 - фильтруем по частоте
+    Step 5 - вывод кол. таблиц в конфиге
+    Step 6 - текущая макс дата в проде
+    Step 7 - генераия dml скриптов
+    Step 8 - запусе dml скриптов
     :param conf: конфиг запуска охлаждения
     :param db_connection_config_src: config src conn
 
@@ -293,15 +302,15 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
 
     conf_krb_info = conf['target_system']['system_config']['connection_config']['connection_conf']
 
-    'Step 1 - создание conn к vertica'
+    'Step 1'
     db_connection_src = get_connect_manager(con_type, db_connection_config_src)
 
-    'Step 2 - берём конфиг'
+    'Step 2'
     config_manager = get_config_manager(source_type, source_config)
     config = config_manager.get_config()
     logging.info(config)
 
-    'Step FOR TEST - берём макс дату последней репликации'
+    'Step FOR TEST'
     tables = [el['table_name'] for el in config]
     schemas = [el['schema_name'] for el in config]
     schema_table_name_registry = 'AUX_REPLICATION.COOLING_TABLE'
@@ -309,24 +318,24 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
         schemas, tables, schema_table_name_registry, db_connection_src, get_last_tech_load_ts_sql, conf_krb_info)
     logging.info(last_tech_load_ts)
 
-    'Step 4 - фильтруем по частоте'
+    'Step 4'
     filter_object = filter_objects(config, system_tz, last_tech_load_ts)
     logging.info(filter_object)
 
-    'Step 5 - вывод кол. таблиц в конфиге'
+    'Step 5'
     logging.info(
         f'''Колличество таблиц которое будеи охлаждаться - {len(filter_object)} ''')
 
-    'Step 6 - текущая макс дата в проде'
+    'Step 6'
     max_tech_load_ts = get_max_load_ts(
         filter_object, db_connection_src, get_max_tech_load_ts, conf_krb_info)
     logging.info(max_tech_load_ts)
 
-    'Step 7 - генераия dml скриптов'
+    'Step 7'
     gen_dmls = gen_dml(max_tech_load_ts, copy_to_vertica,
                        delete_with_partitions, export_with_partitions)
     logging.info(gen_dmls)
 
-    'Step 8 - запусе dml скриптов'
+    'Step 8'
     run_dml(gen_dmls, db_connection_src, conf_krb_info,
             load_max_tech_load_ts_insert, schema_table_name_registry)
