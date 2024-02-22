@@ -177,7 +177,7 @@ def compound_heat_cool(data_list_cool: list, data_list_heat: list) -> list:
                 data_list.append(a)
             else:
                 data_list.append(a)
-    
+
     return data_list
 
 
