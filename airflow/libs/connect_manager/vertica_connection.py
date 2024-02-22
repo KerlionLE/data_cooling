@@ -7,7 +7,7 @@ from krbticket import KrbCommand, KrbConfig
 class KerberosAuth:
     """Класс KerberosAuth для con к Вертике и hdfs"""
 
-    def __init__(self, principal: str, keytab_path: str):
+    def __init__(self, principal: str, keytab_path: str) -> None:
         """
         Инициализация класса
         :param principal: необходимый параметр для подключения через керберос
@@ -31,19 +31,19 @@ class KerberosAuth:
 
         return self._krb_config
 
-    def kinit(self):
+    def kinit(self) -> None:
         """kinit"""
         KrbCommand.kinit(self.krb_config)
 
-    def kdestroy(self):
+    def kdestroy(self) -> None:
         """kdestroy"""
         KrbCommand.kdestroy(self.krb_config)
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         """enter"""
         self.kinit()
 
-    def __exit__(self, exc_type: str, exc_val: str, exc_tb: str):
+    def __exit__(self, exc_type: str, exc_val: str, exc_tb: str) -> None:
         """
         exit
 

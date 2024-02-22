@@ -231,7 +231,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, load_max_tech_load_ts_insert: str, schema_table_name_registry: str):
+def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, load_max_tech_load_ts_insert: str, schema_table_name_registry: str) -> None:
     """
     Запуск DML скриптов
     :param config: конфиг
