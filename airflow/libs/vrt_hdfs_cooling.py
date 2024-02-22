@@ -22,16 +22,17 @@ def get_last_tech_load_ts(schemas: list, tables: list, schema_table_name_registr
 
     :return: возвращает словарь с 2-мя ключами - схема, таблица
     """
+    result = {}
     sql = get_formated_file(
         sql_scripts_path,
         schema_table_name=schema_table_name_registry,
         schema_names=', '.join(f'{element!r}' for element in schemas),
         table_names=', '.join(f'{element!r}' for element in tables),
     )
+    for schema_name, table_name, tech_load_ts in db_connection_src.apply_script_hdfs(sql, conf_krb_info)[0]:
+        result[(schema_name, table_name)] = {'tech_load_ts': tech_load_ts}
 
-    obj = {(schema_name, table_name): {'tech_load_ts': tech_load_ts} for schema_name, table_name, tech_load_ts in db_connection_src.apply_script_hdfs(sql, conf_krb_info)[0]}
-
-    return obj
+    return result
 
 # ------------------------------------------------------------------------------------------------------------------
 
