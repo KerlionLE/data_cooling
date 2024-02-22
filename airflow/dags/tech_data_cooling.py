@@ -108,9 +108,9 @@ with DAG(**DAG_CONFIG) as dag:
                 'host': r'{{ conn.artifactory_pypi_rc.host }}',
         },
         pip_config={
-            'index-url': f'{{{{ var.json.dg.pip_config.{AIRFLOW_ENV}.index_url }}}}',
-            'trusted-host': f'{{{{ var.json.dg.pip_config.{AIRFLOW_ENV}.trusted_host }}}}',
-            'extra-index-url': f'{{{{ var.json.dg.pip_config.{AIRFLOW_ENV}.extra_index_url }}}}',
+            'index-url': f'{{{{ var.json.pip_conf.pip_config.{AIRFLOW_ENV}.index_url }}}}',
+            'trusted-host': f'{{{{ var.json.pip_conf.pip_config.{AIRFLOW_ENV}.trusted_host }}}}',
+            'extra-index-url': f'{{{{ var.json.pip_conf.pip_config.{AIRFLOW_ENV}.extra_index_url }}}}',
             'extra-url-password': r'{{ conn.artifactory_pypi_rc.password }}',
             'extra-url-login': r'{{ conn.artifactory_pypi_rc.login }}',
         },
