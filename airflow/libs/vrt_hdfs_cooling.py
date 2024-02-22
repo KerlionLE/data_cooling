@@ -1,9 +1,9 @@
 import logging
 from datetime import datetime, timedelta
 
-import pytz
 from croniter import croniter
 
+import pytz
 from .connect_manager import DBConnection
 from .utils import get_formated_file, get_connect_manager, get_config_manager
 
