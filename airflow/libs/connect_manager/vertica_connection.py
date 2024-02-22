@@ -1,7 +1,7 @@
 import vertica_python
 
 from data_cooling.utils import KerberosAuth
-from .db_connection import DBConnection
+from data_cooling.connect_manager.db_connection import DBConnection
 
 
 class VerticaConnection(DBConnection):

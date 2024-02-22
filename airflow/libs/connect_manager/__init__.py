@@ -1,5 +1,5 @@
-from .db_connection import DBConnection
-from .vertica_connection import VerticaConnection
+from data_cooling.connect_manager.db_connection import DBConnection
+from data_cooling.connect_manager.vertica_connection import VerticaConnection
 
 AVAILABLE_DB_CONNECTIONS = {
     'vertica': VerticaConnection,
