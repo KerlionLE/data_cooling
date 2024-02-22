@@ -1,7 +1,7 @@
 import vertica_python
 
-from .db_connection import DBConnection
 from krbticket import KrbCommand, KrbConfig
+from .db_connection import DBConnection
 
 
 class KerberosAuth:
