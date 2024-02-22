@@ -3,8 +3,8 @@ import json
 
 from krbticket import KrbCommand, KrbConfig
 
-from data_cooling.config_manager import AVAILABLE_FORMAT_MANAGER
-from data_cooling.connect_manager import AVAILABLE_DB_CONNECTIONS, DBConnection
+from .config_manager import AVAILABLE_FORMAT_MANAGER
+from .connect_manager import AVAILABLE_DB_CONNECTIONS, DBConnection
 
 
 class KerberosAuth:
