@@ -1,6 +1,6 @@
 import vertica_python
-
 from krbticket import KrbCommand, KrbConfig
+
 from .db_connection import DBConnection
 
 
