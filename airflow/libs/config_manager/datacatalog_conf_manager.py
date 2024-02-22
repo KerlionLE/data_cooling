@@ -6,6 +6,7 @@ from pydg.data_catalog.model.dicts import DataCatalogEntityType
 
 from .conf_manager import ConfigManager
 
+
 def type_to_dict(obj: str) -> str:
     """
     Функция реализована для работы со структурой обект в объекте
@@ -27,32 +28,33 @@ def params_to_dict(obj: str) -> dict:
 
     d = {}
     for name, value in obj.__dict__.items():
-        d[name] = value if name != 'coolingType' or name != 'heatingType' else type_to_dict(value)
+        d[name] = value if name != 'coolingType' or name != 'heatingType' else type_to_dict(
+            value)
     return d
 
-def PhysicalObjectCoolParams_PhysicalObjectCoolResult(repo: str) -> list:
+
+def physicalobjectcoolparams_physicalobjectcoolresult(repo: str) -> list:
     """
     Обработка конфига охлаждения - json формата из data catalog
     :param repo: сессия con
 
-    :return data_list_cool: лист с обектами для охлаждения
-    :return id_objs_cool_parms: лист только с id для фильтра к api
+    :return: лист с обектами для охлаждения
     """
-   
+
     request_cool_parms = {
-    'quer': {
-        'coolingIsActive': True,
-    },
-    'page': 1,
-    'pageSize': 300,
+        'quer': {
+            'coolingIsActive': True,
+        },
+        'page': 1,
+        'pageSize': 300,
     }
 
     request_cool_results = {
-    'query': {
-        'physicalObjectCoolParamsId': 39,
-    },
-    'page': 1,
-    'pageSize': 300,
+        'query': {
+            'physicalObjectCoolParamsId': 39,
+        },
+        'page': 1,
+        'pageSize': 300,
     }
 
     # 1 Работа с обектом PhysicalObjectCoolParams
@@ -66,7 +68,8 @@ def PhysicalObjectCoolParams_PhysicalObjectCoolResult(repo: str) -> list:
         data_list_cool_parms.append(params_to_dict(d))
 
     # 1.1.1 Берём список таблиц для того не тащить имена таблиц
-    id_objs_cool_parms = [d.get('physicalObjectId') for d in data_list_cool_parms]
+    id_objs_cool_parms = [d.get('physicalObjectId')
+                          for d in data_list_cool_parms]
 
     # 1.1 Работа с обектом PhysicalObjectCoolResult
     get_cool_results = repo.readEntity(
@@ -88,10 +91,11 @@ def PhysicalObjectCoolParams_PhysicalObjectCoolResult(repo: str) -> list:
                     data_list_cool.append(a)
         else:
             data_list_cool.append(a)
-    
+
     return data_list_cool, id_objs_cool_parms
 
-def PhysicalObjectHeatParams_PhysicalObjectHeatResult(repo: str) -> list:
+
+def physicalobjectheatparams_physicalobjectheatresult(repo: str) -> list:
     """
     Обработка конфига разогрева - json формата из data catalog
     :param repo: сессия con
@@ -100,19 +104,19 @@ def PhysicalObjectHeatParams_PhysicalObjectHeatResult(repo: str) -> list:
     """
 
     request_heating_parms = {
-    'query': {
-        'heatingIsActive': True,
-    },
-    'page': 1,
-    'pageSize': 300,
+        'query': {
+            'heatingIsActive': True,
+        },
+        'page': 1,
+        'pageSize': 300,
     }
 
     request_heating_results = {
-    'query': {
-        'physicalObjectHeatParamsId': 39,
-    },
-    'page': 1,
-    'pageSize': 300,
+        'query': {
+            'physicalObjectHeatParamsId': 39,
+        },
+        'page': 1,
+        'pageSize': 300,
     }
 
     # 2 Работа с обектом PhysicalObjectHeatParams
@@ -147,6 +151,9 @@ def PhysicalObjectHeatParams_PhysicalObjectHeatResult(repo: str) -> list:
         else:
             data_list_heat.append(a)
 
+    return data_list_heat
+
+
 class DataCatalogConfManager(ConfigManager):
     """Класс Обработки конфига - включает в себя get и save"""
 
@@ -177,8 +184,10 @@ class DataCatalogConfManager(ConfigManager):
         repo = Repo(session, logger)
         logger.info('Execute query')
 
-        data_list_cool, id_objs_cool_parms = PhysicalObjectCoolParams_PhysicalObjectCoolResult(repo)
-        data_list_heat = PhysicalObjectHeatParams_PhysicalObjectHeatResult(repo)
+        data_list_cool, id_objs_cool_parms = physicalobjectcoolparams_physicalobjectcoolresult(
+            repo)
+        data_list_heat = physicalobjectheatparams_physicalobjectheatresult(
+            repo)
 
         # 3 Объединение Heat и Cool
         data_list = []
