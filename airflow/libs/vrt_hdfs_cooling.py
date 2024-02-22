@@ -30,7 +30,7 @@ def get_last_tech_load_ts(schemas: list, tables: list, schema_table_name_registr
     )
 
     obj = {(schema_name, table_name): {'tech_load_ts': tech_load_ts} for schema_name, table_name, tech_load_ts in db_connection_src.apply_script_hdfs(sql, conf_krb_info)[0]}
-    
+
     return obj
 
 # ------------------------------------------------------------------------------------------------------------------
