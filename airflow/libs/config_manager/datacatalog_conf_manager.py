@@ -49,6 +49,7 @@ def compound_coolparams_coolresult(repo: str) -> list:
         'pageSize': 300,
     }
 
+    print(request_cool_parms)
     request_cool_results = {
         'query': {
             'physicalObjectCoolParamsId': 39,
