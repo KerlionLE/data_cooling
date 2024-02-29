@@ -62,6 +62,7 @@ def compound_coolparams_coolresult(repo: str) -> list:
         entityType=DataCatalogEntityType.PhysicalObjectCoolParams.value,
         payload=request_cool_parms,
     )
+    print(get_cool_parms)
 
     data_list_cool_parms = []
     for d in get_cool_parms['items']:
@@ -80,6 +81,7 @@ def compound_coolparams_coolresult(repo: str) -> list:
     for d in get_cool_results['items']:
         data_list_cool_results.append(params_to_dict(d))
 
+    print(data_list_cool_results)
     # 1.2 Объединение PhysicalObjectCoolParams и PhysicalObjectCoolResult
     data_list_cool = []
     for a in data_list_cool_parms:
