@@ -31,6 +31,7 @@
         "replication_objects_source": {
           "source_type": "datacatalog",
           "source_config": {
+            "base_url": "https://dg.dev002.local/dc-blue",
             "root_ca_path": "/usr/local/airflow/certs/DevRootCA.pem",
             "username": "a001cd-dg-cool-bot",
             "password": "rx2RTBTZoLH0FweLvPBl"

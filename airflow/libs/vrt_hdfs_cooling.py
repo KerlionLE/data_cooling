@@ -10,34 +10,7 @@ from data_cooling.utils import get_formated_file, get_connect_manager, get_confi
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def get_last_tech_load_ts(schemas: list, tables: list, schema_table_name_registry: str, db_connection_src: DBConnection, sql_scripts_path: str, conf_krb_info: list) -> dict:
-    """
-    Забираем max дату из технической таблицы - записываем в словарь с 2-мя ключами
-    :param schemas: название схем, которые нужно реплицировать
-    :param tables: название таблиц, которые нужно реплицировать
-    :param schema_table_name_registry: название технической схемы-таблицы с историей работы репликации
-    :param db_connection_src: объект соединения
-    :param sql_scripts_path: путь к sql скрипту
-    :param conf_krb_info: конфиг подключения через керберос
-
-    :return: возвращает словарь с 2-мя ключами - схема, таблица
-    """
-    result = {}
-    sql = get_formated_file(
-        sql_scripts_path,
-        schema_table_name=schema_table_name_registry,
-        schema_names=', '.join(f'{element!r}' for element in schemas),
-        table_names=', '.join(f'{element!r}' for element in tables),
-    )
-    for schema_name, table_name, tech_load_ts in db_connection_src.apply_script_hdfs(sql, conf_krb_info)[0]:
-        result[(schema_name, table_name)] = {'tech_load_ts': tech_load_ts}
-
-    return result
-
-# ------------------------------------------------------------------------------------------------------------------
-
-
-def filter_objects(config: dict, system_tz: str, objects: dict) -> list:
+def filter_objects(config: dict, system_tz: str) -> list:
     """
     Фильтрует словарь относительно частоты загрузки данных, сравнивая его с config timezone - airflow в utc, вертика в utc +3
     :param config: конфиг репликации
@@ -49,12 +22,10 @@ def filter_objects(config: dict, system_tz: str, objects: dict) -> list:
     filtered_objects = []
     for conf in config:
 
-        db_data = objects.get(
-            (conf['schema_name'], conf['table_name']))  # для тестов
-        # Для тестов - last_date_cooling = conf.get('last_date_cooling')
+        last_date_cooling = conf.get('last_date_cooling')
         update_freq = conf.get('data_cooling_frequency')
 
-        if not db_data:
+        if not last_date_cooling:
             conf['is_new'] = True
             conf['last_tech_load_ts'] = None
             filtered_objects.append(conf)
@@ -62,7 +33,7 @@ def filter_objects(config: dict, system_tz: str, objects: dict) -> list:
 
         conf['is_new'] = False
         # Для тестов - last_tech_load_ts = datetime.strptime(last_date_cooling, '%Y-%m-%d %H:%M:%S')
-        last_tech_load_ts = db_data['tech_load_ts'].replace(tzinfo=None)
+        last_tech_load_ts = last_date_cooling.replace(tzinfo=None)
         conf['last_date_cooling'] = last_tech_load_ts.strftime(
             '%Y-%m-%d %H:%M:%S')
         now = datetime.now(pytz.timezone(system_tz)).replace(tzinfo=None)
@@ -234,7 +205,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, load_max_tech_load_ts_insert: str, schema_table_name_registry: str) -> None:
+def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list) -> None:
     """
     Запуск DML скриптов
     :param config: конфиг
@@ -251,16 +222,6 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, 
             db_connection_src.apply_script_hdfs(
                 conf['dml_script'], conf_krb_info)
             date_end = datetime.now()
-
-            sql_insert = get_formated_file(
-                load_max_tech_load_ts_insert,
-                schema_table_name_registry=schema_table_name_registry,
-                schema_name=conf['schema_name'],
-                table_name=conf['table_name'],
-                actual_max_tech_load_ts=conf['actual_max_tech_load_ts'],
-            )
-            db_connection_src.apply_script_hdfs(
-                sql_insert, conf_krb_info)
             logging.info(
                 f'''Продолжительность выполнения - {date_end - date_start} ''',
             )
@@ -292,11 +253,6 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     export_with_partitions = conf['auxiliary_sql_paths']['sql_export_with_partitions']
     get_max_tech_load_ts = conf['auxiliary_sql_paths']['sql_get_max_tech_load_ts']
 
-    # Тесты
-    get_last_tech_load_ts_sql = conf['auxiliary_sql_paths']['get_last_tech_load_ts']
-    # Тесты
-    load_max_tech_load_ts_insert = conf['auxiliary_sql_paths']['load_max_tech_load_ts_insert']
-
     con_type = conf['source_system']['system_type']
     source_type = conf['replication_objects_source']['source_type']
     source_config = conf['replication_objects_source']['source_config']
@@ -312,16 +268,8 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     config = config_manager.get_config()
     logging.info(config)
 
-    'Step FOR TEST'
-    tables = [el['table_name'] for el in config]
-    schemas = [el['schema_name'] for el in config]
-    schema_table_name_registry = 'AUX_REPLICATION.COOLING_TABLE'
-    last_tech_load_ts = get_last_tech_load_ts(
-        schemas, tables, schema_table_name_registry, db_connection_src, get_last_tech_load_ts_sql, conf_krb_info)
-    logging.info(last_tech_load_ts)
-
     'Step 4'
-    filter_object = filter_objects(config, system_tz, last_tech_load_ts)
+    filter_object = filter_objects(config, system_tz)
     logging.info(filter_object)
 
     'Step 5'
@@ -339,5 +287,4 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(gen_dmls)
 
     'Step 8'
-    run_dml(gen_dmls, db_connection_src, conf_krb_info,
-            load_max_tech_load_ts_insert, schema_table_name_registry)
+    run_dml(gen_dmls, db_connection_src, conf_krb_info)
