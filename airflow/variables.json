@@ -29,7 +29,7 @@
           }
         },
         "replication_objects_source": {
-          "source_type": "data_catalog",
+          "source_type": "datacatalog",
           "source_config": {
             "root_ca_path": "/usr/local/airflow/certs/DevRootCA.pem",
             "username": "a001cd-dg-cool-bot",
