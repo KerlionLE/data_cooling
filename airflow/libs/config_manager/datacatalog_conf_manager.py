@@ -274,10 +274,13 @@ class DataCatalogConfManager(ConfigManager):
 
         # 3 Объединение coolresult и heatresult
         data_list_cool, id_objs_cool_parms = compound_coolparams_coolresult(repo)
+        print(data_list_cool, id_objs_cool_parms)
         data_list_heat = compound_heatparams_heatresult(repo)
+        print(data_list_heat)
 
         # 4 Объединение Heat и Cool
         data_list = compound_heat_cool(data_list_cool, data_list_heat)
+        print(data_list)
 
         # 5 Работа с обектом PhysicalObject
         data_list_oblects, id_objs_objects = physicalobject(id_objs_cool_parms, repo)
