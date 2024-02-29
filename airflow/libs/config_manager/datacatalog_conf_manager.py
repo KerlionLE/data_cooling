@@ -258,6 +258,7 @@ class DataCatalogConfManager(ConfigManager):
         root_ca_path = self.config['root_ca_path']
         username = self.config['username']
         password = self.config['password']
+        print(base_url, root_ca_path, username, password)
 
         logger = logging.getLogger('data_catalog')
         logger.setLevel(logging.DEBUG)
