@@ -67,7 +67,7 @@ def compound_coolparams_coolresult(repo: str) -> list:
     data_list_cool_parms = []
     for d in get_cool_parms['items']:
         data_list_cool_parms.append(params_to_dict(d))
-
+    print(data_list_cool_parms)
     # 1.1.1 Берём список таблиц для того не тащить имена таблиц
     id_objs_cool_parms = [d.get('physicalObjectId')
                           for d in data_list_cool_parms]

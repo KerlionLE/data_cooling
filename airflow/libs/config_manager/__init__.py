@@ -6,7 +6,3 @@ AVAILABLE_FORMAT_MANAGER = {
     'json': JsonConfManager,
     'datacatalog': DataCatalogConfManager
 }
-
-AVAILABLE_FORMAT = {
-    'json': ConfigManager,
-}
