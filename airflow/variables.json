@@ -68,74 +68,74 @@
           "load_max_tech_load_ts_insert": "$AIRFLOW_HOME/libs/data_cooling/sqls/load_max_tech_load_ts.sql"
         }
       }
-    }
-  },
-  "TEST": {
-    "data_cooling": {
-      "workers": 2,
-      "source_system": {
-        "system_type": "vertica",
-        "system_config": {
-          "connection_config": {
-            "connection": "airflow_conn",
-            "connection_conf": {
-              "conn_id": "vertica_staging"
-            }
-          },
-          "system_tz": "Europe/Moscow"
-        }
-      },
-      "target_system": {
-        "system_type": "hdfs",
-        "system_config": {
-          "connection_config": {
-            "connection": "airflow_conn",
-            "connection_conf": {
-              "principal": "a001cd-etl-vrt-hdp@DEV002.LOCAL",
-              "keytab": "/usr/local/airflow/data/data_cooling/vrt_hdp.keytab"
-            }
-          },
-          "system_tz": "Europe/Moscow"
-        }
-      },
-      "replication_objects_source": {
-        "source_type": "json",
-        "source_config": [
-          {
-            "schema_name": "AUX_REPLICATION",
-            "table_name": "TEST1",
-            "cooling_type": "time_based",
-            "replication_policy": 1,
-            "depth": 1,
-            "last_date_cooling": "",
-            "data_cooling_frequency": "* * * * *",
-            "tech_ts_column_name": "last_tech_load_ts",
-            "filter_expression": "",
-            "partition_expressions": ""
-          },
-          {
-            "schema_name": "AUX_REPLICATION",
-            "table_name": "TEST2",
-            "cooling_type": "fullcopy",
-            "replication_policy": 0,
-            "depth": 123,
-            "last_date_cooling": "",
-            "data_cooling_frequency": "* * * * *",
-            "tech_ts_column_name": "",
-            "filter_expression": "",
-            "partition_expressions": ""
+    },
+    "TEST": {
+      "data_cooling": {
+        "workers": 2,
+        "source_system": {
+          "system_type": "vertica",
+          "system_config": {
+            "connection_config": {
+              "connection": "airflow_conn",
+              "connection_conf": {
+                "conn_id": "vertica_staging"
+              }
+            },
+            "system_tz": "Europe/Moscow"
           }
-        ]
-      },
-      "auxiliary_sql_paths": {
-        "sql_export_without_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/export_without_partitions.sql",
-        "sql_export_with_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/export_with_partitions.sql",
-        "sql_copy_to_vertica": "$AIRFLOW_HOME/libs/data_cooling/sqls/copy_to_vertica.sql",
-        "sql_delete_without_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/delete_from_vertica_without_partitions.sql",
-        "sql_delete_with_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/delete_from_vertica_with_partitions.sql",
-        "sql_get_max_tech_load_ts": "$AIRFLOW_HOME/libs/data_cooling/sqls/get_max_tech_load_ts.sql",
-        "get_last_tech_load_ts": "$AIRFLOW_HOME/libs/data_cooling/sqls/get_last_tech_load_ts.sql",
-        "load_max_tech_load_ts_insert": "$AIRFLOW_HOME/libs/data_cooling/sqls/load_max_tech_load_ts.sql"
+        },
+        "target_system": {
+          "system_type": "hdfs",
+          "system_config": {
+            "connection_config": {
+              "connection": "airflow_conn",
+              "connection_conf": {
+                "principal": "a001cd-etl-vrt-hdp@DEV002.LOCAL",
+                "keytab": "/usr/local/airflow/data/data_cooling/vrt_hdp.keytab"
+              }
+            },
+            "system_tz": "Europe/Moscow"
+          }
+        },
+        "replication_objects_source": {
+          "source_type": "json",
+          "source_config": [
+            {
+              "schema_name": "AUX_REPLICATION",
+              "table_name": "TEST1",
+              "cooling_type": "time_based",
+              "replication_policy": 1,
+              "depth": 1,
+              "last_date_cooling": "",
+              "data_cooling_frequency": "* * * * *",
+              "tech_ts_column_name": "last_tech_load_ts",
+              "filter_expression": "",
+              "partition_expressions": ""
+            },
+            {
+              "schema_name": "AUX_REPLICATION",
+              "table_name": "TEST2",
+              "cooling_type": "fullcopy",
+              "replication_policy": 0,
+              "depth": 123,
+              "last_date_cooling": "",
+              "data_cooling_frequency": "* * * * *",
+              "tech_ts_column_name": "",
+              "filter_expression": "",
+              "partition_expressions": ""
+            }
+          ]
+        },
+        "auxiliary_sql_paths": {
+          "sql_export_without_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/export_without_partitions.sql",
+          "sql_export_with_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/export_with_partitions.sql",
+          "sql_copy_to_vertica": "$AIRFLOW_HOME/libs/data_cooling/sqls/copy_to_vertica.sql",
+          "sql_delete_without_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/delete_from_vertica_without_partitions.sql",
+          "sql_delete_with_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/delete_from_vertica_with_partitions.sql",
+          "sql_get_max_tech_load_ts": "$AIRFLOW_HOME/libs/data_cooling/sqls/get_max_tech_load_ts.sql",
+          "get_last_tech_load_ts": "$AIRFLOW_HOME/libs/data_cooling/sqls/get_last_tech_load_ts.sql",
+          "load_max_tech_load_ts_insert": "$AIRFLOW_HOME/libs/data_cooling/sqls/load_max_tech_load_ts.sql"
+        }
       }
     }
   }
