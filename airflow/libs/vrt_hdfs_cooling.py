@@ -7,8 +7,6 @@ from croniter import croniter
 from data_cooling.connect_manager import DBConnection
 from data_cooling.utils import get_formated_file, get_connect_manager, get_config_manager
 
-# ------------------------------------------------------------------------------------------------------------------
-
 
 def filter_objects(config: dict, system_tz: str) -> list:
     """
@@ -34,11 +32,9 @@ def filter_objects(config: dict, system_tz: str) -> list:
         conf['is_new'] = False
         # Для тестов - last_tech_load_ts = datetime.strptime(last_date_cooling, '%Y-%m-%d %H:%M:%S')
         last_tech_load_ts = last_date_cooling.replace(tzinfo=None)
-        conf['last_date_cooling'] = last_tech_load_ts.strftime(
-            '%Y-%m-%d %H:%M:%S')
+        conf['last_date_cooling'] = last_tech_load_ts.strftime('%Y-%m-%d %H:%M:%S')
         now = datetime.now(pytz.timezone(system_tz)).replace(tzinfo=None)
-        update_freq = croniter(
-            update_freq, last_tech_load_ts).get_next(datetime)
+        update_freq = croniter(update_freq, last_tech_load_ts).get_next(datetime)
 
         if now >= update_freq:
             filtered_objects.append(conf)

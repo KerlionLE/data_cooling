@@ -258,13 +258,11 @@ class DataCatalogConfManager(ConfigManager):
         root_ca_path = self.config['root_ca_path']
         username = self.config['username']
         password = self.config['password']
-        print(base_url, root_ca_path, username, password)
 
         logger = logging.getLogger('data_catalog')
         logger.setLevel(logging.DEBUG)
         sh = logging.StreamHandler()
-        sh.setFormatter(logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+        sh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
         logger.addHandler(sh)
         logger.info('Start')
 
