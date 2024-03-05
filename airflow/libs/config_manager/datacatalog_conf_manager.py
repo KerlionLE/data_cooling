@@ -49,7 +49,6 @@ def compound_coolparams_coolresult(repo: str) -> list:
         'pageSize': 300,
     }
 
-    print(request_cool_parms)
     request_cool_results = {
         'query': {
             'physicalObjectCoolParamsId': 39,
@@ -63,7 +62,6 @@ def compound_coolparams_coolresult(repo: str) -> list:
         entityType=DataCatalogEntityType.PhysicalObjectCoolParams.value,
         payload=request_cool_parms,
     )
-    print(get_cool_parms)
 
     data_list_cool_parms = []
     for d in get_cool_parms['items']:
