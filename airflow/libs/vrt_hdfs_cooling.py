@@ -92,7 +92,7 @@ def get_max_load_ts(config: list, db_connection_src: DBConnection, sql_scripts_p
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, export_with_partitions: str) -> list:
+def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, export_with_partitions: str, hdfs_path_con: str) -> list:
     """
     Генерирует DML скрипт
     :param config: конфиг
@@ -118,11 +118,11 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
         date_format = '%Y-%m-%d %H:%M:%S'
 
         current_date = datetime.now()
-        date_end_cooling_depth = (datetime.strptime(
-            actual_max_tech_load_ts, date_format) - timedelta(days=depth_cooling)).strftime(date_format)
+        date_end_cooling_depth = (datetime.strptime(actual_max_tech_load_ts, date_format) - timedelta(days=depth_cooling)).strftime(date_format)
 
         sql_export_date_start_date_end_cooling_depth = get_formated_file(
             export_with_partitions,
+            hdfs_path = hdfs_path_con,
             schema_name=conf['schema_name'],
             table_name=conf['table_name'],
             filter_expression=conf['filter_expression'],
@@ -159,6 +159,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                     if conf['temporary_heating']['already_heat'] == 0 and current_date >= date_start_heating and current_date < date_end_heating:
                         sql_copy_to_vertica = get_formated_file(
                             copy_to_vertica,
+                            hdfs_path = hdfs_path_con,
                             schema_name=conf['schema_name'],
                             table_name=conf['table_name'],
                             cur_date=(datetime.now()).strftime('%Y%m%d'),
@@ -182,6 +183,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
             if conf['replication_policy'] == 0:
                 sql_export = get_formated_file(
                     export_with_partitions,
+                    hdfs_path = hdfs_path_con,
                     schema_name=conf['schema_name'],
                     table_name=conf['table_name'],
                     filter_expression='',
@@ -233,7 +235,6 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     Функция состоит из екскольких этапав:
     Step 1 - создание conn к vertica
     Step 2 - берём конфиг
-    Step FOR TEST - берём макс дату последней репликации
     Step 4 - фильтруем по частоте
     Step 5 - вывод кол. таблиц в конфиге
     Step 6 - текущая макс дата в проде
@@ -253,6 +254,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     source_type = conf['replication_objects_source']['source_type']
     source_config = conf['replication_objects_source']['source_config']
     system_tz = conf['source_system']['system_config']['system_tz']
+    hdfs_path = conf['target_system']['system_config']['hdfs_path']
 
     conf_krb_info = conf['target_system']['system_config']['connection_config']['connection_conf']
 
@@ -261,7 +263,6 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
 
     'Step 2'
     config_manager = get_config_manager(source_type, source_config)
-    print(config_manager)
     config = config_manager.get_config()
     logging.info(config)
 
@@ -280,7 +281,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
 
     'Step 7'
     gen_dmls = gen_dml(max_tech_load_ts, copy_to_vertica,
-                       delete_with_partitions, export_with_partitions)
+                       delete_with_partitions, export_with_partitions, hdfs_path)
     logging.info(gen_dmls)
 
     'Step 8'

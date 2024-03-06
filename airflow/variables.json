@@ -25,6 +25,7 @@
                 "keytab": "/usr/local/airflow/data/data_cooling/vrt_hdp.keytab"
               }
             },
+            "hdfs_path": "webhdfs:///data/vertica_cold_data/",
             "system_tz": "Europe/Moscow"
           }
         },
@@ -38,14 +39,10 @@
           }
         },
         "auxiliary_sql_paths": {
-          "sql_export_without_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/export_without_partitions.sql",
           "sql_export_with_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/export_with_partitions.sql",
           "sql_copy_to_vertica": "$AIRFLOW_HOME/libs/data_cooling/sqls/copy_to_vertica.sql",
-          "sql_delete_without_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/delete_from_vertica_without_partitions.sql",
           "sql_delete_with_partitions": "$AIRFLOW_HOME/libs/data_cooling/sqls/delete_from_vertica_with_partitions.sql",
-          "sql_get_max_tech_load_ts": "$AIRFLOW_HOME/libs/data_cooling/sqls/get_max_tech_load_ts.sql",
-          "get_last_tech_load_ts": "$AIRFLOW_HOME/libs/data_cooling/sqls/get_last_tech_load_ts.sql",
-          "load_max_tech_load_ts_insert": "$AIRFLOW_HOME/libs/data_cooling/sqls/load_max_tech_load_ts.sql"
+          "sql_get_max_tech_load_ts": "$AIRFLOW_HOME/libs/data_cooling/sqls/get_max_tech_load_ts.sql"
         }
       }
     },
