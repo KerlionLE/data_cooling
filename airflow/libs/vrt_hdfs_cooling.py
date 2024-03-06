@@ -160,7 +160,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
             table_name=conf['table_name'],
             filter_expression=conf['filter_expression'],
             partition_expressions=partition,
-            time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' ''',
+            time_between=f'''and {tech_ts_column_name} <= '{date_end_cooling_depth}' ''',
             cur_date=(datetime.now()).strftime('%Y%m%d'),
         )
 
@@ -169,7 +169,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
             schema_name=conf['schema_name'],
             table_name=conf['table_name'],
             filter_expression=conf['filter_expression'],
-            time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' ''',
+            time_between=f'''and {tech_ts_column_name} <= '{date_end_cooling_depth}' ''',
         )
 
         if conf['cooling_type'] == 'time_based':
