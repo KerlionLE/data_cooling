@@ -165,7 +165,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                             cur_date=(datetime.now()).strftime('%Y%m%d'),
                         )
 
-                        sql = f'{sql_copy_to_vertica}\n{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_heating_depth}'
+                        sql = f'{sql_copy_to_vertica}\n{sql_delete_date_start_date_end_heating_depth}'
 
                     elif conf['temporary_heating']['already_heat'] == 1 and current_date >= date_start_heating and current_date < date_end_heating:
                         sql = f'{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_heating_depth}'
