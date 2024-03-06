@@ -78,7 +78,7 @@
             "connection_config": {
               "connection": "airflow_conn",
               "connection_conf": {
-                "conn_id": "vertica_staging"
+                "conn_id": "vrt_cooling"
               }
             },
             "system_tz": "Europe/Moscow"
@@ -90,8 +90,8 @@
             "connection_config": {
               "connection": "airflow_conn",
               "connection_conf": {
-                "principal": "a001cd-etl-vrt-hdp@DEV002.LOCAL",
-                "keytab": "/usr/local/airflow/data/data_cooling/vrt_hdp.keytab"
+                "principal": "A001TST_ETL_HDP_VRT",
+                "keytab": "/usr/local/airflow/krb_files/a001tst_etl_hdp_vrt.keytab"
               }
             },
             "system_tz": "Europe/Moscow"
@@ -101,28 +101,22 @@
           "source_type": "json",
           "source_config": [
             {
-              "schema_name": "AUX_REPLICATION",
-              "table_name": "TEST1",
+              "schema_name": "ODS_MES_HIST_STG",
+              "table_name": "KAFKA_MESINT_VERTICA_COOL_TEST",
               "cooling_type": "time_based",
               "replication_policy": 1,
-              "depth": 1,
+              "depth": 280,
               "last_date_cooling": "",
               "data_cooling_frequency": "* * * * *",
-              "tech_ts_column_name": "last_tech_load_ts",
+              "tech_ts_column_name": "load_ts",
               "filter_expression": "",
-              "partition_expressions": ""
-            },
-            {
-              "schema_name": "AUX_REPLICATION",
-              "table_name": "TEST2",
-              "cooling_type": "fullcopy",
-              "replication_policy": 0,
-              "depth": 123,
-              "last_date_cooling": "",
-              "data_cooling_frequency": "* * * * *",
-              "tech_ts_column_name": "",
-              "filter_expression": "",
-              "partition_expressions": ""
+              "partition_expressions": "",
+              "temporary_heating": {
+                "depth": 282,
+                "already_heat": 0,
+                "date_start": "2024-03-05 12:23:12",
+                "date_end": "2024-03-07 12:23:12"
+              }
             }
           ]
         },
