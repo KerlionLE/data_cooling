@@ -2,5 +2,4 @@
 EXPORT TO PARQUET(directory='webhdfs:///tmp/{schema_name}/{table_name}/tech_hdfs_load_ts={cur_date}', compression='snappy') OVER(PARTITION BY part) AS
 SELECT *, {partition_expressions} as part 
 FROM {schema_name}.{table_name} 
-WHERE 1=1 {filter_expression} {time_between}
-limit 100000;
+WHERE 1=1 {filter_expression} {time_between};
