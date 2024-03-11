@@ -36,7 +36,7 @@ def params_to_dict(obj: str) -> dict:
     return d
 
 
-def compound_coolparams_coolresult(repo: str) -> list:
+def compound_coolparams_coolresult(repo) -> list:
     """
     Обработка конфига охлаждения - json формата из data catalog
     :param repo: сессия con
