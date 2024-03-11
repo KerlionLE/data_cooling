@@ -294,6 +294,7 @@ class DataCatalogConfManager(ConfigManager):
                 if a['group'] == b['id']:
                     a['physicalNameGroup'] = b['physicalName']
                     data_list_oblects_group.append(a)
+        print(data_list_oblects_group)
 
         # 6 Объединение Всего
         data_list_all = []
@@ -303,3 +304,4 @@ class DataCatalogConfManager(ConfigManager):
                     a['physicalName'] = b['physicalName']
                     a['physicalNameGroup'] = b['physicalNameGroup']
                     data_list_all.append(a)
+        print(data_list_oblects_group)
