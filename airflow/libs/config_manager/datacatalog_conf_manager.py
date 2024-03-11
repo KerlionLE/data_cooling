@@ -1,8 +1,11 @@
 import logging
 
-from pydg.core.session import Session
-from pydg.data_catalog.repo import Repo
-from pydg.data_catalog.model.dicts import DataCatalogEntityType
+try:
+    from pydg.core.session import Session
+    from pydg.data_catalog.repo import Repo
+    from pydg.data_catalog.model.dicts import DataCatalogEntityType
+except ImportError:
+    logging.warning("Импорт: нет библиотеки 'sql_generator'")
 
 from .conf_manager import ConfigManager
 
@@ -67,7 +70,7 @@ def compound_coolparams_coolresult(repo: str) -> list:
     for d in get_cool_parms['items']:
         data_list_cool_parms.append(params_to_dict(d))
     print(data_list_cool_parms)
-    # 1.1.1 Берём список таблиц для того не тащить имена таблиц
+    # 1.1.1 Берём список таблиц для того не тащить имена таб.
     id_objs_cool_parms = [d.get('physicalObjectId')
                           for d in data_list_cool_parms]
 
