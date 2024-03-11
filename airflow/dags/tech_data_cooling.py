@@ -90,7 +90,7 @@ PYPI_REQUIREMENTS = [
     'pydantic>=2.0.0',
 ]
 UKD_REQUIREMENTS = [
-        {'lib_name': 'pydg', 'version': 'v0.3.19', 'storage': 'non-standard'},
+        {'lib_name': 'pydg', 'version': 'v0.3.19', 'storage': 'standard'},
         {'lib_name': 'dg_utils', 'version': '1.0.3', 'storage': 'standard'},
     ]
 
