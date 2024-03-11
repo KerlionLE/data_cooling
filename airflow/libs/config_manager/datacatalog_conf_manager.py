@@ -65,7 +65,7 @@ def compound_coolparams_coolresult(repo: str) -> list:
         entityType=DataCatalogEntityType.PhysicalObjectCoolParams.value,
         payload=request_cool_parms,
     )
-
+    print(get_cool_parms)
     data_list_cool_parms = []
     for d in get_cool_parms['items']:
         data_list_cool_parms.append(params_to_dict(d))
