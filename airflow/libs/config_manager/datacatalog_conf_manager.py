@@ -281,9 +281,11 @@ class DataCatalogConfManager(ConfigManager):
 
         # 5 Работа с обектом PhysicalObject
         data_list_oblects, id_objs_objects = physicalobject(id_objs_cool_parms, repo)
+        print(data_list_oblects, id_objs_objects)
 
         # 6 Работа с обектом PhysicalGroup
         data_list_group = physicalgroup(id_objs_objects, repo)
+        print(data_list_group)
 
         # 7 Объединение объектов обектов PhysicalGroup и PhysicalObject
         data_list_oblects_group = []
