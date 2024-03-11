@@ -45,7 +45,7 @@ def compound_coolparams_coolresult(repo) -> list:
     """
 
     request_cool_parms = {
-        'quer': {
+        'query': {
             'coolingIsActive': True,
         },
         'page': 1,
