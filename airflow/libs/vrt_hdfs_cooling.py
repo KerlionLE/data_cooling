@@ -245,18 +245,29 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, 
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBConnection) -> None:
+def get_config_func(conf: list) -> None:
     """
-    Функция состоит из екскольких этапав:
-    Step 1 - создание conn к vertica
-    Step 2 - берём конфиг
-    Step 4 - фильтруем по частоте
-    Step 5 - вывод кол. таблиц в конфиге
-    Step 6 - текущая макс дата в проде
-    Step 7 - генераия dml скриптов
-    Step 8 - запусе dml скриптов
+    Функция забора конфига из источника
     :param conf: конфиг запуска охлаждения
-    :param db_connection_config_src: config src conn
+
+    :return: возвращает конфиог
+    """
+    source_type = conf['replication_objects_source']['source_type']
+    source_config = conf['replication_objects_source']['source_config']
+
+    'Step 2'
+    config_manager = get_config_manager(source_type, source_config)
+    config = config_manager.get_config()
+    logging.info(config)
+
+    return config
+
+def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: list, config: list) -> None:
+    """
+    Функция обработки и создания конфига
+    :param conf: конфиг запуска охлаждения
+    :param db_connection_config_src: креды содинения с базой
+    :param config: конфиг из источника
 
     """
 
@@ -266,41 +277,39 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     get_max_tech_load_ts = conf['auxiliary_sql_paths']['sql_get_max_tech_load_ts']
 
     con_type = conf['source_system']['system_type']
-    source_type = conf['replication_objects_source']['source_type']
-    source_config = conf['replication_objects_source']['source_config']
     system_tz = conf['source_system']['system_config']['system_tz']
     hdfs_path = conf['target_system']['system_config']['hdfs_path']
 
-    conf_krb_info = conf['target_system']['system_config']['connection_config']['connection_conf']
+    source_type = conf['replication_objects_source']['source_type']
+    source_config = conf['replication_objects_source']['source_config']
 
+    conf_krb_info = conf['target_system']['system_config']['connection_config']['connection_conf']
+    
     'Step 1'
     db_connection_src = get_connect_manager(con_type, db_connection_config_src)
-
+    logging.info(filter_object)
+    
     'Step 2'
     config_manager = get_config_manager(source_type, source_config)
-    config = config_manager.get_config()
-    print(config)
-    logging.info(config)
-
-    'Step 4'
-    filter_object = filter_objects(config, system_tz, hdfs_path)
-    print(filter_object)
     logging.info(filter_object)
 
-    'Step 5'
+    'Step 3'
+    filter_object = filter_objects(config, system_tz, hdfs_path)
+    logging.info(filter_object)
+
+    'Step 4'
     logging.info(
         f'''Колличество таблиц которое будеи охлаждаться - {len(filter_object)} ''')
 
-    'Step 6'
+    'Step 5'
     max_tech_load_ts = get_max_load_ts(
         filter_object, db_connection_src, get_max_tech_load_ts, conf_krb_info)
-    print(max_tech_load_ts)
     logging.info(max_tech_load_ts)
 
-    'Step 7'
+    'Step 6'
     gen_dmls = gen_dml(max_tech_load_ts, copy_to_vertica,
                        delete_with_partitions, export_with_partitions, hdfs_path)
     logging.info(gen_dmls)
 
-    'Step 8'
+    'Step 7'
     run_dml(gen_dmls, db_connection_src, conf_krb_info, config_manager)

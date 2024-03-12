@@ -3,13 +3,14 @@ import logging
 from datetime import datetime
 
 from airflow import DAG
+from airflow.operators.python import PythonOperator
 from airflow.hooks.base import BaseHook
 from airflow.models import Variable
 from dwh_utils.airflow.common import get_dag_name
 
 from operators.python_virtualenv_artifactory_operator import PythonVirtualenvCurlOperator
 
-from data_cooling.vrt_hdfs_cooling import preprocess_config_checks_con_dml
+from data_cooling.vrt_hdfs_cooling import preprocess_config_checks_con_dml, get_config_func
 
 AIRFLOW_ENV = os.environ['AIRFLOW_ENV']
 
@@ -98,8 +99,8 @@ with DAG(**DAG_CONFIG) as dag:
 
     inegration_name = 'data_cooling'
 
-    preprocess_config_checks_con_dml = PythonVirtualenvCurlOperator(
-        task_id='preprocess_config_checks_con_dml',
+    get_config_func = PythonVirtualenvCurlOperator(
+        task_id='get_config_func',
         pypi_requirements=PYPI_REQUIREMENTS,
         ukd_requirements=UKD_REQUIREMENTS,
         connection_params={
@@ -114,11 +115,21 @@ with DAG(**DAG_CONFIG) as dag:
             'extra-url-password': r'{{ conn.artifactory_pypi_rc.password }}',
             'extra-url-login': r'{{ conn.artifactory_pypi_rc.login }}',
         },
+        python_callable=get_config_func,
+        op_kwargs={
+            'conf': f'{{{{ var.json.{DAG_NAME}.{AIRFLOW_ENV}.{inegration_name}}}}}'
+        },
+    )
+
+    preprocess_config_cheks_con_dml = PythonOperator(
+        task_id='preprocess_config_cheks_con_dml',
+        trigger_rule='all_success',
         python_callable=preprocess_config_checks_con_dml,
         op_kwargs={
             'conf': f'{{{{ var.json.{DAG_NAME}.{AIRFLOW_ENV}.{inegration_name} }}}}',
             'db_connection_config_src': get_conn(dag_name=DAG_NAME, env_name=AIRFLOW_ENV, replication_names=inegration_name, system_type='source_system'),
+            'config': "{{ ti.xcom_pull(task_ids='get_config_func') }}",
         },
     )
 
-    preprocess_config_checks_con_dml
+    get_config_func >> preprocess_config_cheks_con_dml
