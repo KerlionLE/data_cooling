@@ -115,6 +115,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
         date_start = conf.get('last_date_cooling') or '1000-10-01 15:14:15'
         partition = conf.get('partition_expressions') or f'DATE({tech_ts_column_name})'
         date_format = '%Y-%m-%d %H:%M:%S'
+        sql = ''
 
         current_date = datetime.now()
         date_end_cooling_depth = (datetime.strptime(actual_max_tech_load_ts, date_format) - timedelta(days=depth_cooling)).strftime(date_format)
@@ -191,8 +192,6 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                     cur_date=(datetime.now()).strftime('%Y%m%d'),
                 )
                 sql = f'{sql_export}'
-            else:
-                sql = ''
 
         conf['dml_script'] = sql
         conf_with_dml.append(conf)

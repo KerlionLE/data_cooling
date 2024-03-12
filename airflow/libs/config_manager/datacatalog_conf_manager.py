@@ -10,6 +10,36 @@ except ImportError:
 from .conf_manager import ConfigManager
 
 
+def conn_to(config: list) -> str:
+    """
+    Подключение к дата каталогу
+    :param config: креды для подключения
+
+    :return: конект
+    """
+
+    base_url = config['base_url']  # URL прода, теста или дева
+    root_ca_path = config['root_ca_path']
+    username = config['username']
+    password = config['password']
+
+    logger = logging.getLogger('data_catalog')
+    logger.setLevel(logging.DEBUG)
+    sh = logging.StreamHandler()
+    sh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    logger.addHandler(sh)
+    logger.info('Start')
+
+    session = Session(logger)  # create and start API session
+    if not session.start(baseUrl=base_url, username=username, password=password, rootCA=root_ca_path):
+        logger.error('Failed to start session')
+        return
+
+    repo = Repo(session, logger)
+    logger.info('Execute query')
+
+    return repo
+
 def type_to_dict(obj: str) -> str:
     """
     Функция реализована для работы со структурой обект в объекте
@@ -249,25 +279,7 @@ class DataCatalogConfManager(ConfigManager):
         :param conf: возможные параметры конфига
 
         """
-        base_url = self.config['base_url']  # URL прода, теста или дева
-        root_ca_path = self.config['root_ca_path']
-        username = self.config['username']
-        password = self.config['password']
-
-        logger = logging.getLogger('data_catalog')
-        logger.setLevel(logging.DEBUG)
-        sh = logging.StreamHandler()
-        sh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-        logger.addHandler(sh)
-        logger.info('Start')
-
-        session = Session(logger)  # create and start API session
-        if not session.start(baseUrl=base_url, username=username, password=password, rootCA=root_ca_path):
-            logger.error('Failed to start session')
-            return
-
-        repo = Repo(session, logger)
-        logger.info('Execute query')
+        repo =  conn_to(self.config)
 
         # 3 Объединение coolresult и heatresult
         data_list_cool, id_objs_cool_parms = compound_coolparams_coolresult(repo)
@@ -314,7 +326,13 @@ class DataCatalogConfManager(ConfigManager):
             conf_final['partition_expressions'] = a.get('coolingPartitionExpression')
             data_final.append(conf_final)
 
-
-        print(data_final)
-
         return data_final
+
+    def put_data(self, conf: list = None) -> None:
+
+        """
+        Заолняем таблицы result для охлаждения и разогрева
+        :param conf: возможные параметры конфига
+
+        """
+        repo =  conn_to(self.config)
