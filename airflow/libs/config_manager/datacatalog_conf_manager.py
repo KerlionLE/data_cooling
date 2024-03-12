@@ -37,7 +37,7 @@ def conn_to(config: list) -> str:
 
     repo = Repo(session, logger)
     logger.info('Execute query')
-
+    logger.handlers.clear()
     return repo
 
 def type_to_dict(obj: str) -> str:
