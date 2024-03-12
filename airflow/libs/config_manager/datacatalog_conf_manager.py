@@ -61,8 +61,7 @@ def params_to_dict(obj: str) -> dict:
 
     d = {}
     for name, value in obj.__dict__.items():
-        d[name] = value if name != 'coolingType' or name != 'heatingType' else type_to_dict(
-            value)
+        d[name] = value if name != 'coolingType' or name != 'heatingType' else type_to_dict(value)
     return d
 
 
@@ -313,7 +312,8 @@ class DataCatalogConfManager(ConfigManager):
 
         data_final = []
         for a in data_list_all:
-            conf_final = {}
+            conf_final = {} 
+            conf_final['physicalObjectCoolParamsId'] = a.get('physicalObjectCoolParamsId')
             conf_final['schema_name'] = a.get('physicalNameGroup')
             conf_final['table_name'] = a.get('physicalName')
             conf_final['cooling_type'] = a.get('coolingType')
@@ -328,11 +328,21 @@ class DataCatalogConfManager(ConfigManager):
 
         return data_final
 
-    def put_data(self, conf: list = None) -> None:
+    def put_data_cooling(self, config: list = None) -> None:
 
         """
-        Заолняем таблицы result для охлаждения и разогрева
+        Заолняем таблицы result для охлаждения
         :param conf: возможные параметры конфига
 
         """
         repo =  conn_to(self.config)
+
+        for conf in config: 
+
+            post_result = repo.createEntity(entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
+                                        entityDraft={
+                                            "physicalObjectCoolParamsId": conf['physicalObjectCoolParamsId'],
+                                            "coolingLastDate": conf['actual_max_tech_load_ts'],
+                                            "coolingHdfsTarget": conf['hdfs_path']
+                                        })
+        

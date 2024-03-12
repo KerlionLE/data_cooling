@@ -8,18 +8,19 @@ from data_cooling.connect_manager import DBConnection
 from data_cooling.utils import get_formated_file, get_connect_manager, get_config_manager
 
 
-def filter_objects(config: dict, system_tz: str) -> list:
+def filter_objects(config: dict, system_tz: str, hdfs_path: str) -> list:
     """
     Фильтрует словарь относительно частоты загрузки данных, сравнивая его с config timezone - airflow в utc, вертика в utc +3
     :param config: конфиг репликации
     :param system_tz: таймзона в конфиге
     :param objects: значения из технической таблицы
+    :param hdfs_path: путь к данным в hdfs
 
     :return: возвращает лист - отфильтрованный конфиг с учётом частоты
     """
     filtered_objects = []
     for conf in config:
-
+        conf['hdfs_path'] = f'{hdfs_path}{conf['schema_name']}/{conf['table_name']}'
         last_date_cooling = conf.get('last_date_cooling')
         update_freq = conf.get('data_cooling_frequency')
 
