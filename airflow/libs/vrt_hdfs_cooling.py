@@ -30,7 +30,6 @@ def filter_objects(config: dict, system_tz: str) -> list:
             continue
 
         conf['is_new'] = False
-        # Для тестов - last_tech_load_ts = datetime.strptime(last_date_cooling, '%Y-%m-%d %H:%M:%S')
         last_tech_load_ts = last_date_cooling.replace(tzinfo=None)
         conf['last_date_cooling'] = last_tech_load_ts.strftime('%Y-%m-%d %H:%M:%S')
         now = datetime.now(pytz.timezone(system_tz)).replace(tzinfo=None)
@@ -264,10 +263,12 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     'Step 2'
     config_manager = get_config_manager(source_type, source_config)
     config = config_manager.get_config()
+    print(config)
     logging.info(config)
 
     'Step 4'
     filter_object = filter_objects(config, system_tz)
+    print(filter_object)
     logging.info(filter_object)
 
     'Step 5'
@@ -277,6 +278,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     'Step 6'
     max_tech_load_ts = get_max_load_ts(
         filter_object, db_connection_src, get_max_tech_load_ts, conf_krb_info)
+    print(max_tech_load_ts)
     logging.info(max_tech_load_ts)
 
     'Step 7'
