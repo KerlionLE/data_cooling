@@ -139,7 +139,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
         )
 
         if conf['cooling_type'] == 'time_based':
-            if conf['replication_policy'] == 1:
+            if conf['replication_policy'] == True:
                 if temporary_heating:
 
                     depth_heating = conf['temporary_heating']['depth']
@@ -175,11 +175,11 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                 else:
                     sql = f'{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_cooling_depth}'
 
-            elif conf['replication_policy'] == 0:
+            elif conf['replication_policy'] == False:
                 sql = f'{sql_export_date_start_date_end_cooling_depth}'
 
         elif conf['cooling_type'] == 'fullcopy':
-            if conf['replication_policy'] == 0:
+            if conf['replication_policy'] == False:
                 sql_export = get_formated_file(
                     export_with_partitions,
                     hdfs_path = hdfs_path_con,
