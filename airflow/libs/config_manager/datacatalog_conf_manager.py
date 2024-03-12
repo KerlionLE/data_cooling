@@ -302,6 +302,7 @@ class DataCatalogConfManager(ConfigManager):
         data_final = []
         conf_final = {}
         for a in data_list_all:
+            print(a)
             conf_final['schema_name'] = a.get('physicalNameGroup')
             conf_final['table_name'] = a.get('physicalName')
             conf_final['cooling_type'] = a.get('coolingType')
