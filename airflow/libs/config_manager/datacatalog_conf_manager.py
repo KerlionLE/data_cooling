@@ -47,8 +47,7 @@ def type_to_dict(obj: str) -> str:
 
     :return: возвращает правильное значение
     """
-    a = 'FULLCOPY'
-    return a
+    return obj.__dict__.values
 
 
 def params_to_dict(obj: str) -> dict:
@@ -58,13 +57,10 @@ def params_to_dict(obj: str) -> dict:
 
     :return: словарь
     """
+
     d = {}
-    python_types = [str, int, float, dict, list, tuple, set, bool]
     for name, value in obj.__dict__.items():
-        if type(value) in python_types:
-            d[name] = value
-        else:
-            d[name] = params_to_dict(value)
+        d[name] = value if name not in ['coolingType','heatingType'] else value.__dict__.values
     return d
 
 
