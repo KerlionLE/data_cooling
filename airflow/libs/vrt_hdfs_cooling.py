@@ -287,11 +287,11 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: list,
     
     'Step 1'
     db_connection_src = get_connect_manager(con_type, db_connection_config_src)
-    logging.info(filter_object)
-    
+    logging.info(db_connection_src)
+
     'Step 2'
     config_manager = get_config_manager(source_type, source_config)
-    logging.info(filter_object)
+    logging.info(config_manager)
 
     'Step 3'
     filter_object = filter_objects(config, system_tz, hdfs_path)
