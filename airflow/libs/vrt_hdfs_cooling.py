@@ -20,7 +20,7 @@ def filter_objects(config: dict, system_tz: str, hdfs_path: str) -> list:
     """
     filtered_objects = []
     for conf in config:
-        conf['hdfs_path'] = f'{hdfs_path}{conf['schema_name']}/{conf['table_name']}'
+        conf['hdfs_path'] = f'''{hdfs_path}{conf['schema_name']}/{conf['table_name']}'''
         last_date_cooling = conf.get('last_date_cooling')
         update_freq = conf.get('data_cooling_frequency')
 
