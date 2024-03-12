@@ -169,12 +169,12 @@ def compound_heat_cool(data_list_cool: list, data_list_heat: list) -> list:
                 a['heatingStartDate'] = b['heatingStartDate']
                 a['heatingEndDate'] = b['heatingEndDate']
                 a['heatingIsActive'] = b['heatingIsActive']
-                a['heatingExternalTableName'] = b['heatingExternalTableName']
-                a['isAlreadyHeating'] = b['isAlreadyHeating']
+                # a['heatingExternalTableName'] = b['heatingExternalTableName']
+                # a['isAlreadyHeating'] = b['isAlreadyHeating']
                 data_list.append(a)
                 continue
 
-        data_list.append(a)
+            data_list.append(a)
 
     return data_list
 
