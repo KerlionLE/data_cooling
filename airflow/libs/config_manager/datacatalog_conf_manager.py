@@ -126,7 +126,6 @@ def compound_heatparams_heatresult(repo: str) -> list:
     for d in get_heat_param['items']:
         data_list_heat_parms.append(params_to_dict(d))
 
-    print(data_list_heat_parms)
     # 2.1 Работа с обектом PhysicalObjectHeatResult
     get_heat_results = repo.readEntity(
         entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
@@ -136,7 +135,7 @@ def compound_heatparams_heatresult(repo: str) -> list:
     data_list_heat_results = []
     for d in get_heat_results['items']:
         data_list_heat_results.append(params_to_dict(d))
-    print(data_list_heat_results)
+
     # 2.2 Объединение PhysicalObjectHeatParams и PhysicalObjectHeatResult
     data_list_heat = []
     for a in data_list_heat_parms:
@@ -175,7 +174,7 @@ def compound_heat_cool(data_list_cool: list, data_list_heat: list) -> list:
                 data_list.append(a)
         
         if a.get('heatingType', False) == False:
-            data_list_heat.append(a) 
+            data_list.append(a) 
 
     return data_list
 
