@@ -107,7 +107,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
     for conf in config:
 
         actual_max_tech_load_ts = conf['actual_max_tech_load_ts']
-        depth_cooling = conf['depth']
+        depth_cooling = conf.get('depth') or 0
         tech_ts_column_name = conf.get('tech_ts_column_name') or 'tech_load_ts'
 
         temporary_heating = conf.get('temporary_heating') or False
