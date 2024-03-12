@@ -303,16 +303,16 @@ class DataCatalogConfManager(ConfigManager):
         data_final = []
         conf_final = {}
         for a in data_list_all:
-            conf_final['schema_name'] == a.get('physicalNameGroup')
-            conf_final['table_name'] == a.get('physicalName')
-            conf_final['cooling_type'] == a.get('coolingType')
+            conf_final['schema_name'] = a.get('physicalNameGroup')
+            conf_final['table_name'] = a.get('physicalName')
+            conf_final['cooling_type'] = a.get('coolingType')
             conf_final['replication_policy'] == a.get('shouldDeleteSourceData')
-            conf_final['depth'] == a.get('coolingDepthDays')
-            conf_final['last_date_cooling'] == a.get('coolingLastDate') or None
-            conf_final['data_cooling_frequency'] == a.get('coolingFrequency')
-            conf_final['tech_ts_column_name'] == a.get('coolingFilterTimeColumnName')
-            conf_final['filter_expression'] == a.get('coolingFilterExpression')
-            conf_final['partition_expressions'] == a.get('coolingPartitionExpression')
+            conf_final['depth'] = a.get('coolingDepthDays')
+            conf_final['last_date_cooling'] = a.get('coolingLastDate') or None
+            conf_final['data_cooling_frequency'] = a.get('coolingFrequency')
+            conf_final['tech_ts_column_name'] = a.get('coolingFilterTimeColumnName')
+            conf_final['filter_expression'] = a.get('coolingFilterExpression')
+            conf_final['partition_expressions'] = a.get('coolingPartitionExpression')
             data_final.append(conf_final)
 
         return data_final
