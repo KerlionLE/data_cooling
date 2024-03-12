@@ -17,8 +17,8 @@ def type_to_dict(obj: str) -> str:
 
     :return: возвращает правильное значение
     """
-
-    return 'FULLCOPY'
+    a = 'FULLCOPY'
+    return a
 
 
 def params_to_dict(obj: str) -> dict:
