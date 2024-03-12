@@ -283,7 +283,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(config)
 
     'Step 4'
-    filter_object = filter_objects(config, system_tz)
+    filter_object = filter_objects(config, system_tz, hdfs_path)
     print(filter_object)
     logging.info(filter_object)
 
