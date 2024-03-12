@@ -173,8 +173,8 @@ def compound_heat_cool(data_list_cool: list, data_list_heat: list) -> list:
                 # a['isAlreadyHeating'] = b['isAlreadyHeating']
                 data_list.append(a)
                 continue
-
-            data_list.append(a)
+            else:
+                data_list.append(a)
 
     return data_list
 
