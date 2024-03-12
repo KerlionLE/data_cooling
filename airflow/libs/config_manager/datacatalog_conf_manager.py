@@ -271,21 +271,16 @@ class DataCatalogConfManager(ConfigManager):
 
         # 3 Объединение coolresult и heatresult
         data_list_cool, id_objs_cool_parms = compound_coolparams_coolresult(repo)
-        print(f' 1 - {data_list_cool, id_objs_cool_parms}')
         data_list_heat = compound_heatparams_heatresult(repo)
-        print(f'2 - {data_list_heat}')
 
         # 4 Объединение Heat и Cool
         data_list = compound_heat_cool(data_list_cool, data_list_heat)
-        print(f' 3 - {data_list}')
 
         # 5 Работа с обектом PhysicalObject
         data_list_oblects, id_objs_objects = physicalobject(id_objs_cool_parms, repo)
-        print(data_list_oblects, id_objs_objects)
 
         # 6 Работа с обектом PhysicalGroup
         data_list_group = physicalgroup(id_objs_objects, repo)
-        print(data_list_group)
 
         # 7 Объединение объектов обектов PhysicalGroup и PhysicalObject
         data_list_oblects_group = []
@@ -294,7 +289,6 @@ class DataCatalogConfManager(ConfigManager):
                 if a['group'] == b['id']:
                     a['physicalNameGroup'] = b['physicalName']
                     data_list_oblects_group.append(a)
-        print(data_list_oblects_group)
 
         # 6 Объединение Всего
         data_list_all = []
@@ -305,3 +299,20 @@ class DataCatalogConfManager(ConfigManager):
                     a['physicalNameGroup'] = b['physicalNameGroup']
                     data_list_all.append(a)
         print(data_list_all)
+
+        data_final = []
+        conf_final = {}
+        for a in data_list_all:
+            conf_final['schema_name'] == a.get('physicalNameGroup')
+            conf_final['table_name'] == a.get('physicalName')
+            conf_final['cooling_type'] == a.get('coolingType')
+            conf_final['replication_policy'] == a.get('shouldDeleteSourceData')
+            conf_final['depth'] == a.get('coolingDepthDays')
+            conf_final['last_date_cooling'] == a.get('coolingLastDate') or None
+            conf_final['data_cooling_frequency'] == a.get('coolingFrequency')
+            conf_final['tech_ts_column_name'] == a.get('coolingFilterTimeColumnName')
+            conf_final['filter_expression'] == a.get('coolingFilterExpression')
+            conf_final['partition_expressions'] == a.get('coolingPartitionExpression')
+            data_final.append(conf_final)
+
+        return data_final
