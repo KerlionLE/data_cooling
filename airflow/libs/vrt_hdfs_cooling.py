@@ -217,7 +217,7 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, 
 
     for conf in config:
         try:
-            if conf['replication_policy'] == True:
+            if conf['replication_policy'] == True and conf['dml_script'] != '':
                 date_start = datetime.now()
                 db_connection_src.apply_script_hdfs(
                     conf['dml_script'], conf_krb_info)
@@ -228,7 +228,7 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, 
                     f'''Продолжительность выполнения - {date_end - date_start} ''',
                 )
 
-            elif conf['replication_policy'] == False:
+            elif conf['replication_policy'] == False  and conf['dml_script'] != '':
                 date_start = datetime.now()
                 db_connection_src.apply_script_hdfs(
                     conf['dml_script'], conf_krb_info)
