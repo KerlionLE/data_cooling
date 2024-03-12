@@ -58,10 +58,13 @@ def params_to_dict(obj: str) -> dict:
 
     :return: словарь
     """
-
     d = {}
+    python_types = [str, int, float, dict, list, tuple, set, bool]
     for name, value in obj.__dict__.items():
-        d[name] = value # if name not in ['coolingType','heatingType'] else type_to_dict(value)
+        if type(value) in python_types:
+            d[name] = value
+        else:
+            d[name] = params_to_dict(value)
     return d
 
 
