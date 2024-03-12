@@ -136,6 +136,8 @@ def compound_heatparams_heatresult(repo: str) -> list:
     for d in get_heat_results['items']:
         data_list_heat_results.append(params_to_dict(d))
 
+    print(f' 1 - {data_list_heat_parms} ')
+    print(f' 2 - {data_list_heat_results} ')
     # 2.2 Объединение PhysicalObjectHeatParams и PhysicalObjectHeatResult
     data_list_heat = []
     for a in data_list_heat_parms:
