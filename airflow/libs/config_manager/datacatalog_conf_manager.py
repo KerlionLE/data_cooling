@@ -61,7 +61,7 @@ def params_to_dict(obj: str) -> dict:
 
     d = {}
     for name, value in obj.__dict__.items():
-        d[name] = value if name != 'coolingType' or name != 'heatingType' else type_to_dict(value)
+        d[name] = value if name in ['coolingType','heatingType'] else type_to_dict(value)
     return d
 
 
@@ -372,15 +372,15 @@ class DataCatalogConfManager(ConfigManager):
         """
         repo =  conn_to(self.config)
 
-        res_read = repo.readEntity(
-        entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
-        payload={
-            "query": {
-                "physicalObjectHeatParamsId": [int(conf['physicalObjectCoolParamsId'])]
-            },
-            "page": 1,
-            "pageSize": 300
-        })
+        res_read=repo.readEntity(
+            entityType=DataCatalogEntityType.Physical ObjectHeatResult.value,
+                entityDraft={
+                    "query": {
+                        "physicalObjectHeatParamsId": [int(conf['physicalObjectCoolParamsId'])]
+                    },
+                    "page": 1,
+                    "pageSize": 300
+                })
 
         if res_read is None:
             post_result = repo.createEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
@@ -396,5 +396,5 @@ class DataCatalogConfManager(ConfigManager):
                                                     "id": conf['physicalObjectCoolParamsId'],
                                                     "isAlreadyHeating": True,
                                                 })
-            logging.info(post_result)
+            logging.info(res)
 
