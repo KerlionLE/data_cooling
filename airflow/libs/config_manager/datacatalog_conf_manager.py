@@ -305,7 +305,7 @@ class DataCatalogConfManager(ConfigManager):
             conf_final['schema_name'] = a.get('physicalNameGroup')
             conf_final['table_name'] = a.get('physicalName')
             conf_final['cooling_type'] = a.get('coolingType')
-            conf_final['replication_policy'] == a.get('shouldDeleteSourceData')
+            conf_final['replication_policy'] = a.get('shouldDeleteSourceData')
             conf_final['depth'] = a.get('coolingDepthDays')
             conf_final['last_date_cooling'] = a.get('coolingLastDate') or None
             conf_final['data_cooling_frequency'] = a.get('coolingFrequency')
