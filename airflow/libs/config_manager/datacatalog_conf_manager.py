@@ -373,7 +373,7 @@ class DataCatalogConfManager(ConfigManager):
         repo =  conn_to(self.config)
 
         res_read=repo.readEntity(
-            entityType=DataCatalogEntityType.Physical ObjectHeatResult.value,
+            entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
                 entityDraft={
                     "query": {
                         "physicalObjectHeatParamsId": [int(conf['physicalObjectCoolParamsId'])]
