@@ -31,7 +31,7 @@ def params_to_dict(obj: str) -> dict:
 
     d = {}
     for name, value in obj.__dict__.items():
-        d[name] = value if name != 'coolingType' or name != 'heatingType' else type_to_dict(
+        d[name] = value if name == 'coolingType' or name == 'heatingType' else type_to_dict(
             value)
     return d
 
