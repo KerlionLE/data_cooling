@@ -163,17 +163,14 @@ def compound_heat_cool(data_list_cool: list, data_list_heat: list) -> list:
 
     for a in data_list_cool:
         for b in data_list_heat:
-            if a['physicalObjectId'] == b['physicalObjectId']:
-                a['heatingType'] = b['heatingType']
-                a['heatingDepthDays'] = b['heatingDepthDays']
-                a['heatingStartDate'] = b['heatingStartDate']
-                a['heatingEndDate'] = b['heatingEndDate']
-                a['heatingIsActive'] = b['heatingIsActive']
-                # a['heatingExternalTableName'] = b['heatingExternalTableName']
-                # a['isAlreadyHeating'] = b['isAlreadyHeating']
-                data_list.append(a)
-                continue
-            else:
+            if a['physicalObjectId'] == b['physicalObjectId']: 
+                a['heatingType'] = b.get('heatingType')
+                a['heatingDepthDays'] = b.get('heatingDepthDays')
+                a['heatingStartDate'] = b.get('heatingStartDate')
+                a['heatingEndDate'] = b.get('heatingEndDate')
+                a['heatingIsActive'] = b.get('heatingIsActive')
+                # a['heatingExternalTableName'] = b.get('heatingExternalTableName')
+                # a['isAlreadyHeating'] = b.get('isAlreadyHeating')
                 data_list.append(a)
 
     return data_list
