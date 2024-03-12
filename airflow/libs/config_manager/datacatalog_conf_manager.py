@@ -328,7 +328,7 @@ class DataCatalogConfManager(ConfigManager):
 
         return data_final
 
-    def put_data_cooling(self, config: list = None) -> None:
+    def put_data_cooling(self, conf: list = None) -> None:
 
         """
         Заолняем таблицы result для охлаждения
@@ -337,12 +337,64 @@ class DataCatalogConfManager(ConfigManager):
         """
         repo =  conn_to(self.config)
 
-        for conf in config: 
+        res_read = repo.readEntity(
+        entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
+        payload={
+            "query": {
+                "physicalObjectCoolParamsId": [int(conf['physicalObjectCoolParamsId'])]
+            },
+            "page": 1,
+            "pageSize": 300
+        })
 
+        if res_read is None:
             post_result = repo.createEntity(entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
                                         entityDraft={
                                             "physicalObjectCoolParamsId": conf['physicalObjectCoolParamsId'],
                                             "coolingLastDate": conf['actual_max_tech_load_ts'],
-                                            "coolingHdfsTarget": conf['hdfs_path']
+                                            "coolingHdfsTarget": conf['hdfs_path'],
                                         })
-        
+            logging.info(post_result)
+        else: 
+            res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value, 
+                                    entityDraft={
+                                                            "id":  conf['physicalObjectCoolParamsId'],
+                                                            "coolingLastDate": conf['actual_max_tech_load_ts'],
+                                                })
+            logging.info(res)
+            
+    def put_data_heating(self, conf: list = None) -> None:
+
+        """
+        Заолняем таблицы result для охлаждения
+        :param conf: возможные параметры конфига
+
+        """
+        repo =  conn_to(self.config)
+
+        res_read = repo.readEntity(
+        entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
+        payload={
+            "query": {
+                "physicalObjectHeatParamsId": [int(conf['physicalObjectCoolParamsId'])]
+            },
+            "page": 1,
+            "pageSize": 300
+        })
+
+        if res_read is None:
+            post_result = repo.createEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
+                                        entityDraft={
+                                                        "physicalObjectHeatParamsId": conf['physicalObjectCoolParamsId'],
+                                                        "heatingExternalTableName": f'''{conf['schema_name']}.{conf['table_name']}''',
+                                                        "isAlreadyHeating": True,
+                                        })
+            logging.info(post_result)
+        else: 
+            res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value, 
+                                    entityDraft={
+                                                    "id": conf['physicalObjectCoolParamsId'],
+                                                    "isAlreadyHeating": True,
+                                                })
+            logging.info(post_result)
+

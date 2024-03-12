@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import pytz
 from croniter import croniter
 
+from data_cooling.config_manager import ConfigManager
 from data_cooling.connect_manager import DBConnection
 from data_cooling.utils import get_formated_file, get_connect_manager, get_config_manager
 
@@ -202,7 +203,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list) -> None:
+def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, config_manager: ConfigManager) -> None:
     """
     Запуск DML скриптов
     :param config: конфиг
@@ -210,18 +211,33 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list) 
     :param conf_krb_info: конфиг соединения через керберос
     :param load_max_tech_load_ts_insert: sql скрипт
     :param schema_table_name_registry: название тех талицы
+    :param config_manager: класс конфига
 
     """
 
     for conf in config:
         try:
-            date_start = datetime.now()
-            db_connection_src.apply_script_hdfs(
-                conf['dml_script'], conf_krb_info)
-            date_end = datetime.now()
-            logging.info(
-                f'''Продолжительность выполнения - {date_end - date_start} ''',
-            )
+            if conf['replication_policy'] == True:
+                date_start = datetime.now()
+                db_connection_src.apply_script_hdfs(
+                    conf['dml_script'], conf_krb_info)
+                config_manager.put_data_cooling(conf)
+                config_manager.put_data_heating(conf)
+                date_end = datetime.now()
+                logging.info(
+                    f'''Продолжительность выполнения - {date_end - date_start} ''',
+                )
+
+            elif conf['replication_policy'] == False:
+                date_start = datetime.now()
+                db_connection_src.apply_script_hdfs(
+                    conf['dml_script'], conf_krb_info)
+                config_manager.put_data_cooling(conf)
+                date_end = datetime.now()
+                logging.info(
+                    f'''Продолжительность выполнения - {date_end - date_start} ''',
+                )
+
         except Exception as e:
             logging.error(
                 f'''Таблица - {conf['schema_name']}.{conf['table_name']} - не будет реплицироваться, ошибка - {e}''',
@@ -287,4 +303,4 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     logging.info(gen_dmls)
 
     'Step 8'
-    run_dml(gen_dmls, db_connection_src, conf_krb_info)
+    run_dml(gen_dmls, db_connection_src, conf_krb_info, config_manager)
