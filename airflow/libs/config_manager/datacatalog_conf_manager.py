@@ -160,17 +160,17 @@ def compound_heat_cool(data_list_cool: list, data_list_heat: list) -> list:
     :return: лист
     """
     data_list = []
-    temporary_heating = 'temporary_heating'
+
     for a in data_list_cool:
         for b in data_list_heat:
             if a['physicalObjectId'] == b['physicalObjectId']:
                 a['heatingType'] = b['heatingType']
-                a[{temporary_heating}]['heatingDepthDays'] = b['heatingDepthDays']
-                a[{temporary_heating}]['heatingStartDate'] = b['heatingStartDate']
-                a[{temporary_heating}]['heatingEndDate'] = b['heatingEndDate']
-                a[{temporary_heating}]['heatingIsActive'] = b['heatingIsActive']
-                a[{temporary_heating}]['heatingExternalTableName'] = b['heatingExternalTableName']
-                a[{temporary_heating}]['isAlreadyHeating'] = b['isAlreadyHeating']
+                a['heatingDepthDays'] = b['heatingDepthDays']
+                a['heatingStartDate'] = b['heatingStartDate']
+                a['heatingEndDate'] = b['heatingEndDate']
+                a['heatingIsActive'] = b['heatingIsActive']
+                a['heatingExternalTableName'] = b['heatingExternalTableName']
+                a['isAlreadyHeating'] = b['isAlreadyHeating']
                 data_list.append(a)
                 continue
 
