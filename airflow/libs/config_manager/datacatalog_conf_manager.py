@@ -298,7 +298,6 @@ class DataCatalogConfManager(ConfigManager):
                     a['physicalName'] = b['physicalName']
                     a['physicalNameGroup'] = b['physicalNameGroup']
                     data_list_all.append(a)
-        print(data_list_all)
 
         data_final = []
         conf_final = {}
@@ -314,5 +313,8 @@ class DataCatalogConfManager(ConfigManager):
             conf_final['filter_expression'] = a.get('coolingFilterExpression')
             conf_final['partition_expressions'] = a.get('coolingPartitionExpression')
             data_final.append(conf_final)
+
+
+        print(data_final)
 
         return data_final
