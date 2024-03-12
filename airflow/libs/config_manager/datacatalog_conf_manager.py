@@ -89,7 +89,7 @@ def compound_coolparams_coolresult(repo) -> list:
                 a['coolingHdfsTarget'] = b['coolingHdfsTarget']
                 data_list_cool.append(a)
         
-        if not a['coolingLastDate']:
+        if a.get('coolingLastDate', False) == False:
             data_list_cool.append(a) 
             
     return data_list_cool, id_objs_cool_parms
@@ -145,7 +145,7 @@ def compound_heatparams_heatresult(repo: str) -> list:
                 a['isAlreadyHeating'] = b['isAlreadyHeating']
                 data_list_heat.append(a)
         
-        if not a['heatingExternalTableName']:
+        if a.get('heatingExternalTableName', False) == False:
             data_list_heat.append(a) 
 
     return data_list_heat
@@ -173,7 +173,7 @@ def compound_heat_cool(data_list_cool: list, data_list_heat: list) -> list:
                 # a['isAlreadyHeating'] = b.get('isAlreadyHeating')
                 data_list.append(a)
         
-        if not a['heatingType']:
+        if a.get('heatingType', False) == False:
             data_list_heat.append(a) 
 
     return data_list
