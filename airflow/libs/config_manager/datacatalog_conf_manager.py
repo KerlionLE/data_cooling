@@ -304,4 +304,4 @@ class DataCatalogConfManager(ConfigManager):
                     a['physicalName'] = b['physicalName']
                     a['physicalNameGroup'] = b['physicalNameGroup']
                     data_list_all.append(a)
-        print(data_list_oblects_group)
+        print(data_list_all)
