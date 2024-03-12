@@ -164,8 +164,8 @@ def compound_heat_cool(data_list_cool: list, data_list_heat: list) -> list:
     for a in data_list_cool:
         for b in data_list_heat:
             if a['physicalObjectId'] == b['physicalObjectId']:
-                print(a)
-                print(b)
+                a = frozenset(a)
+                b = frozenset(b)
                 a[{temporary_heating}]['heatingType'] = b['heatingType']
                 a[{temporary_heating}]['heatingDepthDays'] = b['heatingDepthDays']
                 a[{temporary_heating}]['heatingStartDate'] = b['heatingStartDate']
