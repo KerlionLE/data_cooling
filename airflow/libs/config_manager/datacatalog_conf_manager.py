@@ -83,15 +83,15 @@ def compound_coolparams_coolresult(repo) -> list:
     # 1.2 Объединение PhysicalObjectCoolParams и PhysicalObjectCoolResult
     data_list_cool = []
     for a in data_list_cool_parms:
-        if len(data_list_cool_results) != 0:
-            for b in data_list_cool_results:
-                if a['id'] == b['physicalObjectCoolParamsId']:
-                    a['coolingLastDate'] = b['coolingLastDate']
-                    a['coolingHdfsTarget'] = b['coolingHdfsTarget']
-                    data_list_cool.append(a)
-        else:
-            data_list_cool.append(a)
-
+        for b in data_list_cool_results:
+            if a['id'] == b['physicalObjectCoolParamsId']:
+                a['coolingLastDate'] = b['coolingLastDate']
+                a['coolingHdfsTarget'] = b['coolingHdfsTarget']
+                data_list_cool.append(a)
+        
+        if b['coolingLastDate'] != '':
+            data_list_cool.append(a) 
+            
     return data_list_cool, id_objs_cool_parms
 
 
@@ -139,14 +139,14 @@ def compound_heatparams_heatresult(repo: str) -> list:
     # 2.2 Объединение PhysicalObjectHeatParams и PhysicalObjectHeatResult
     data_list_heat = []
     for a in data_list_heat_parms:
-        if len(data_list_heat_results) != 0:
-            for b in data_list_heat_results:
-                if a['id'] == b['physicalObjectHeatParamsId']:
-                    a['heatingExternalTableName'] = b['heatingExternalTableName']
-                    a['isAlreadyHeating'] = b['isAlreadyHeating']
-                    data_list_heat.append(a)
-        else:
-            data_list_heat.append(a)
+        for b in data_list_heat_results:
+            if a['id'] == b['physicalObjectHeatParamsId']:
+                a['heatingExternalTableName'] = b['heatingExternalTableName']
+                a['isAlreadyHeating'] = b['isAlreadyHeating']
+                data_list_heat.append(a)
+        
+        if b['heatingExternalTableName'] != '':
+            data_list_heat.append(a) 
 
     return data_list_heat
 
@@ -172,9 +172,6 @@ def compound_heat_cool(data_list_cool: list, data_list_heat: list) -> list:
                 # a['heatingExternalTableName'] = b.get('heatingExternalTableName')
                 # a['isAlreadyHeating'] = b.get('isAlreadyHeating')
                 data_list.append(a)
-            else: 
-                data_list.append(a)
-        break
 
     return data_list
 
@@ -271,13 +268,13 @@ class DataCatalogConfManager(ConfigManager):
 
         # 3 Объединение coolresult и heatresult
         data_list_cool, id_objs_cool_parms = compound_coolparams_coolresult(repo)
-        print(data_list_cool, id_objs_cool_parms)
+        print(f' 1 - {data_list_cool, id_objs_cool_parms}')
         data_list_heat = compound_heatparams_heatresult(repo)
-        print(data_list_heat)
+        print(f'2 - {data_list_heat}')
 
         # 4 Объединение Heat и Cool
         data_list = compound_heat_cool(data_list_cool, data_list_heat)
-        print(data_list)
+        print(f' 3 - {data_list}')
 
         # 5 Работа с обектом PhysicalObject
         data_list_oblects, id_objs_objects = physicalobject(id_objs_cool_parms, repo)
