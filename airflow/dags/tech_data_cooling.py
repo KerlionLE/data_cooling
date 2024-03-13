@@ -10,7 +10,7 @@ from dwh_utils.airflow.common import get_dag_name
 
 from operators.python_virtualenv_artifactory_operator import PythonVirtualenvCurlOperator
 
-from data_cooling.vrt_hdfs_cooling import preprocess_config_checks_con_dml, get_config_func, gen_dmls
+from data_cooling.vrt_hdfs_cooling import preprocess_config_checks_con_dml, get_config_func, run_dml_func
 
 AIRFLOW_ENV = os.environ['AIRFLOW_ENV']
 
@@ -135,7 +135,7 @@ with DAG(**DAG_CONFIG) as dag:
     gen_dmls = PythonOperator(
         task_id='gen_dmls',
         trigger_rule='all_success',
-        python_callable=gen_dmls,
+        python_callable=run_dml_func,
         op_kwargs={
             'conf': f'{{{{ var.json.{DAG_NAME}.{AIRFLOW_ENV}.{inegration_name} }}}}',
             'db_connection_config_src': get_conn(dag_name=DAG_NAME, env_name=AIRFLOW_ENV, replication_names=inegration_name, system_type='source_system'),
