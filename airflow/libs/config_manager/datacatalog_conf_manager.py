@@ -324,6 +324,10 @@ class DataCatalogConfManager(ConfigManager):
             conf_final['tech_ts_column_name'] = a.get('coolingFilterTimeColumnName')
             conf_final['filter_expression'] = a.get('coolingFilterExpression')
             conf_final['partition_expressions'] = a.get('coolingPartitionExpression')
+            conf_final['heatingType'] = a.get('heatingType') or None
+            conf_final['depth'] = a.get('heatingDepthDays') or None
+            conf_final['date_start'] = a.get('heatingStartDate') or None
+            conf_final['date_end'] = a.get('heatingEndDate') or None
             data_final.append(conf_final)
 
         return data_final
