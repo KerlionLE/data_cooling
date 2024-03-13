@@ -1,5 +1,4 @@
 import logging
-import kerberos
 
 try:
     from pydg.core.session import Session
