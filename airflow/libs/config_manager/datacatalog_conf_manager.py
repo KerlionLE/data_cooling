@@ -1,4 +1,5 @@
 import logging
+import kerberos
 
 try:
     from pydg.core.session import Session
@@ -310,6 +311,7 @@ class DataCatalogConfManager(ConfigManager):
                     data_list_all.append(a)
 
         data_final = []
+        print(kerberos.__file__)
         for a in data_list_all:
             conf_final = {} 
             conf_final['physicalObjectCoolParamsId'] = a.get('physicalObjectCoolParamsId')

@@ -262,6 +262,7 @@ def get_config_func(conf: list) -> None:
 
     return config
 
+
 def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: list, config: list) -> None:
     """
     Функция обработки и создания конфига
@@ -312,6 +313,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: list,
     logging.info(gen_dmls)
 
     return gen_dmls
+
 
 def run_dml_func(gen_dmls: list, db_connection_config_src: list, conf: list) -> None:
     """
