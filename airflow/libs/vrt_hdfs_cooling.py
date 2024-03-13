@@ -304,7 +304,7 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: list,
     logging.info(max_tech_load_ts)
 
     logging.info(
-        f'''Колличество таблиц которое будеи охлаждаться - {len(filter_object)} ''')
+        f'''Колличество таблиц которое будеи охлаждаться - {len(max_tech_load_ts)} ''')
 
     'Step 5'
     gen_dmls = gen_dml(max_tech_load_ts, copy_to_vertica,
