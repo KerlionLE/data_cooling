@@ -143,4 +143,4 @@ with DAG(**DAG_CONFIG) as dag:
         },
     )
 
-    get_config_func >> preprocess_config_cheks_con_dml >> gen_dmls
+    get_config_func >> preprocess_config_cheks_con_dml >> run_dmls
