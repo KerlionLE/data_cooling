@@ -298,6 +298,9 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: list,
     filter_object = filter_objects(config, system_tz, hdfs_path)
     logging.info(filter_object)
 
+    import kerberos
+    print(kerberos.__file__)
+
     'Step 4'
     logging.info(
         f'''Колличество таблиц которое будеи охлаждаться - {len(filter_object)} ''')
