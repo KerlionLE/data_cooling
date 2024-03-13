@@ -299,15 +299,14 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: list,
     logging.info(filter_object)
 
     'Step 4'
-    logging.info(
-        f'''Колличество таблиц которое будеи охлаждаться - {len(filter_object)} ''')
-
-    'Step 5'
     max_tech_load_ts = get_max_load_ts(
         filter_object, db_connection_src, get_max_tech_load_ts, conf_krb_info)
     logging.info(max_tech_load_ts)
 
-    'Step 6'
+    logging.info(
+        f'''Колличество таблиц которое будеи охлаждаться - {len(filter_object)} ''')
+
+    'Step 5'
     gen_dmls = gen_dml(max_tech_load_ts, copy_to_vertica,
                        delete_with_partitions, export_with_partitions, hdfs_path)
     logging.info(gen_dmls)
