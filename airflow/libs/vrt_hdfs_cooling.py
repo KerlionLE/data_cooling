@@ -146,7 +146,8 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                 if temporary_heating:
 
                     depth_heating = ['heating_depth']
-                    date_end_heating_depth = (datetime.strptime(actual_max_tech_load_ts, date_format) - timedelta(days=depth_heating)).strftime(date_format)
+                    print(depth_heating)
+                    date_end_heating_depth = (datetime.strptime(actual_max_tech_load_ts, date_format) - timedelta(days=int(depth_heating))).strftime(date_format)
                     date_end_heating = datetime.strptime(conf['heating_date_end'], date_format)
                     date_start_heating = datetime.strptime(conf['heating_date_start'], date_format)
 
