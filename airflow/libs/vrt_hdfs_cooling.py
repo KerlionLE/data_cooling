@@ -141,7 +141,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
             time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' ''',
         )
 
-        if conf['cooling_type'] == 'time_based':
+        if conf['cooling_type'] == 'TimeBased':
             if conf['replication_policy'] == True:
                 if temporary_heating:
 
@@ -181,7 +181,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
             elif conf['replication_policy'] == False:
                 sql = f'{sql_export_date_start_date_end_cooling_depth}'
 
-        elif conf['cooling_type'] == 'fullcopy':
+        elif conf['cooling_type'] == 'Full':
             if conf['replication_policy'] == False:
                 sql_export = get_formated_file(
                     export_with_partitions,
@@ -255,7 +255,7 @@ def get_config_func(conf: list) -> None:
     source_type = conf['replication_objects_source']['source_type']
     source_config = conf['replication_objects_source']['source_config']
 
-    'Step 2'
+    'Step 1'
     config_manager = get_config_manager(source_type, source_config)
     config = config_manager.get_config()
     logging.info(config)
@@ -311,5 +311,31 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: list,
                        delete_with_partitions, export_with_partitions, hdfs_path)
     logging.info(gen_dmls)
 
-    'Step 7'
+    return gen_dmls
+
+def run_dml_func(gen_dmls: list, db_connection_config_src: list, conf: list) -> None:
+    """
+    Функция обработки и создания конфига
+    :param conf: конфиг запуска охлаждения
+    :param db_connection_config_src: креды содинения с базой
+    :param config: конфиг из источника
+
+    """
+
+    con_type = conf['source_system']['system_type']
+
+    source_type = conf['replication_objects_source']['source_type']
+    source_config = conf['replication_objects_source']['source_config']
+
+    conf_krb_info = conf['target_system']['system_config']['connection_config']['connection_conf']
+
+    'Step 1'
+    db_connection_src = get_connect_manager(con_type, db_connection_config_src)
+    logging.info(db_connection_src)
+
+    'Step 2'
+    config_manager = get_config_manager(source_type, source_config)
+    logging.info(config_manager)
+
+    'Step 3'
     run_dml(gen_dmls, db_connection_src, conf_krb_info, config_manager)

@@ -310,6 +310,7 @@ class DataCatalogConfManager(ConfigManager):
                     data_list_all.append(a)
 
         data_final = []
+        print(data_list_all)
         for a in data_list_all:
             conf_final = {} 
             conf_final['physicalObjectCoolParamsId'] = a.get('physicalObjectCoolParamsId')
@@ -371,23 +372,22 @@ class DataCatalogConfManager(ConfigManager):
         """
         repo =  conn_to(self.config)
 
-        res_read=repo.readEntity(
-            entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
-                entityDraft={
-                    "query": {
-                        "physicalObjectHeatParamsId": [int(conf['physicalObjectCoolParamsId'])]
-                    },
-                    "page": 1,
-                    "pageSize": 300
-                })
+        res_read=repo.readEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
+                                 entityDraft={
+                                    "query": {
+                                        "physicalObjectHeatParamsId": [int(conf['physicalObjectCoolParamsId'])]
+                                    },
+                                    "page": 1,
+                                    "pageSize": 300
+                                })
 
         if res_read is None:
             post_result = repo.createEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
-                                        entityDraft={
+                                            entityDraft={
                                                         "physicalObjectHeatParamsId": conf['physicalObjectCoolParamsId'],
                                                         "heatingExternalTableName": f'''{conf['schema_name']}.{conf['table_name']}''',
                                                         "isAlreadyHeating": True,
-                                        })
+                                            })
             logging.info(post_result)
         else: 
             res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value, 
