@@ -109,10 +109,10 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
     for conf in config:
 
         actual_max_tech_load_ts = conf['actual_max_tech_load_ts']
-        depth_cooling = conf.get('depth') or 0
+        depth_cooling = conf.get('cooling_depth') or 0
         tech_ts_column_name = conf.get('tech_ts_column_name') or 'tech_load_ts'
 
-        temporary_heating = conf.get('temporary_heating') or False
+        temporary_heating = conf.get('heating_type') or False
 
         date_start = conf.get('last_date_cooling') or '1000-10-01 15:14:15'
         partition = conf.get('partition_expressions') or f'DATE({tech_ts_column_name})'
@@ -145,10 +145,10 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
             if conf['replication_policy'] == True:
                 if temporary_heating:
 
-                    depth_heating = conf['temporary_heating']['depth']
+                    depth_heating = ['heating_depth']
                     date_end_heating_depth = (datetime.strptime(actual_max_tech_load_ts, date_format) - timedelta(days=depth_heating)).strftime(date_format)
-                    date_end_heating = datetime.strptime(conf['temporary_heating']['date_end'], date_format)
-                    date_start_heating = datetime.strptime(conf['temporary_heating']['date_start'], date_format)
+                    date_end_heating = datetime.strptime(conf['heating_date_end'], date_format)
+                    date_start_heating = datetime.strptime(conf['heating_date_start'], date_format)
 
                     sql_delete_date_start_date_end_heating_depth = get_formated_file(
                         delete_with_partitions,
@@ -158,7 +158,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                         time_between=f'''and {tech_ts_column_name} <= '{date_end_heating_depth}' ''',
                     )
 
-                    if conf['temporary_heating']['already_heat'] == 0 and current_date >= date_start_heating and current_date < date_end_heating:
+                    if conf['already_heat'] == 0 and current_date >= date_start_heating and current_date < date_end_heating:
                         sql_copy_to_vertica = get_formated_file(
                             copy_to_vertica,
                             hdfs_path = hdfs_path_con,
@@ -169,10 +169,10 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
 
                         sql = f'{sql_copy_to_vertica}\n{sql_delete_date_start_date_end_heating_depth}'
 
-                    elif conf['temporary_heating']['already_heat'] == 1 and current_date >= date_start_heating and current_date < date_end_heating:
+                    elif conf['already_heat'] == 1 and current_date >= date_start_heating and current_date < date_end_heating:
                         sql = f'{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_heating_depth}'
 
-                    elif conf['temporary_heating']['already_heat'] == 1 and current_date > date_end_heating:
+                    elif conf['already_heat'] == 1 and current_date > date_end_heating:
                         sql = f'{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_cooling_depth}'
 
                 else:
