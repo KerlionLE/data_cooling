@@ -132,8 +132,8 @@ with DAG(**DAG_CONFIG) as dag:
         },
     )
 
-    gen_dmls = PythonOperator(
-        task_id='gen_dmls',
+    run_dmls = PythonOperator(
+        task_id='run_dmls',
         trigger_rule='all_success',
         python_callable=run_dml_func,
         op_kwargs={
