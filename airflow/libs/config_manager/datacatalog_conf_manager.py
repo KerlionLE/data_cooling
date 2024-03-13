@@ -1,6 +1,6 @@
 import logging
 import kerberos
-from krbticket import KrbCommand, KrbConfig
+import krbticket
 
 try:
     from pydg.core.session import Session
@@ -313,7 +313,6 @@ class DataCatalogConfManager(ConfigManager):
 
         data_final = []
         print(kerberos.__file__)
-        print(KrbCommand.__file__)
         for a in data_list_all:
             conf_final = {} 
             conf_final['physicalObjectCoolParamsId'] = a.get('physicalObjectCoolParamsId')
