@@ -112,8 +112,6 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
         depth_cooling = conf.get('cooling_depth') or 0
         tech_ts_column_name = conf.get('tech_ts_column_name') or 'tech_load_ts'
 
-        temporary_heating = conf.get('heating_type') or False
-
         date_start = conf.get('last_date_cooling') or '1000-10-01 15:14:15'
         partition = conf.get('partition_expressions') or f'DATE({tech_ts_column_name})'
         date_format = '%Y-%m-%d %H:%M:%S'
@@ -143,7 +141,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
 
         if conf['cooling_type'] == 'TimeBased':
             if conf['replication_policy'] == True:
-                if temporary_heating:
+                if conf['heating_type'] is not None:
 
                     depth_heating = conf['heating_depth']
                     date_end_heating_depth = (datetime.strptime(actual_max_tech_load_ts, date_format) - timedelta(days=int(depth_heating))).strftime(date_format)
