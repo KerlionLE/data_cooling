@@ -120,6 +120,8 @@ def compound_coolparams_coolresult(repo) -> list:
         
         if a.get('coolingLastDate', False) == False:
             data_list_cool.append(a) 
+
+    print(data_list_cool)
             
     return data_list_cool, id_objs_cool_parms
 
@@ -177,6 +179,8 @@ def compound_heatparams_heatresult(repo: str) -> list:
         
         if a.get('heatingExternalTableName', False) == False:
             data_list_heat.append(a) 
+
+    print(data_list_heat)
 
     return data_list_heat
 
