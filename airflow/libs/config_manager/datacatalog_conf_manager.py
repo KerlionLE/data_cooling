@@ -328,6 +328,8 @@ class DataCatalogConfManager(ConfigManager):
             conf_final['heating_depth'] = a.get('heatingDepthDays') or None
             conf_final['heating_date_start'] = str(a.get('heatingStartDate')) or None
             conf_final['heating_date_end'] = str(a.get('heatingEndDate')) or None
+            conf_final['heatingExternalTableName'] = a.get('heatingExternalTableName')
+            conf_final['isAlreadyHeating'] = a.get('isAlreadyHeating')
             data_final.append(conf_final)
 
         return data_final
