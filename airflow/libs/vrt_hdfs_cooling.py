@@ -145,10 +145,9 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
 
                     depth_heating = conf['heating_depth']
                     date_end_heating_depth = (datetime.strptime(actual_max_tech_load_ts, date_format) - timedelta(days=int(depth_heating))).strftime(date_format)
-                    heating_date_end= datetime.datetime.strptime(conf['heating_date_end'], '%Y-%m-%d %H:%M:%S.%f')
-                    heating_date_start = datetime.datetime.strptime(conf['heating_date_start'], '%Y-%m-%d %H:%M:%S.%f')
-                    date_end_heating = datetime.strptime(heating_date_end.replace(tzinfo=None), date_format)
-                    date_start_heating = datetime.strptime(heating_date_start.replace(tzinfo=None), date_format)
+                    print(f'''1 - {conf['heating_date_end']}, 2 - {conf['heating_date_start']}''')
+                    date_end_heating = datetime.strptime(conf['heating_date_end'].replace(tzinfo=None), date_format)
+                    date_start_heating = datetime.strptime(conf['heating_date_start'].replace(tzinfo=None), date_format)
 
                     sql_delete_date_start_date_end_heating_depth = get_formated_file(
                         delete_with_partitions,
