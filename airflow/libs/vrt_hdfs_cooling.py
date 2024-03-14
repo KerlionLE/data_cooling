@@ -111,6 +111,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
         actual_max_tech_load_ts = conf['actual_max_tech_load_ts']
         depth_cooling = conf.get('cooling_depth') or 0
         tech_ts_column_name = conf.get('tech_ts_column_name') or 'tech_load_ts'
+        filter_expression = conf.get('filter_expression') or ''
 
         date_start = conf.get('last_date_cooling') or '1000-10-01 15:14:15'
         partition = conf.get('partition_expressions') or f'DATE({tech_ts_column_name})'
@@ -125,7 +126,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
             hdfs_path = hdfs_path_con,
             schema_name=conf['schema_name'],
             table_name=conf['table_name'],
-            filter_expression=conf['filter_expression'],
+            filter_expression=filter_expression,
             partition_expressions=partition,
             time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' ''',
             cur_date=(datetime.now()).strftime('%Y%m%d'),
@@ -135,7 +136,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
             delete_with_partitions,
             schema_name=conf['schema_name'],
             table_name=conf['table_name'],
-            filter_expression=conf['filter_expression'],
+            filter_expression=filter_expression,
             time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' ''',
         )
 
@@ -152,7 +153,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                         delete_with_partitions,
                         schema_name=conf['schema_name'],
                         table_name=conf['table_name'],
-                        filter_expression=conf['filter_expression'],
+                        filter_expression=filter_expression,
                         time_between=f'''and {tech_ts_column_name} <= '{date_end_heating_depth}' ''',
                     )
 

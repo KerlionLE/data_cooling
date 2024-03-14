@@ -113,6 +113,7 @@ def compound_coolparams_coolresult(repo) -> list:
     for a in data_list_cool_parms:
         for b in data_list_cool_results:
             if a['id'] == b['physicalObjectCoolParamsId']:
+                a['physicalObjectCoolParamsId'] = b['physicalObjectCoolParamsId']
                 a['coolingLastDate'] = b['coolingLastDate']
                 a['coolingHdfsTarget'] = b['coolingHdfsTarget']
                 data_list_cool.append(a)
@@ -169,6 +170,7 @@ def compound_heatparams_heatresult(repo: str) -> list:
     for a in data_list_heat_parms:
         for b in data_list_heat_results:
             if a['id'] == b['physicalObjectHeatParamsId']:
+                a['physicalObjectHeatParamsId'] = b['physicalObjectHeatParamsId']
                 a['heatingExternalTableName'] = b['heatingExternalTableName']
                 a['isAlreadyHeating'] = b['isAlreadyHeating']
                 data_list_heat.append(a)
@@ -191,7 +193,8 @@ def compound_heat_cool(data_list_cool: list, data_list_heat: list) -> list:
 
     for a in data_list_cool:
         for b in data_list_heat:
-            if a['physicalObjectId'] == b['physicalObjectId']: 
+            if a['physicalObjectId'] == b['physicalObjectId']:
+                a['physicalObjectHeatParamsId'] == b.get('physicalObjectHeatParamsId')
                 a['heatingType'] = b.get('heatingType')
                 a['heatingDepthDays'] = b.get('heatingDepthDays')
                 a['heatingStartDate'] = b.get('heatingStartDate')
@@ -314,6 +317,7 @@ class DataCatalogConfManager(ConfigManager):
         for a in data_list_all:
             conf_final = {} 
             conf_final['physicalObjectCoolParamsId'] = a.get('physicalObjectCoolParamsId')
+            conf_final['physicalObjectHeatParamsId'] = a.get('physicalObjectHeatParamsId')
             conf_final['schema_name'] = a.get('physicalNameGroup')
             conf_final['table_name'] = a.get('physicalName')
             conf_final['cooling_type'] = a.get('coolingType')
@@ -328,7 +332,7 @@ class DataCatalogConfManager(ConfigManager):
             conf_final['heating_depth'] = a.get('heatingDepthDays') or None
             conf_final['heating_date_start'] = str(a.get('heatingStartDate')) or None
             conf_final['heating_date_end'] = str(a.get('heatingEndDate')) or None
-            conf_final['heatingExternalTableName'] = a.get('heatingExternalTableName')
+            conf_final['hdfs_path'] = a.get('heatingExternalTableName')
             conf_final['isAlreadyHeating'] = a.get('isAlreadyHeating') or 0
             data_final.append(conf_final)
 
