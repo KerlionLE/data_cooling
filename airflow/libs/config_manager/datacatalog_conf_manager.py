@@ -176,8 +176,6 @@ def compound_heatparams_heatresult(repo: str) -> list:
         if a.get('heatingExternalTableName', False) == False:
             data_list_heat.append(a) 
 
-    print(data_list_heat)
-
     return data_list_heat
 
 
@@ -206,7 +204,9 @@ def compound_heat_cool(data_list_cool: list, data_list_heat: list) -> list:
                 data_list.append(a)
         
         if a.get('heatingType', False) == False:
-            data_list.append(a) 
+            data_list.append(a)
+
+        print(data_list)
 
     return data_list
 
