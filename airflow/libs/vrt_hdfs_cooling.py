@@ -156,7 +156,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                         time_between=f'''and {tech_ts_column_name} <= '{date_end_heating_depth}' ''',
                     )
 
-                    if conf['isAlreadyHeating'] == 0 and current_date >= date_start_heating and current_date < date_end_heating:
+                    if conf['isAlreadyHeating'] == 0 and current_date >= date_start_heating.replace(tzinfo=None) and current_date < date_end_heating.replace(tzinfo=None):
                         sql_copy_to_vertica = get_formated_file(
                             copy_to_vertica,
                             hdfs_path = hdfs_path_con,
