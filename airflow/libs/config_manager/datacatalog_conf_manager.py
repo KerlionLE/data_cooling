@@ -357,6 +357,8 @@ class DataCatalogConfManager(ConfigManager):
             "pageSize": 300
         })
 
+        print(res_read)
+
         if res_read is None:
             post_result = repo.createEntity(entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
                                         entityDraft={

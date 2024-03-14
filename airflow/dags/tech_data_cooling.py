@@ -26,7 +26,7 @@ DAG_NAME = get_dag_name(__file__)
 
 DAG_CONFIG = {
     'dag_id': DAG_NAME,
-    'schedule_interval': '0 1 * * *',
+    'schedule_interval': '* */1 * * *',
     'concurrency': 5,
     'max_active_runs': 1,
     'catchup': False,
@@ -132,8 +132,8 @@ with DAG(**DAG_CONFIG) as dag:
         },
     )
 
-    run_dmls = PythonOperator(
-        task_id='run_dmls',
+    run_dml_func = PythonOperator(
+        task_id='run_dml_func',
         trigger_rule='all_success',
         python_callable=run_dml_func,
         op_kwargs={
@@ -143,4 +143,4 @@ with DAG(**DAG_CONFIG) as dag:
         },
     )
 
-    get_config_func >> preprocess_config_cheks_con_dml >> run_dmls
+    get_config_func >> preprocess_config_cheks_con_dml >> run_dml_func
