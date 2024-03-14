@@ -32,7 +32,6 @@ def filter_objects(config: dict, system_tz: str, hdfs_path: str) -> list:
             continue
 
         conf['is_new'] = False
-        print(last_date_cooling)
         last_tech_load_ts = last_date_cooling.replace(tzinfo=None)
         conf['last_date_cooling'] = last_tech_load_ts.strftime('%Y-%m-%d %H:%M:%S')
         now = datetime.now(pytz.timezone(system_tz)).replace(tzinfo=None)
@@ -146,8 +145,8 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
 
                     depth_heating = conf['heating_depth']
                     date_end_heating_depth = (datetime.strptime(actual_max_tech_load_ts, date_format) - timedelta(days=int(depth_heating))).strftime(date_format)
-                    heating_date_end= conf['heating_date_end']
-                    heating_date_start = conf['heating_date_start']
+                    heating_date_end= datetime.datetime.strptime(conf['heating_date_end'], '%Y-%m-%d %H:%M:%S.%f')
+                    heating_date_start = datetime.datetime.strptime(conf['heating_date_start'], '%Y-%m-%d %H:%M:%S.%f')
                     date_end_heating = datetime.strptime(heating_date_end.replace(tzinfo=None), date_format)
                     date_start_heating = datetime.strptime(heating_date_start.replace(tzinfo=None), date_format)
 
