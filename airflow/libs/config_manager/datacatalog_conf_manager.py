@@ -113,7 +113,7 @@ def compound_coolparams_coolresult(repo) -> list:
     for a in data_list_cool_parms:
         for b in data_list_cool_results:
             if a['id'] == b['physicalObjectCoolParamsId']:
-                a['physicalObjectCoolParamsId'] = b['physicalObjectCoolParamsId']
+                a['physicalObjectCoolParamsId'] = a['id']
                 a['coolingLastDate'] = b['coolingLastDate']
                 a['coolingHdfsTarget'] = b['coolingHdfsTarget']
                 data_list_cool.append(a)
@@ -170,7 +170,7 @@ def compound_heatparams_heatresult(repo: str) -> list:
     for a in data_list_heat_parms:
         for b in data_list_heat_results:
             if a['id'] == b['physicalObjectHeatParamsId']:
-                a['physicalObjectHeatParamsId'] = b['physicalObjectHeatParamsId']
+                a['physicalObjectHeatParamsId'] = a['id']
                 a['heatingExternalTableName'] = b['heatingExternalTableName']
                 a['isAlreadyHeating'] = b['isAlreadyHeating']
                 data_list_heat.append(a)
