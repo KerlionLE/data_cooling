@@ -315,6 +315,8 @@ class DataCatalogConfManager(ConfigManager):
 
         data_final = []
 
+        print(data_list)
+
         for a in data_list_all:
             conf_final = {} 
             conf_final['physicalObjectCoolParamsId'] = a.get('physicalObjectCoolParamsId')
