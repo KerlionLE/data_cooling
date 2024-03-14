@@ -205,7 +205,6 @@ def compound_heat_cool(data_list_cool: list, data_list_heat: list) -> list:
         
         if a.get('heatingType', False) == False:
             a['physicalObjectCoolParamsId'] = a.get('id')
-            a['physicalObjectHeatParamsId'] = b.get('id')
             data_list.append(a)
 
     return data_list
@@ -314,8 +313,6 @@ class DataCatalogConfManager(ConfigManager):
                     data_list_all.append(a)
 
         data_final = []
-
-        print(data_list)
 
         for a in data_list_all:
             conf_final = {} 
