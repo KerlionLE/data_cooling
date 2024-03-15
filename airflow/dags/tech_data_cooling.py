@@ -93,7 +93,7 @@ PYPI_REQUIREMENTS = [
 UKD_REQUIREMENTS = [
         {'lib_name': 'pydg', 'version': 'v0.3.19', 'storage': 'non-standard'},
         {'lib_name': 'dg_utils', 'version': '1.0.3', 'storage': 'standard'},
-    ]
+]
 
 with DAG(**DAG_CONFIG) as dag:
 
