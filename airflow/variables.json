@@ -80,7 +80,7 @@
             "base_url": "https://dg-test.sibur.local/dc-integration/",
             "root_ca_path": "/usr/local/airflow/certs/RootCA.pem",
             "username": "a001tst-dg-cool-bot",
-            "password": "rx2RTBTZoLH0FweLvPBl"
+            "password": "fw4cJV!7sp38oT@S1Ey"
           }
         },
         "auxiliary_sql_paths": {
