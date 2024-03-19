@@ -12,7 +12,7 @@ class ConfigManager:
     def get_config(self, **kwargstr) -> dict:
         """
         Обработка config
-        :param **kwargstr: путь или конфиг с путём
+        :param **kwargstr: путь
 
         """
         raise NotImplementedError

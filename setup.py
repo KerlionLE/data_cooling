@@ -23,8 +23,8 @@ setup(
     tests_require=[],
     entry_points={},
     classifiers=[
-        'Programming Language :: Python :: ',
+        'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
-        'Operating System :: OS Independen',
+        'Operating System :: OS Independent',
     ],
 )
