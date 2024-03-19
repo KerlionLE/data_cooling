@@ -3,13 +3,14 @@ import logging
 from datetime import datetime
 
 from airflow import DAG
+from airflow.operators.python import PythonOperator
 from airflow.hooks.base import BaseHook
 from airflow.models import Variable
 from dwh_utils.airflow.common import get_dag_name
 
 from operators.python_virtualenv_artifactory_operator import PythonVirtualenvCurlOperator
 
-from data_cooling.vrt_hdfs_cooling import preprocess_config_checks_con_dml
+from data_cooling.vrt_hdfs_cooling import preprocess_config_checks_con_dml, get_config_func, run_dml_func
 
 AIRFLOW_ENV = os.environ['AIRFLOW_ENV']
 
@@ -25,7 +26,7 @@ DAG_NAME = get_dag_name(__file__)
 
 DAG_CONFIG = {
     'dag_id': DAG_NAME,
-    'schedule_interval': '* * 1 * *',
+    'schedule_interval': '0 1 * * *',
     'concurrency': 5,
     'max_active_runs': 1,
     'catchup': False,
@@ -92,14 +93,14 @@ PYPI_REQUIREMENTS = [
 UKD_REQUIREMENTS = [
         {'lib_name': 'pydg', 'version': 'v0.3.19', 'storage': 'non-standard'},
         {'lib_name': 'dg_utils', 'version': '1.0.3', 'storage': 'standard'},
-    ]
+]
 
 with DAG(**DAG_CONFIG) as dag:
 
     inegration_name = 'data_cooling'
 
-    preprocess_config_checks_con_dml = PythonVirtualenvCurlOperator(
-        task_id='preprocess_config_checks_con_dml',
+    get_config_func = PythonVirtualenvCurlOperator(
+        task_id='get_config_func',
         pypi_requirements=PYPI_REQUIREMENTS,
         ukd_requirements=UKD_REQUIREMENTS,
         connection_params={
@@ -108,17 +109,38 @@ with DAG(**DAG_CONFIG) as dag:
                 'host': r'{{ conn.artifactory_pypi_rc.host }}',
         },
         pip_config={
-            'index-url': f'{{{{ var.json.pip_conf.pip_config.{AIRFLOW_ENV}.index_url }}}}',
-            'trusted-host': f'{{{{ var.json.pip_conf.pip_config.{AIRFLOW_ENV}.trusted_host }}}}',
-            'extra-index-url': f'{{{{ var.json.pip_conf.pip_config.{AIRFLOW_ENV}.extra_index_url }}}}',
+            'index-url': f'{{{{ var.json.pip_conf.pip_config.index_url }}}}',
+            'trusted-host': f'{{{{ var.json.pip_conf.pip_config.trusted_host }}}}',
+            'extra-index-url': f'{{{{ var.json.pip_conf.pip_config.extra_index_url }}}}',
             'extra-url-password': r'{{ conn.artifactory_pypi_rc.password }}',
             'extra-url-login': r'{{ conn.artifactory_pypi_rc.login }}',
         },
+        python_callable=get_config_func,
+        op_kwargs={
+            'conf': f'{{{{ var.json.{DAG_NAME}.{AIRFLOW_ENV}.{inegration_name}}}}}'
+        },
+    )
+
+    preprocess_config_cheks_con_dml = PythonOperator(
+        task_id='preprocess_config_cheks_con_dml',
+        trigger_rule='all_success',
         python_callable=preprocess_config_checks_con_dml,
         op_kwargs={
             'conf': f'{{{{ var.json.{DAG_NAME}.{AIRFLOW_ENV}.{inegration_name} }}}}',
             'db_connection_config_src': get_conn(dag_name=DAG_NAME, env_name=AIRFLOW_ENV, replication_names=inegration_name, system_type='source_system'),
+            'config': "{{ ti.xcom_pull(task_ids='get_config_func') }}",
         },
     )
 
-    preprocess_config_checks_con_dml
+    run_dml_func = PythonOperator(
+        task_id='run_dml_func',
+        trigger_rule='all_success',
+        python_callable=run_dml_func,
+        op_kwargs={
+            'conf': f'{{{{ var.json.{DAG_NAME}.{AIRFLOW_ENV}.{inegration_name} }}}}',
+            'db_connection_config_src': get_conn(dag_name=DAG_NAME, env_name=AIRFLOW_ENV, replication_names=inegration_name, system_type='source_system'),
+            'gen_dmls': "{{ ti.xcom_pull(task_ids='preprocess_config_cheks_con_dml') }}",
+        },
+    )
+
+    get_config_func >> preprocess_config_cheks_con_dml >> run_dml_func

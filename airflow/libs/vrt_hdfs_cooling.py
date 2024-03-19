@@ -4,70 +4,38 @@ from datetime import datetime, timedelta
 import pytz
 from croniter import croniter
 
+from data_cooling.config_manager import ConfigManager
 from data_cooling.connect_manager import DBConnection
 from data_cooling.utils import get_formated_file, get_connect_manager, get_config_manager
 
-# ------------------------------------------------------------------------------------------------------------------
 
-
-def get_last_tech_load_ts(schemas: list, tables: list, schema_table_name_registry: str, db_connection_src: DBConnection, sql_scripts_path: str, conf_krb_info: list) -> dict:
-    """
-    Забираем max дату из технической таблицы - записываем в словарь с 2-мя ключами
-    :param schemas: название схем, которые нужно реплицировать
-    :param tables: название таблиц, которые нужно реплицировать
-    :param schema_table_name_registry: название технической схемы-таблицы с историей работы репликации
-    :param db_connection_src: объект соединения
-    :param sql_scripts_path: путь к sql скрипту
-    :param conf_krb_info: конфиг подключения через керберос
-
-    :return: возвращает словарь с 2-мя ключами - схема, таблица
-    """
-    result = {}
-    sql = get_formated_file(
-        sql_scripts_path,
-        schema_table_name=schema_table_name_registry,
-        schema_names=', '.join(f'{element!r}' for element in schemas),
-        table_names=', '.join(f'{element!r}' for element in tables),
-    )
-    for schema_name, table_name, tech_load_ts in db_connection_src.apply_script_hdfs(sql, conf_krb_info)[0]:
-        result[(schema_name, table_name)] = {'tech_load_ts': tech_load_ts}
-
-    return result
-
-# ------------------------------------------------------------------------------------------------------------------
-
-
-def filter_objects(config: dict, system_tz: str, objects: dict) -> list:
+def filter_objects(config: dict, system_tz: str, hdfs_path: str) -> list:
     """
     Фильтрует словарь относительно частоты загрузки данных, сравнивая его с config timezone - airflow в utc, вертика в utc +3
     :param config: конфиг репликации
     :param system_tz: таймзона в конфиге
     :param objects: значения из технической таблицы
+    :param hdfs_path: путь к данным в hdfs
 
     :return: возвращает лист - отфильтрованный конфиг с учётом частоты
     """
     filtered_objects = []
     for conf in config:
-
-        db_data = objects.get(
-            (conf['schema_name'], conf['table_name']))  # для тестов
-        # Для тестов - last_date_cooling = conf.get('last_date_cooling')
+        conf['hdfs_path'] = f'''{hdfs_path}{conf['schema_name']}/{conf['table_name']}'''
+        last_date_cooling = conf.get('last_date_cooling')
         update_freq = conf.get('data_cooling_frequency')
 
-        if not db_data:
+        if not last_date_cooling:
             conf['is_new'] = True
             conf['last_tech_load_ts'] = None
             filtered_objects.append(conf)
             continue
 
         conf['is_new'] = False
-        # Для тестов - last_tech_load_ts = datetime.strptime(last_date_cooling, '%Y-%m-%d %H:%M:%S')
-        last_tech_load_ts = db_data['tech_load_ts'].replace(tzinfo=None)
-        conf['last_date_cooling'] = last_tech_load_ts.strftime(
-            '%Y-%m-%d %H:%M:%S')
+        last_tech_load_ts = last_date_cooling.replace(tzinfo=None)
+        conf['last_date_cooling'] = last_tech_load_ts.strftime('%Y-%m-%d %H:%M:%S')
         now = datetime.now(pytz.timezone(system_tz)).replace(tzinfo=None)
-        update_freq = croniter(
-            update_freq, last_tech_load_ts).get_next(datetime)
+        update_freq = croniter(update_freq, last_tech_load_ts).get_next(datetime)
 
         if now >= update_freq:
             filtered_objects.append(conf)
@@ -125,7 +93,7 @@ def get_max_load_ts(config: list, db_connection_src: DBConnection, sql_scripts_p
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, export_with_partitions: str) -> list:
+def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, export_with_partitions: str, hdfs_path_con: str) -> list:
     """
     Генерирует DML скрипт
     :param config: конфиг
@@ -141,24 +109,24 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
     for conf in config:
 
         actual_max_tech_load_ts = conf['actual_max_tech_load_ts']
-        depth_cooling = conf['depth']
+        depth_cooling = conf.get('cooling_depth') or 0
         tech_ts_column_name = conf.get('tech_ts_column_name') or 'tech_load_ts'
-
-        temporary_heating = conf.get('temporary_heating') or False
+        filter_expression = conf.get('filter_expression') or ''
 
         date_start = conf.get('last_date_cooling') or '1000-10-01 15:14:15'
         partition = conf.get('partition_expressions') or f'DATE({tech_ts_column_name})'
         date_format = '%Y-%m-%d %H:%M:%S'
+        sql = ''
 
         current_date = datetime.now()
-        date_end_cooling_depth = (datetime.strptime(
-            actual_max_tech_load_ts, date_format) - timedelta(days=depth_cooling)).strftime(date_format)
+        date_end_cooling_depth = (datetime.strptime(actual_max_tech_load_ts, date_format) - timedelta(days=depth_cooling)).strftime(date_format)
 
         sql_export_date_start_date_end_cooling_depth = get_formated_file(
             export_with_partitions,
+            hdfs_path = hdfs_path_con,
             schema_name=conf['schema_name'],
             table_name=conf['table_name'],
-            filter_expression=conf['filter_expression'],
+            filter_expression=filter_expression,
             partition_expressions=partition,
             time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' ''',
             cur_date=(datetime.now()).strftime('%Y%m%d'),
@@ -168,30 +136,31 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
             delete_with_partitions,
             schema_name=conf['schema_name'],
             table_name=conf['table_name'],
-            filter_expression=conf['filter_expression'],
+            filter_expression=filter_expression,
             time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' ''',
         )
 
-        if conf['cooling_type'] == 'time_based':
-            if conf['replication_policy'] == 1:
-                if temporary_heating:
+        if conf['cooling_type'] == 'TimeBased':
+            if conf['replication_policy'] == True:
+                if conf['heating_type'] is not None:
 
-                    depth_heating = conf['temporary_heating']['depth']
-                    date_end_heating_depth = (datetime.strptime(actual_max_tech_load_ts, date_format) - timedelta(days=depth_heating)).strftime(date_format)
-                    date_end_heating = datetime.strptime(conf['temporary_heating']['date_end'], date_format)
-                    date_start_heating = datetime.strptime(conf['temporary_heating']['date_start'], date_format)
+                    depth_heating = conf['heating_depth']
+                    date_end_heating_depth = (datetime.strptime(actual_max_tech_load_ts, date_format) - timedelta(days=int(depth_heating))).strftime(date_format)
+                    date_end_heating = datetime.strptime(conf['heating_date_end'], "%Y-%m-%d %H:%M:%S%z")
+                    date_start_heating = datetime.strptime(conf['heating_date_start'], "%Y-%m-%d %H:%M:%S%z")
 
                     sql_delete_date_start_date_end_heating_depth = get_formated_file(
                         delete_with_partitions,
                         schema_name=conf['schema_name'],
                         table_name=conf['table_name'],
-                        filter_expression=conf['filter_expression'],
+                        filter_expression=filter_expression,
                         time_between=f'''and {tech_ts_column_name} <= '{date_end_heating_depth}' ''',
                     )
 
-                    if conf['temporary_heating']['already_heat'] == 0 and current_date >= date_start_heating and current_date < date_end_heating:
+                    if conf['isAlreadyHeating'] == 0 and current_date >= date_start_heating.replace(tzinfo=None) and current_date < date_end_heating.replace(tzinfo=None):
                         sql_copy_to_vertica = get_formated_file(
                             copy_to_vertica,
+                            hdfs_path = hdfs_path_con,
                             schema_name=conf['schema_name'],
                             table_name=conf['table_name'],
                             cur_date=(datetime.now()).strftime('%Y%m%d'),
@@ -199,22 +168,23 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
 
                         sql = f'{sql_copy_to_vertica}\n{sql_delete_date_start_date_end_heating_depth}'
 
-                    elif conf['temporary_heating']['already_heat'] == 1 and current_date >= date_start_heating and current_date < date_end_heating:
+                    elif conf['isAlreadyHeating'] == 1 and current_date >= date_start_heating.replace(tzinfo=None) and current_date < date_end_heating.replace(tzinfo=None):
                         sql = f'{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_heating_depth}'
 
-                    elif conf['temporary_heating']['already_heat'] == 1 and current_date > date_end_heating:
+                    elif conf['isAlreadyHeating'] == 1 and current_date > date_end_heating.replace(tzinfo=None):
                         sql = f'{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_cooling_depth}'
 
                 else:
                     sql = f'{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_cooling_depth}'
 
-            elif conf['replication_policy'] == 0:
+            elif conf['replication_policy'] == False:
                 sql = f'{sql_export_date_start_date_end_cooling_depth}'
 
-        elif conf['cooling_type'] == 'fullcopy':
-            if conf['replication_policy'] == 0:
+        elif conf['cooling_type'] == 'Full':
+            if conf['replication_policy'] == False:
                 sql_export = get_formated_file(
                     export_with_partitions,
+                    hdfs_path = hdfs_path_con,
                     schema_name=conf['schema_name'],
                     table_name=conf['table_name'],
                     filter_expression='',
@@ -223,8 +193,6 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                     cur_date=(datetime.now()).strftime('%Y%m%d'),
                 )
                 sql = f'{sql_export}'
-            else:
-                sql = ''
 
         conf['dml_script'] = sql
         conf_with_dml.append(conf)
@@ -234,7 +202,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, load_max_tech_load_ts_insert: str, schema_table_name_registry: str) -> None:
+def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, config_manager: ConfigManager) -> None:
     """
     Запуск DML скриптов
     :param config: конфиг
@@ -242,48 +210,65 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, 
     :param conf_krb_info: конфиг соединения через керберос
     :param load_max_tech_load_ts_insert: sql скрипт
     :param schema_table_name_registry: название тех талицы
+    :param config_manager: класс конфига
 
     """
 
     for conf in config:
         try:
-            date_start = datetime.now()
-            db_connection_src.apply_script_hdfs(
-                conf['dml_script'], conf_krb_info)
-            date_end = datetime.now()
+            if conf['replication_policy'] == True and conf['dml_script'] != '':
+                date_start = datetime.now()
+                db_connection_src.apply_script_hdfs(
+                    conf['dml_script'], conf_krb_info)
+                config_manager.put_data_cooling(conf)
+                config_manager.put_data_heating(conf)
+                date_end = datetime.now()
+                logging.info(
+                    f'''Продолжительность выполнения - {date_end - date_start} ''',
+                )
 
-            sql_insert = get_formated_file(
-                load_max_tech_load_ts_insert,
-                schema_table_name_registry=schema_table_name_registry,
-                schema_name=conf['schema_name'],
-                table_name=conf['table_name'],
-                actual_max_tech_load_ts=conf['actual_max_tech_load_ts'],
-            )
-            db_connection_src.apply_script_hdfs(
-                sql_insert, conf_krb_info)
-            logging.info(
-                f'''Продолжительность выполнения - {date_end - date_start} ''',
-            )
+            elif conf['replication_policy'] == False  and conf['dml_script'] != '':
+                date_start = datetime.now()
+                db_connection_src.apply_script_hdfs(
+                    conf['dml_script'], conf_krb_info)
+                config_manager.put_data_cooling(conf)
+                date_end = datetime.now()
+                logging.info(
+                    f'''Продолжительность выполнения - {date_end - date_start} ''',
+                )
+
         except Exception as e:
             logging.error(
                 f'''Таблица - {conf['schema_name']}.{conf['table_name']} - не будет реплицироваться, ошибка - {e}''',
             )
+
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBConnection) -> None:
+def get_config_func(conf: list) -> None:
     """
-    Функция состоит из екскольких этапав:
-    Step 1 - создание conn к vertica
-    Step 2 - берём конфиг
-    Step FOR TEST - берём макс дату последней репликации
-    Step 4 - фильтруем по частоте
-    Step 5 - вывод кол. таблиц в конфиге
-    Step 6 - текущая макс дата в проде
-    Step 7 - генераия dml скриптов
-    Step 8 - запусе dml скриптов
+    Функция забора конфига из источника
     :param conf: конфиг запуска охлаждения
-    :param db_connection_config_src: config src conn
+
+    :return: возвращает конфиог
+    """
+    source_type = conf['replication_objects_source']['source_type']
+    source_config = conf['replication_objects_source']['source_config']
+
+    'Step 1'
+    config_manager = get_config_manager(source_type, source_config)
+    config = config_manager.get_config()
+    logging.info(config)
+
+    return config
+
+
+def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: list, config: list) -> None:
+    """
+    Функция обработки и создания конфига
+    :param conf: конфиг запуска охлаждения
+    :param db_connection_config_src: креды содинения с базой
+    :param config: конфиг из источника
 
     """
 
@@ -292,52 +277,66 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: DBCon
     export_with_partitions = conf['auxiliary_sql_paths']['sql_export_with_partitions']
     get_max_tech_load_ts = conf['auxiliary_sql_paths']['sql_get_max_tech_load_ts']
 
-    # Тесты
-    get_last_tech_load_ts_sql = conf['auxiliary_sql_paths']['get_last_tech_load_ts']
-    # Тесты
-    load_max_tech_load_ts_insert = conf['auxiliary_sql_paths']['load_max_tech_load_ts_insert']
-
     con_type = conf['source_system']['system_type']
+    system_tz = conf['source_system']['system_config']['system_tz']
+    hdfs_path = conf['target_system']['system_config']['hdfs_path']
+
     source_type = conf['replication_objects_source']['source_type']
     source_config = conf['replication_objects_source']['source_config']
-    system_tz = conf['source_system']['system_config']['system_tz']
+
+    conf_krb_info = conf['target_system']['system_config']['connection_config']['connection_conf']
+    
+    'Step 1'
+    db_connection_src = get_connect_manager(con_type, db_connection_config_src)
+    logging.info(db_connection_src)
+
+    'Step 2'
+    config_manager = get_config_manager(source_type, source_config)
+    logging.info(config_manager)
+
+    'Step 3'
+    filter_object = filter_objects(config, system_tz, hdfs_path)
+    logging.info(filter_object)
+
+    'Step 4'
+    max_tech_load_ts = get_max_load_ts(
+        filter_object, db_connection_src, get_max_tech_load_ts, conf_krb_info)
+    logging.info(max_tech_load_ts)
+
+    logging.info(
+        f'''Колличество таблиц которое будеи охлаждаться - {len(max_tech_load_ts)} ''')
+
+    'Step 5'
+    gen_dmls = gen_dml(max_tech_load_ts, copy_to_vertica,
+                       delete_with_partitions, export_with_partitions, hdfs_path)
+    logging.info(gen_dmls)
+
+    return gen_dmls
+
+
+def run_dml_func(gen_dmls: list, db_connection_config_src: list, conf: list) -> None:
+    """
+    Функция обработки и создания конфига
+    :param conf: конфиг запуска охлаждения
+    :param db_connection_config_src: креды содинения с базой
+    :param config: конфиг из источника
+
+    """
+
+    con_type = conf['source_system']['system_type']
+
+    source_type = conf['replication_objects_source']['source_type']
+    source_config = conf['replication_objects_source']['source_config']
 
     conf_krb_info = conf['target_system']['system_config']['connection_config']['connection_conf']
 
     'Step 1'
     db_connection_src = get_connect_manager(con_type, db_connection_config_src)
+    logging.info(db_connection_src)
 
     'Step 2'
     config_manager = get_config_manager(source_type, source_config)
-    config = config_manager.get_config()
-    logging.info(config)
+    logging.info(config_manager)
 
-    'Step FOR TEST'
-    tables = [el['table_name'] for el in config]
-    schemas = [el['schema_name'] for el in config]
-    schema_table_name_registry = 'AUX_REPLICATION.COOLING_TABLE'
-    last_tech_load_ts = get_last_tech_load_ts(
-        schemas, tables, schema_table_name_registry, db_connection_src, get_last_tech_load_ts_sql, conf_krb_info)
-    logging.info(last_tech_load_ts)
-
-    'Step 4'
-    filter_object = filter_objects(config, system_tz, last_tech_load_ts)
-    logging.info(filter_object)
-
-    'Step 5'
-    logging.info(
-        f'''Колличество таблиц которое будеи охлаждаться - {len(filter_object)} ''')
-
-    'Step 6'
-    max_tech_load_ts = get_max_load_ts(
-        filter_object, db_connection_src, get_max_tech_load_ts, conf_krb_info)
-    logging.info(max_tech_load_ts)
-
-    'Step 7'
-    gen_dmls = gen_dml(max_tech_load_ts, copy_to_vertica,
-                       delete_with_partitions, export_with_partitions)
-    logging.info(gen_dmls)
-
-    'Step 8'
-    run_dml(gen_dmls, db_connection_src, conf_krb_info,
-            load_max_tech_load_ts_insert, schema_table_name_registry)
+    'Step 3'
+    run_dml(gen_dmls, db_connection_src, conf_krb_info, config_manager)
