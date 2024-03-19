@@ -62,6 +62,6 @@ def get_connect_manager(con_type: str, con_config: list) -> DBConnection:
 
     if db_connection_cls is None:
         raise ValueError(
-            f'''UNKNOWN DB_TYPE: {con_type}. AVAILABLE TYPES:{','.join(AVAILABLE_FORMAT_MANAGER)}''',
+            f'''UNKNOWN DB_TYPE: {con_type}. AVAILABLE TYPES:{','.join(AVAILABLE_DB_CONNECTIONS)}''',
         )
     return db_connection_cls(**con_config)

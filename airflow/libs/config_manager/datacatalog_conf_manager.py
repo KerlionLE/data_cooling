@@ -246,7 +246,7 @@ def physicalobject(id_objs_cool_parms: list, repo: str) -> list:
 
 def physicalgroup(id_objs_objects: list, repo: str) -> list:
     """
-    Обработка конфига разогрева - json формата из data catalog берем 2 конфига объединяем
+    Обработка конфига разогрева - json формата из data catalog берем 2 конфига объед.
     :param id_objs_objects: список таблиц для охлаждения
     :param repo: сессия con
 
