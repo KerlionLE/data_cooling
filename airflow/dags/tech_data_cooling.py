@@ -132,9 +132,22 @@ with DAG(**DAG_CONFIG) as dag:
         },
     )
 
-    run_dml_func = PythonOperator(
+    run_dml_func = PythonVirtualenvCurlOperator(
         task_id='run_dml_func',
-        trigger_rule='all_success',
+        pypi_requirements=PYPI_REQUIREMENTS,
+        ukd_requirements=UKD_REQUIREMENTS,
+        connection_params={
+                'login': r'{{ conn.artifactory_pypi_rc.login }}',
+                'password': r'{{ conn.artifactory_pypi_rc.password }}',
+                'host': r'{{ conn.artifactory_pypi_rc.host }}',
+        },
+        pip_config={
+            'index-url': f'{{{{ var.json.pip_conf.pip_config.index_url }}}}',
+            'trusted-host': f'{{{{ var.json.pip_conf.pip_config.trusted_host }}}}',
+            'extra-index-url': f'{{{{ var.json.pip_conf.pip_config.extra_index_url }}}}',
+            'extra-url-password': r'{{ conn.artifactory_pypi_rc.password }}',
+            'extra-url-login': r'{{ conn.artifactory_pypi_rc.login }}',
+        },
         python_callable=run_dml_func,
         op_kwargs={
             'conf': f'{{{{ var.json.{DAG_NAME}.{AIRFLOW_ENV}.{inegration_name} }}}}',
