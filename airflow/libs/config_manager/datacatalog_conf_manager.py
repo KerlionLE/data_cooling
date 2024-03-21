@@ -1,5 +1,5 @@
 import logging
-import datetime
+from datetime import datetime
 
 try:
     from pydg.core.session import Session
@@ -359,7 +359,6 @@ class DataCatalogConfManager(ConfigManager):
             "page": 1,
             "pageSize": 300
         })
-
         print(res_read)
 
         if not res_read['items'] or res_read['items'] is None:
