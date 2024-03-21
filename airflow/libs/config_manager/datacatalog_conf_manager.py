@@ -1,4 +1,5 @@
 import logging
+import datetime
 
 try:
     from pydg.core.session import Session
@@ -361,11 +362,11 @@ class DataCatalogConfManager(ConfigManager):
 
         print(res_read)
 
-        if res_read['items'] is None:
+        if not res_read['items'] or res_read['items'] is None:
             post_result = repo.createEntity(entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
                                         entityDraft={
                                             "physicalObjectCoolParamsId": conf['physicalObjectCoolParamsId'],
-                                            "coolingLastDate": conf['actual_max_tech_load_ts'],
+                                            "coolingLastDate": datetime.strptime(conf['actual_max_tech_load_ts'], '%Y-%m-%d %H:%M:%S'),
                                             "coolingHdfsTarget": conf['hdfs_path'],
                                         })
             print(post_result)
@@ -373,10 +374,10 @@ class DataCatalogConfManager(ConfigManager):
             res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value, 
                                     entityDraft={
                                                             "id":  conf['physicalObjectCoolParamsId'],
-                                                            "coolingLastDate": conf['actual_max_tech_load_ts'],
+                                                            "coolingLastDate": datetime.strptime(conf['actual_max_tech_load_ts'], '%Y-%m-%d %H:%M:%S'),
                                                 })
             print(res)
-            
+
     def put_data_heating(self, conf: list = None) -> None:
 
         """
