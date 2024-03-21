@@ -35,10 +35,10 @@ def conn_to(config: list) -> str:
         logger.error('Failed to start session')
         return
 
-    repo = Repo(cur_session, logger)
+    cur_repo = Repo(cur_session, logger)
     logger.info('Execute query')
     logger.handlers.clear()
-    return repo
+    return cur_repo
 
 def type_to_dict(obj: str) -> str:
     """
