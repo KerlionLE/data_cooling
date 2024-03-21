@@ -30,15 +30,15 @@ def conn_to(config: list) -> str:
     logger.addHandler(sh)
     logger.info('Start')
 
-    session = Session(logger)  # create and start API session
-    if not session.start(baseUrl=base_url, username=username, password=password, rootCA=root_ca_path):
+    cur_session = Session(logger)  # create and start API session
+    if not cur_session.start(baseUrl=base_url, username=username, password=password, rootCA=root_ca_path):
         logger.error('Failed to start session')
         return
 
-    repo = Repo(session, logger)
+    cur_repo = Repo(cur_session, logger)
     logger.info('Execute query')
     logger.handlers.clear()
-    return repo
+    return cur_repo
 
 def type_to_dict(obj: str) -> str:
     """

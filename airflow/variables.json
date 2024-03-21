@@ -55,7 +55,7 @@
             "connection_config": {
               "connection": "airflow_conn",
               "connection_conf": {
-                "conn_id": "vertica_staging"
+                "conn_id": "vrt_cooling"
               }
             },
             "system_tz": "Europe/Moscow"
@@ -71,6 +71,7 @@
                 "keytab": "/usr/local/airflow/krb_files/a001tst_etl_hdp_vrt.keytab"
               }
             },
+            "hdfs_path": "webhdfs:///tmp/vertica_cold_data/",
             "system_tz": "Europe/Moscow"
           }
         },
