@@ -12,7 +12,7 @@ except ImportError:
 from .conf_manager import ConfigManager
 
 
-def conn_to(config: list) -> str:
+def conn_to(config: list) -> Repo:
     """
     Подключение к дата каталогу
     :param config: креды для подключения
@@ -35,18 +35,18 @@ def conn_to(config: list) -> str:
     cur_session = Session(logger)  # create and start API session
     if not cur_session.start(baseUrl=base_url, username=username, password=password, rootCA=root_ca_path):
         logger.error('Failed to start session')
-        sys.exit()
+        raise
 
-    logger.info('Execute query')
     logger.handlers.clear()
     return Repo(cur_session, logger)
 
 
 def type_to_dict(obj: str) -> str:
     """
-    Функция реализована для работы со структурой обект в объекте.
-    Идея заключается в том что - каталог возвращает один из обдектов класса как класс
-    Следовательно нужно его достать и обрабоать
+    Функция реализована для работы со структурой объекта(один из объектов охлаждения/разогрева) 
+    В объекте(список данных, которые мы получаем из дата_каталога).
+    Идея заключается в том что - каталог возвращает один из объектов класса как класс
+    Cледовательно нужно его достать и обрабоать
     :param obj: объект для изменения
 
     :return: возвращает правильное значение
@@ -69,7 +69,7 @@ def params_to_dict(obj: str) -> dict:
     return d
 
 
-def compound_coolparams_coolresult(repo: str) -> list:
+def compound_coolparams_coolresult(repo: Repo) -> list:
     """
     Обработка конфига охлаждения - json формата из data catalog
     :param repo: сессия con
