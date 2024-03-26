@@ -401,7 +401,7 @@ class DataCatalogConfManager(ConfigManager):
             post_result = repo.createEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
                                             entityDraft={
                                                         "physicalObjectHeatParamsId": conf['physicalObjectCoolParamsId'],
-                                                        "heatingExternalTableName": f'{conf['schema_name']}.{conf['table_name']}',
+                                                        "heatingExternalTableName": f'''{conf['schema_name']}.{conf['table_name']}''',
                                                         "isAlreadyHeating": True,
                                             })
         else: 
