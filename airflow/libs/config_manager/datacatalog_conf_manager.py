@@ -12,7 +12,7 @@ except ImportError:
 from .conf_manager import ConfigManager
 
 
-def conn_to(config: list) -> Repo:
+def conn_to(config: list) -> str:
     """
     Подключение к дата каталогу
     :param config: креды для подключения
@@ -37,14 +37,14 @@ def conn_to(config: list) -> Repo:
         logger.error('Failed to start session')
         sys.exit()
 
-    cur_repo = Repo(cur_session, logger)
     logger.info('Execute query')
     logger.handlers.clear()
-    return cur_repo
+    return Repo(cur_session, logger)
+
 
 def type_to_dict(obj: str) -> str:
     """
-    Функция реализована для работы со структурой обект в объекте. 
+    Функция реализована для работы со структурой обект в объекте.
     Идея заключается в том что - каталог возвращает один из обдектов класса как класс 
     Следовательно нужно его достать и обрабоать
     :param obj: объект для изменения
@@ -121,10 +121,10 @@ def compound_coolparams_coolresult(repo) -> list:
                 a['coolingLastDate'] = b['coolingLastDate']
                 a['coolingHdfsTarget'] = b['coolingHdfsTarget']
                 data_list_cool.append(a)
-        
+
         if a.get('coolingLastDate', False) == False:
             data_list_cool.append(a) 
-            
+
     return data_list_cool, id_objs_cool_parms
 
 
@@ -177,9 +177,9 @@ def compound_heatparams_heatresult(repo: str) -> list:
                 a['heatingExternalTableName'] = b['heatingExternalTableName']
                 a['isAlreadyHeating'] = b['isAlreadyHeating']
                 data_list_heat.append(a)
-        
-        if a.get('heatingExternalTableName', False) == False:
-            data_list_heat.append(a) 
+
+        if a.get('heatingExternalTableName', False) is False:
+            data_list_heat.append(a)
 
     return data_list_heat
 
@@ -207,7 +207,7 @@ def compound_heat_cool(data_list_cool: list, data_list_heat: list) -> list:
                 a['heatingExternalTableName'] = b.get('heatingExternalTableName') or None
                 a['isAlreadyHeating'] = b.get('isAlreadyHeating') or None
                 data_list.append(a)
-        
+
         if a.get('heatingType', False) is False:
             a['physicalObjectCoolParamsId'] = a.get('id')
             data_list.append(a)
@@ -236,8 +236,6 @@ def get_physicalobject(id_objs_cool_parms: list, repo: str) -> list:
         entityType=DataCatalogEntityType.PhysicalObject.value,
         payload=request_objects,
     )
-
-    print(get_objects)
 
     data_list_oblects = []
     for d in get_objects['items']:
@@ -286,8 +284,9 @@ class DataCatalogConfManager(ConfigManager):
         Обработка конфига - json формата из data catalog берем 2 конфига объединяем
         :param conf: возможные параметры конфига
 
+        :return: лист
         """
-        repo =  conn_to(self.config)
+        repo = conn_to(self.config)
 
         # 3 Объединение coolresult и heatresult
         data_list_cool, id_objs_cool_parms = compound_coolparams_coolresult(repo)
@@ -322,7 +321,7 @@ class DataCatalogConfManager(ConfigManager):
         data_final = []
 
         for a in data_list_all:
-            conf_final = {} 
+            conf_final = {}
             conf_final['physicalObjectCoolParamsId'] = a.get('physicalObjectCoolParamsId')
             conf_final['physicalObjectHeatParamsId'] = a.get('physicalObjectHeatParamsId') or None
             conf_final['schema_name'] = a.get('physicalNameGroup')
@@ -352,7 +351,7 @@ class DataCatalogConfManager(ConfigManager):
         :param conf: возможные параметры конфига
 
         """
-        repo =  conn_to(self.config)
+        repo = conn_to(self.config)
         data_type = '%Y-%m-%d %H:%M:%S'
 
         res_read = repo.readEntity(
@@ -362,7 +361,7 @@ class DataCatalogConfManager(ConfigManager):
                 "physicalObjectCoolParamsId": [int(conf['physicalObjectCoolParamsId'])]
             },
             "page": 1,
-            "pageSize": 300
+            "pageSize": 300,
         })
 
         if not res_read['items'] or res_read['items'] is None:
@@ -372,8 +371,8 @@ class DataCatalogConfManager(ConfigManager):
                                             "coolingLastDate": datetime.strptime(conf['actual_max_tech_load_ts'], data_type),
                                             "coolingHdfsTarget": conf['hdfs_path'],
                                         })
-        else: 
-            res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value, 
+        else:
+            res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
                                     entityDraft={
                                                             "id":  conf['physicalObjectCoolParamsId'],
                                                             "coolingLastDate": datetime.strptime(conf['actual_max_tech_load_ts'], data_type),
@@ -386,7 +385,7 @@ class DataCatalogConfManager(ConfigManager):
         :param conf: возможные параметры конфига
 
         """
-        repo =  conn_to(self.config)
+        repo = conn_to(self.config)
 
         res_read=repo.readEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
                                  entityDraft={
@@ -394,7 +393,7 @@ class DataCatalogConfManager(ConfigManager):
                                         "physicalObjectHeatParamsId": [int(conf['physicalObjectCoolParamsId'])]
                                     },
                                     "page": 1,
-                                    "pageSize": 300
+                                    "pageSize": 300,
                                 })
 
         if res_read['items'] is None:
@@ -405,9 +404,10 @@ class DataCatalogConfManager(ConfigManager):
                                                         "isAlreadyHeating": True,
                                             })
         else: 
-            res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value, 
+            res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
                                     entityDraft={
                                                     "id": conf['physicalObjectCoolParamsId'],
                                                     "isAlreadyHeating": True,
                                                 })
+
 
