@@ -12,6 +12,7 @@ from operators.python_virtualenv_artifactory_operator import PythonVirtualenvCur
 
 from data_cooling.vrt_hdfs_cooling import preprocess_config_cheks_con_dml_func, get_config_func, run_dml_func, put_result_func
 
+
 AIRFLOW_ENV = os.environ['AIRFLOW_ENV']
 
 DEFAULT_ARGS = {
