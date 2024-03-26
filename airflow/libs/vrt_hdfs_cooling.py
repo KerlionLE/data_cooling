@@ -123,7 +123,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
 
         sql_export_date_start_date_end_cooling_depth = get_formated_file(
             export_with_partitions,
-            hdfs_path = hdfs_path_con,
+            hdfs_path=hdfs_path_con,
             schema_name=conf['schema_name'],
             table_name=conf['table_name'],
             filter_expression=filter_expression,
@@ -160,7 +160,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                     if conf['isAlreadyHeating'] == 0 and current_date >= date_start_heating.replace(tzinfo=None) and current_date < date_end_heating.replace(tzinfo=None):
                         sql_copy_to_vertica = get_formated_file(
                             copy_to_vertica,
-                            hdfs_path = hdfs_path_con,
+                            hdfs_path=hdfs_path_con,
                             schema_name=conf['schema_name'],
                             table_name=conf['table_name'],
                             cur_date=(datetime.now()).strftime('%Y%m%d'),
@@ -183,7 +183,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
         elif conf['cooling_type'] == 'Full' and conf['replication_policy'] is False:
             sql_export = get_formated_file(
                 export_with_partitions,
-                hdfs_path = hdfs_path_con,
+                hdfs_path=hdfs_path_con,
                 schema_name=conf['schema_name'],
                 table_name=conf['table_name'],
                 filter_expression='',
