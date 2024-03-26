@@ -365,12 +365,14 @@ class DataCatalogConfManager(ConfigManager):
         })
 
         if not res_read['items'] or res_read['items'] is None:
-            post_result = repo.createEntity(entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
+            post_result = repo.createEntity(
+                                        entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
                                         entityDraft={
                                             "physicalObjectCoolParamsId": conf['physicalObjectCoolParamsId'],
                                             "coolingLastDate": datetime.strptime(conf['actual_max_tech_load_ts'], data_type),
                                             "coolingHdfsTarget": conf['hdfs_path'],
-                                        })
+                                        },
+                                        )
             logging.info(post_result)
         else:
             res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
@@ -397,7 +399,7 @@ class DataCatalogConfManager(ConfigManager):
                                     },
                                     "page": 1,
                                     "pageSize": 300,
-                                }
+                                },
                                 )
 
         if res_read['items'] is None:
