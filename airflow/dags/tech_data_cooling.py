@@ -9,9 +9,7 @@ from airflow.models import Variable
 from dwh_utils.airflow.common import get_dag_name
 
 from operators.python_virtualenv_artifactory_operator import PythonVirtualenvCurlOperator
-
 from data_cooling.vrt_hdfs_cooling import preprocess_config_cheks_con_dml_func, get_config_func, run_dml_func, put_result_func
-
 
 AIRFLOW_ENV = os.environ['AIRFLOW_ENV']
 
@@ -110,9 +108,9 @@ with DAG(**DAG_CONFIG) as dag:
                 'host': r'{{ conn.artifactory_pypi_rc.host }}',
         },
         pip_config={
-            'index-url': f'{{{{ var.json.pip_conf.pip_config.index_url }}}}',
-            'trusted-host': f'{{{{ var.json.pip_conf.pip_config.trusted_host }}}}',
-            'extra-index-url': f'{{{{ var.json.pip_conf.pip_config.extra_index_url }}}}',
+            'index-url': '{{{{ var.json.pip_conf.pip_config.index_url }}}}',
+            'trusted-host': '{{{{ var.json.pip_conf.pip_config.trusted_host }}}}',
+            'extra-index-url': '{{{{ var.json.pip_conf.pip_config.extra_index_url }}}}',
             'extra-url-password': r'{{ conn.artifactory_pypi_rc.password }}',
             'extra-url-login': r'{{ conn.artifactory_pypi_rc.login }}',
         },
@@ -153,9 +151,9 @@ with DAG(**DAG_CONFIG) as dag:
                 'host': r'{{ conn.artifactory_pypi_rc.host }}',
         },
         pip_config={
-            'index-url': f'{{{{ var.json.pip_conf.pip_config.index_url }}}}',
-            'trusted-host': f'{{{{ var.json.pip_conf.pip_config.trusted_host }}}}',
-            'extra-index-url': f'{{{{ var.json.pip_conf.pip_config.extra_index_url }}}}',
+            'index-url': '{{{{ var.json.pip_conf.pip_config.index_url }}}}',
+            'trusted-host': '{{{{ var.json.pip_conf.pip_config.trusted_host }}}}',
+            'extra-index-url': '{{{{ var.json.pip_conf.pip_config.extra_index_url }}}}',
             'extra-url-password': r'{{ conn.artifactory_pypi_rc.password }}',
             'extra-url-login': r'{{ conn.artifactory_pypi_rc.login }}',
         },
