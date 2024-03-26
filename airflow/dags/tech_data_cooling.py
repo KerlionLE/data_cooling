@@ -7,7 +7,9 @@ from airflow.operators.python import PythonOperator
 from airflow.hooks.base import BaseHook
 from airflow.models import Variable
 from data_cooling.vrt_hdfs_cooling import preprocess_config_cheks_con_dml_func, get_config_func, run_dml_func, put_result_func
+
 from dwh_utils.airflow.common import get_dag_name
+
 from operators.python_virtualenv_artifactory_operator import PythonVirtualenvCurlOperator
 
 AIRFLOW_ENV = os.environ['AIRFLOW_ENV']
