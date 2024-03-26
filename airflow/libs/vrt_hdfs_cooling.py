@@ -180,19 +180,18 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
             elif conf['replication_policy'] is False:
                 sql = f'{sql_export_date_start_date_end_cooling_depth}'
 
-        elif conf['cooling_type'] == 'Full':
-            if conf['replication_policy'] is False:
-                sql_export = get_formated_file(
-                    export_with_partitions,
-                    hdfs_path = hdfs_path_con,
-                    schema_name=conf['schema_name'],
-                    table_name=conf['table_name'],
-                    filter_expression='',
-                    partition_expressions=partition,
-                    time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{actual_max_tech_load_ts}' ''',
-                    cur_date=(datetime.now()).strftime('%Y%m%d'),
-                )
-                sql = f'{sql_export}'
+        elif conf['cooling_type'] == 'Full' and conf['replication_policy'] is False:
+            sql_export = get_formated_file(
+                export_with_partitions,
+                hdfs_path = hdfs_path_con,
+                schema_name=conf['schema_name'],
+                table_name=conf['table_name'],
+                filter_expression='',
+                partition_expressions=partition,
+                time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{actual_max_tech_load_ts}' ''',
+                cur_date=(datetime.now()).strftime('%Y%m%d'),
+            )
+            sql = f'{sql_export}'
 
         conf['dml_script'] = sql
         conf_with_dml.append(conf)
@@ -202,7 +201,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list) -> None:
+def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list) -> list:
     """
     Запуск DML скриптов
     :param config: конфиг
@@ -234,7 +233,7 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list) 
     return conf_data
 
 
-def put_result(config: list, config_manager: ConfigManager):
+def put_result(config: list, config_manager: ConfigManager) -> None:
     """
     Запуск DML скриптов
     :param config: конфиг
@@ -252,7 +251,7 @@ def put_result(config: list, config_manager: ConfigManager):
                     f'''Для таблицы Таблица - {conf['schema_name']}.{conf['table_name']} - не будет записан резалт, ошибка - {e}''',
                 )
 
-        elif conf['replication_policy'] is False  and conf['dml_script'] != '':
+        elif conf['replication_policy'] is False and conf['dml_script'] != '':
             try:
                 config_manager.put_data_cooling(conf)
             except Exception as e:

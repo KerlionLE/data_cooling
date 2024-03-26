@@ -117,7 +117,7 @@ with DAG(**DAG_CONFIG) as dag:
         },
         python_callable=get_config_func,
         op_kwargs={
-            'conf': f'{{{{ var.json.{DAG_NAME}.{AIRFLOW_ENV}.{inegration_name}}}}}'
+            'conf': f'{{{{ var.json.{DAG_NAME}.{AIRFLOW_ENV}.{inegration_name}}}}}',
         },
     )
 
