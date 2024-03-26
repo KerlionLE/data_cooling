@@ -202,7 +202,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, config_manager: ConfigManager) -> None:
+def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list) -> None:
     """
     Запуск DML скриптов
     :param config: конфиг
@@ -212,35 +212,58 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, 
     :param schema_table_name_registry: название тех талицы
     :param config_manager: класс конфига
 
+    :return: возвращает конфиог с флагом выполненого крипта или нет
     """
 
+    conf_data = []
     for conf in config:
         try:
-            if conf['replication_policy'] == True and conf['dml_script'] != '':
-                date_start = datetime.now()
-                db_connection_src.apply_script_hdfs(
-                    conf['dml_script'], conf_krb_info)
-                config_manager.put_data_cooling(conf)
-                config_manager.put_data_heating(conf)
-                date_end = datetime.now()
-                logging.info(
-                    f'''Продолжительность выполнения - {date_end - date_start} ''',
-                )
+            date_start = datetime.now()
 
-            elif conf['replication_policy'] == False  and conf['dml_script'] != '':
-                date_start = datetime.now()
-                db_connection_src.apply_script_hdfs(
-                    conf['dml_script'], conf_krb_info)
-                config_manager.put_data_cooling(conf)
-                date_end = datetime.now()
-                logging.info(
-                    f'''Продолжительность выполнения - {date_end - date_start} ''',
-                )
+            db_connection_src.apply_script_hdfs(conf['dml_script'], conf_krb_info)
+            conf['is_success'] = True
+
+            date_end = datetime.now()
+            logging.info(
+                f'''Продолжительность выполнения - {date_end - date_start} ''',
+            )
+            conf_data.append(conf)
 
         except Exception as e:
+            conf['is_success'] = False
             logging.error(
                 f'''Таблица - {conf['schema_name']}.{conf['table_name']} - не будет реплицироваться, ошибка - {e}''',
             )
+
+    return conf_data
+
+
+def put_result(config: list, config_manager: ConfigManager):
+    """
+    Запуск DML скриптов
+    :param config: конфиг
+    :param config_manager: класс конфига
+
+    """
+
+    for conf in config:
+        if conf['replication_policy'] == True and conf['dml_script'] != '':
+            try:
+                config_manager.put_data_cooling(conf)
+                config_manager.put_data_heating(conf)
+            except Exception as e:
+                logging.error(
+                    f'''Для таблицы Таблица - {conf['schema_name']}.{conf['table_name']} - не будет записан резалт, ошибка - {e}''',
+                )
+
+        elif conf['replication_policy'] == False  and conf['dml_script'] != '':
+            try:
+                config_manager.put_data_cooling(conf)
+            except Exception as e:
+                logging.error(
+                    f'''Для таблицы Таблица - {conf['schema_name']}.{conf['table_name']} - не будет записан резалт, ошибка - {e}''',
+                )
+
 
 # ------------------------------------------------------------------------------------------------------------------
 
@@ -263,7 +286,7 @@ def get_config_func(conf: list) -> None:
     return config
 
 
-def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: list, config: list) -> None:
+def preprocess_config_cheks_con_dml_func(conf: list, db_connection_config_src: list, config: list) -> None:
     """
     Функция обработки и создания конфига
     :param conf: конфиг запуска охлаждения
@@ -324,19 +347,32 @@ def run_dml_func(gen_dmls: list, db_connection_config_src: list, conf: list) -> 
     """
 
     con_type = conf['source_system']['system_type']
-
-    source_type = conf['replication_objects_source']['source_type']
-    source_config = conf['replication_objects_source']['source_config']
-
     conf_krb_info = conf['target_system']['system_config']['connection_config']['connection_conf']
 
     'Step 1'
     db_connection_src = get_connect_manager(con_type, db_connection_config_src)
     logging.info(db_connection_src)
 
-    'Step 2'
+    'Step 3'
+    run_dmls = run_dml(gen_dmls, db_connection_src, conf_krb_info)
+
+    return run_dmls
+
+
+def put_result_func(config: list, conf: list) -> None:
+    """
+    Функция обработки и создания конфига
+    :param conf: конфиг запуска охлаждения
+    :param config: конфиг из источника
+
+    """
+
+    source_type = conf['replication_objects_source']['source_type']
+    source_config = conf['replication_objects_source']['source_config']
+
+    'Step 1'
     config_manager = get_config_manager(source_type, source_config)
     logging.info(config_manager)
 
-    'Step 3'
-    run_dml(gen_dmls, db_connection_src, conf_krb_info, config_manager)
+    'Step 2'
+    put_result(config, config_manager)
