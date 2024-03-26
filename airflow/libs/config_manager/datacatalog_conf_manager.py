@@ -44,7 +44,9 @@ def conn_to(config: list) -> Repo:
 
 def type_to_dict(obj: str) -> str:
     """
-    Функция реализована для работы со структурой обект в объекте
+    Функция реализована для работы со структурой обект в объекте. 
+    Идея заключается в том что - каталог возвращает один из обдектов класса как класс 
+    Следовательно нужно его достать и обрабоать
     :param obj: объект для изменения
 
     :return: возвращает правильное значение
@@ -55,6 +57,7 @@ def type_to_dict(obj: str) -> str:
 def params_to_dict(obj: str) -> dict:
     """
     Функция превращения класса в словарь
+    Кака это работает - берём и итерируемся по всем классам и преобразуем в дикт
     :param obj: Класс объекта
 
     :return: словарь
@@ -205,14 +208,14 @@ def compound_heat_cool(data_list_cool: list, data_list_heat: list) -> list:
                 a['isAlreadyHeating'] = b.get('isAlreadyHeating') or None
                 data_list.append(a)
         
-        if a.get('heatingType', False) == False:
+        if a.get('heatingType', False) is False:
             a['physicalObjectCoolParamsId'] = a.get('id')
             data_list.append(a)
 
     return data_list
 
 
-def physicalobject(id_objs_cool_parms: list, repo: str) -> list:
+def get_physicalobject(id_objs_cool_parms: list, repo: str) -> list:
     """
     Обработка конфига разогрева - json формата из data catalog берем 2 конфига объединяем
     :param id_objs_cool_parms: список таблиц для охлаждения
@@ -246,7 +249,7 @@ def physicalobject(id_objs_cool_parms: list, repo: str) -> list:
     return data_list_oblects, id_objs_objects
 
 
-def physicalgroup(id_objs_objects: list, repo: str) -> list:
+def get_physicalgroup(id_objs_objects: list, repo: str) -> list:
     """
     Обработка конфига разогрева - json формата из data catalog берем 2 конфига объед.
     :param id_objs_objects: список таблиц для охлаждения
@@ -294,10 +297,10 @@ class DataCatalogConfManager(ConfigManager):
         data_list = compound_heat_cool(data_list_cool, data_list_heat)
 
         # 5 Работа с обектом PhysicalObject
-        data_list_oblects, id_objs_objects = physicalobject(id_objs_cool_parms, repo)
+        data_list_oblects, id_objs_objects = get_physicalobject(id_objs_cool_parms, repo)
 
         # 6 Работа с обектом PhysicalGroup
-        data_list_group = physicalgroup(id_objs_objects, repo)
+        data_list_group = get_physicalgroup(id_objs_objects, repo)
 
         # 7 Объединение объектов обектов PhysicalGroup и PhysicalObject
         data_list_oblects_group = []
@@ -350,6 +353,7 @@ class DataCatalogConfManager(ConfigManager):
 
         """
         repo =  conn_to(self.config)
+        data_type = '%Y-%m-%d %H:%M:%S'
 
         res_read = repo.readEntity(
         entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
@@ -360,23 +364,20 @@ class DataCatalogConfManager(ConfigManager):
             "page": 1,
             "pageSize": 300
         })
-        print(res_read)
 
         if not res_read['items'] or res_read['items'] is None:
             post_result = repo.createEntity(entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
                                         entityDraft={
                                             "physicalObjectCoolParamsId": conf['physicalObjectCoolParamsId'],
-                                            "coolingLastDate": datetime.strptime(conf['actual_max_tech_load_ts'], '%Y-%m-%d %H:%M:%S'),
+                                            "coolingLastDate": datetime.strptime(conf['actual_max_tech_load_ts'], data_type),
                                             "coolingHdfsTarget": conf['hdfs_path'],
                                         })
-            print(post_result)
         else: 
             res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value, 
                                     entityDraft={
                                                             "id":  conf['physicalObjectCoolParamsId'],
-                                                            "coolingLastDate": datetime.strptime(conf['actual_max_tech_load_ts'], '%Y-%m-%d %H:%M:%S'),
+                                                            "coolingLastDate": datetime.strptime(conf['actual_max_tech_load_ts'], data_type),
                                                 })
-            print(res)
 
     def put_data_heating(self, conf: list = None) -> None:
 
@@ -400,15 +401,13 @@ class DataCatalogConfManager(ConfigManager):
             post_result = repo.createEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
                                             entityDraft={
                                                         "physicalObjectHeatParamsId": conf['physicalObjectCoolParamsId'],
-                                                        "heatingExternalTableName": f'''{conf['schema_name']}.{conf['table_name']}''',
+                                                        "heatingExternalTableName": f'{conf['schema_name']}.{conf['table_name']}',
                                                         "isAlreadyHeating": True,
                                             })
-            print(post_result)
         else: 
             res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value, 
                                     entityDraft={
                                                     "id": conf['physicalObjectCoolParamsId'],
                                                     "isAlreadyHeating": True,
                                                 })
-            print(res)
 

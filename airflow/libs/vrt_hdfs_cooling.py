@@ -221,7 +221,7 @@ def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list) 
 
             date_end = datetime.now()
             logging.info(
-                f'''Продолжительность выполнения - {date_end - date_start} ''',
+                f'Продолжительность выполнения - {date_end - date_start}',
             )
             conf_data.append(conf)
 
@@ -273,7 +273,7 @@ def get_config_func(conf: list) -> None:
     source_type = conf['replication_objects_source']['source_type']
     source_config = conf['replication_objects_source']['source_config']
 
-    'Step 1'
+    'Step 1 - Забираем конфиг из дата каталога'
     config_manager = get_config_manager(source_type, source_config)
     config = config_manager.get_config()
     logging.info(config)
@@ -300,31 +300,24 @@ def preprocess_config_cheks_con_dml_func(conf: list, db_connection_config_src: l
     system_tz = conf['source_system']['system_config']['system_tz']
     hdfs_path = conf['target_system']['system_config']['hdfs_path']
 
-    source_type = conf['replication_objects_source']['source_type']
-    source_config = conf['replication_objects_source']['source_config']
-
     conf_krb_info = conf['target_system']['system_config']['connection_config']['connection_conf']
 
-    'Step 1'
+    'Step 1 - класс сon'
     db_connection_src = get_connect_manager(con_type, db_connection_config_src)
     logging.info(db_connection_src)
 
-    'Step 2'
-    config_manager = get_config_manager(source_type, source_config)
-    logging.info(config_manager)
-
-    'Step 3'
+    'Step 2 - фильтруем объекты оп частоте'
     filter_object = filter_objects(config, system_tz, hdfs_path)
     logging.info(filter_object)
 
-    'Step 4'
+    'Step 3 - берём макс дату на проде'
     max_tech_load_ts = get_max_load_ts(filter_object, db_connection_src, get_max_tech_load_ts, conf_krb_info)
     logging.info(max_tech_load_ts)
 
     logging.info(
         f'''Колличество таблиц которое будеи охлаждаться - {len(max_tech_load_ts)} ''')
 
-    'Step 5'
+    'Step 4 - генерим dml'
     gen_dmls = gen_dml(max_tech_load_ts, copy_to_vertica, delete_with_partitions, export_with_partitions, hdfs_path)
     logging.info(gen_dmls)
 
@@ -344,11 +337,11 @@ def run_dml_func(gen_dmls: list, db_connection_config_src: list, conf: list) -> 
     con_type = conf['source_system']['system_type']
     conf_krb_info = conf['target_system']['system_config']['connection_config']['connection_conf']
 
-    'Step 1'
+    'Step 1 - класс con'
     db_connection_src = get_connect_manager(con_type, db_connection_config_src)
     logging.info(db_connection_src)
 
-    'Step 3'
+    'Step 2 - pзапускаем dml'
     return run_dml(gen_dmls, db_connection_src, conf_krb_info)
 
 
@@ -363,7 +356,7 @@ def put_result_func(config: list, conf: list) -> None:
     source_type = conf['replication_objects_source']['source_type']
     source_config = conf['replication_objects_source']['source_config']
 
-    'Step 1'
+    'Step 1 - класс конфиг'
     config_manager = get_config_manager(source_type, source_config)
     logging.info(config_manager)
 
