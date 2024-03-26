@@ -45,7 +45,7 @@ def conn_to(config: list) -> str:
 def type_to_dict(obj: str) -> str:
     """
     Функция реализована для работы со структурой обект в объекте.
-    Идея заключается в том что - каталог возвращает один из обдектов класса как класс 
+    Идея заключается в том что - каталог возвращает один из обдектов класса как класс
     Следовательно нужно его достать и обрабоать
     :param obj: объект для изменения
 
@@ -65,11 +65,11 @@ def params_to_dict(obj: str) -> dict:
 
     d = {}
     for name, value in obj.__dict__.items():
-        d[name] = value if name not in ['coolingType','heatingType'] else value.value
+        d[name] = value if name not in ['coolingType', 'heatingType'] else value.value
     return d
 
 
-def compound_coolparams_coolresult(repo) -> list:
+def compound_coolparams_coolresult(repo: str) -> list:
     """
     Обработка конфига охлаждения - json формата из data catalog
     :param repo: сессия con
@@ -122,8 +122,8 @@ def compound_coolparams_coolresult(repo) -> list:
                 a['coolingHdfsTarget'] = b['coolingHdfsTarget']
                 data_list_cool.append(a)
 
-        if a.get('coolingLastDate', False) == False:
-            data_list_cool.append(a) 
+        if a.get('coolingLastDate', False) is False:
+            data_list_cool.append(a)
 
     return data_list_cool, id_objs_cool_parms
 
