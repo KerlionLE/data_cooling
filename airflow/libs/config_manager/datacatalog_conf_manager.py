@@ -1,4 +1,5 @@
 import logging
+import sys
 from datetime import datetime
 
 try:
@@ -6,12 +7,12 @@ try:
     from pydg.data_catalog.repo import Repo
     from pydg.data_catalog.model.dicts import DataCatalogEntityType
 except ImportError:
-    logging.warning("Импорт: нет библиотеки 'sql_generator'")
+    logging.warning("Импорт: нет библиотеки 'pydg'")
 
 from .conf_manager import ConfigManager
 
 
-def conn_to(config: list) -> str:
+def conn_to(config: list) -> Repo:
     """
     Подключение к дата каталогу
     :param config: креды для подключения
@@ -34,7 +35,7 @@ def conn_to(config: list) -> str:
     cur_session = Session(logger)  # create and start API session
     if not cur_session.start(baseUrl=base_url, username=username, password=password, rootCA=root_ca_path):
         logger.error('Failed to start session')
-        return
+        sys.exit()
 
     cur_repo = Repo(cur_session, logger)
     logger.info('Execute query')
