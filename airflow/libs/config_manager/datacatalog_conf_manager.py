@@ -371,12 +371,14 @@ class DataCatalogConfManager(ConfigManager):
                                             "coolingLastDate": datetime.strptime(conf['actual_max_tech_load_ts'], data_type),
                                             "coolingHdfsTarget": conf['hdfs_path'],
                                         })
+            logging.info(post_result)
         else:
             res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
                                     entityDraft={
                                                             "id":  conf['physicalObjectCoolParamsId'],
                                                             "coolingLastDate": datetime.strptime(conf['actual_max_tech_load_ts'], data_type),
                                                 })
+            logging.info(res)
 
     def put_data_heating(self, conf: list = None) -> None:
 
@@ -390,7 +392,7 @@ class DataCatalogConfManager(ConfigManager):
         res_read=repo.readEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
                                  entityDraft={
                                     "query": {
-                                        "physicalObjectHeatParamsId": [int(conf['physicalObjectCoolParamsId'])]
+                                        "physicalObjectHeatParamsId":[int(conf['physicalObjectCoolParamsId'])],
                                     },
                                     "page": 1,
                                     "pageSize": 300,
@@ -403,11 +405,11 @@ class DataCatalogConfManager(ConfigManager):
                                                         "heatingExternalTableName": f'''{conf['schema_name']}.{conf['table_name']}''',
                                                         "isAlreadyHeating": True,
                                             })
-        else: 
+            logging.info(post_result)
+        else:
             res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
                                     entityDraft={
                                                     "id": conf['physicalObjectCoolParamsId'],
                                                     "isAlreadyHeating": True,
                                                 })
-
-
+            logging.info(res)
