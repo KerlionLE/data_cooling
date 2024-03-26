@@ -389,14 +389,16 @@ class DataCatalogConfManager(ConfigManager):
         """
         repo = conn_to(self.config)
 
-        res_read = repo.readEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
-                                 entityDraft={
+        res_read = repo.readEntity(
+                                entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
+                                entityDraft={
                                     "query": {
                                         "physicalObjectHeatParamsId": [int(conf['physicalObjectCoolParamsId'])],
                                     },
                                     "page": 1,
                                     "pageSize": 300,
-                                })
+                                }
+                                )
 
         if res_read['items'] is None:
             post_result = repo.createEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
