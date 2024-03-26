@@ -358,7 +358,7 @@ class DataCatalogConfManager(ConfigManager):
         entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
         payload={
             "query": {
-                "physicalObjectCoolParamsId": [int(conf['physicalObjectCoolParamsId'])]
+                "physicalObjectCoolParamsId": [int(conf['physicalObjectCoolParamsId'])],
             },
             "page": 1,
             "pageSize": 300,
@@ -389,10 +389,10 @@ class DataCatalogConfManager(ConfigManager):
         """
         repo = conn_to(self.config)
 
-        res_read=repo.readEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
+        res_read = repo.readEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
                                  entityDraft={
                                     "query": {
-                                        "physicalObjectHeatParamsId":[int(conf['physicalObjectCoolParamsId'])],
+                                        "physicalObjectHeatParamsId": [int(conf['physicalObjectCoolParamsId'])],
                                     },
                                     "page": 1,
                                     "pageSize": 300,
