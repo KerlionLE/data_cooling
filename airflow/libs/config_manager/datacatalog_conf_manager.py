@@ -383,7 +383,7 @@ class DataCatalogConfManager(ConfigManager):
         else:
             res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
                                     entityDraft={
-                                                            "id":  conf['physicalObjectCoolParamsId'],
+                                                            "id":  conf['physicalObjectCoolResultId'],
                                                             "coolingLastDate": datetime.strptime(conf['date_end_cooling_depth'], data_type),
                                                 })
             logging.info(res)
@@ -419,7 +419,7 @@ class DataCatalogConfManager(ConfigManager):
         else:
             res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
                                     entityDraft={
-                                                    "id": conf['physicalObjectHeatParamsId'],
+                                                    "id": conf['physicalObjectHeatResultId'],
                                                     "isAlreadyHeating": True,
                                                 })
             logging.info(res)
