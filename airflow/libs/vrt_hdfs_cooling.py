@@ -121,6 +121,8 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
         current_date = datetime.now()
         date_end_cooling_depth = (datetime.strptime(actual_max_tech_load_ts, date_format) - timedelta(days=depth_cooling)).strftime(date_format)
 
+        conf['date_end_cooling_depth'] = date_end_cooling_depth
+
         sql_export_date_start_date_end_cooling_depth = get_formated_file(
             export_with_partitions,
             hdfs_path=hdfs_path_con,

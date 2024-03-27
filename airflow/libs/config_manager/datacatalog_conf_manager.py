@@ -369,7 +369,7 @@ class DataCatalogConfManager(ConfigManager):
                                         entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
                                         entityDraft={
                                             "physicalObjectCoolParamsId": conf['physicalObjectCoolParamsId'],
-                                            "coolingLastDate": datetime.strptime(conf['actual_max_tech_load_ts'], data_type),
+                                            "coolingLastDate": datetime.strptime(conf['date_end_cooling_depth'], data_type),
                                             "coolingHdfsTarget": conf['hdfs_path'],
                                         },
                                         )
@@ -378,7 +378,7 @@ class DataCatalogConfManager(ConfigManager):
             res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
                                     entityDraft={
                                                             "id":  conf['physicalObjectCoolParamsId'],
-                                                            "coolingLastDate": datetime.strptime(conf['actual_max_tech_load_ts'], data_type),
+                                                            "coolingLastDate": datetime.strptime(conf['date_end_cooling_depth'], data_type),
                                                 })
             logging.info(res)
 
