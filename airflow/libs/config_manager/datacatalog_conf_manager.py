@@ -120,6 +120,7 @@ def compound_coolparams_coolresult(repo: str) -> list:
             if a['id'] == b['physicalObjectCoolParamsId']:
                 a['coolingLastDate'] = b['coolingLastDate']
                 a['coolingHdfsTarget'] = b['coolingHdfsTarget']
+                a['PhysicalObjectCoolResultId'] = b['id']
                 data_list_cool.append(a)
 
         if a.get('coolingLastDate', False) is False:
@@ -176,6 +177,7 @@ def compound_heatparams_heatresult(repo: str) -> list:
             if a['id'] == b['physicalObjectHeatParamsId']:
                 a['heatingExternalTableName'] = b['heatingExternalTableName']
                 a['isAlreadyHeating'] = b['isAlreadyHeating']
+                a['PhysicalObjectHeatResultId'] = b['id']
                 data_list_heat.append(a)
 
         if a.get('heatingExternalTableName', False) is False:
@@ -196,9 +198,11 @@ def compound_heat_cool(data_list_cool: list, data_list_heat: list) -> list:
 
     for a in data_list_cool:
         for b in data_list_heat:
-            if a['physicalObjectId'] == ['physicalObjectId']:
+            if a['physicalObjectId'] == b['physicalObjectId']:
                 a['physicalObjectCoolParamsId'] = a.get('id')
                 a['physicalObjectHeatParamsId'] = b.get('id')
+                a['PhysicalObjectHeatResultId'] = b.get('PhysicalObjectHeatResultId') or None
+                a['PhysicalObjectCoolResultId'] = a.get('PhysicalObjectCoolResultId') or None
                 a['heatingType'] = b.get('heatingType')
                 a['heatingDepthDays'] = b.get('heatingDepthDays')
                 a['heatingStartDate'] = b.get('heatingStartDate')
@@ -324,6 +328,8 @@ class DataCatalogConfManager(ConfigManager):
             conf_final = {}
             conf_final['physicalObjectCoolParamsId'] = a.get('physicalObjectCoolParamsId')
             conf_final['physicalObjectHeatParamsId'] = a.get('physicalObjectHeatParamsId') or None
+            conf_final['PhysicalObjectHeatResultId'] = b.get('PhysicalObjectHeatResultId')
+            conf_final['PhysicalObjectCoolResultId'] = a.get('PhysicalObjectCoolResultId')
             conf_final['schema_name'] = a.get('physicalNameGroup')
             conf_final['table_name'] = a.get('physicalName')
             conf_final['cooling_type'] = a.get('coolingType')
@@ -392,20 +398,20 @@ class DataCatalogConfManager(ConfigManager):
         repo = conn_to(self.config)
 
         res_read = repo.readEntity(
-                                entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
-                                entityDraft={
-                                    "query": {
-                                        "physicalObjectHeatParamsId": [int(conf['physicalObjectCoolParamsId'])],
+                                    entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
+                                    entityDraft={
+                                        "query": {
+                                            "physicalObjectHeatParamsId": [int(conf['physicalObjectHeatParamsId'])],
+                                        },
+                                        "page": 1,
+                                        "pageSize": 300,
                                     },
-                                    "page": 1,
-                                    "pageSize": 300,
-                                },
-                                )
+                                    )
 
-        if res_read['items'] is None:
+        if not res_read['items'] or res_read['items'] is None:
             post_result = repo.createEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
                                             entityDraft={
-                                                        "physicalObjectHeatParamsId": conf['physicalObjectCoolParamsId'],
+                                                        "physicalObjectHeatParamsId": conf['physicalObjectHeatParamsId'],
                                                         "heatingExternalTableName": f'''{conf['schema_name']}.{conf['table_name']}''',
                                                         "isAlreadyHeating": True,
                                             })
@@ -413,7 +419,7 @@ class DataCatalogConfManager(ConfigManager):
         else:
             res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
                                     entityDraft={
-                                                    "id": conf['physicalObjectCoolParamsId'],
+                                                    "id": conf['physicalObjectHeatParamsId'],
                                                     "isAlreadyHeating": True,
                                                 })
             logging.info(res)
