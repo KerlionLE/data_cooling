@@ -161,7 +161,7 @@ with DAG(**DAG_CONFIG) as dag:
         python_callable=put_result_func,
         op_kwargs={
             'conf': f'{{{{ var.json.{DAG_NAME}.{AIRFLOW_ENV}.{inegration_name} }}}}',
-            'gen_dmls': "{{ ti.xcom_pull(task_ids='run_dml_func') }}",
+            'config': "{{ ti.xcom_pull(task_ids='run_dml_func') }}",
         },
     )
 
