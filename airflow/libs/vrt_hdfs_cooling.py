@@ -14,7 +14,6 @@ def filter_objects(config: dict, system_tz: str, hdfs_path: str) -> list:
     Фильтрует словарь относительно частоты загрузки данных, сравнивая его с config timezone - airflow в utc, вертика в utc +3
     :param config: конфиг репликации
     :param system_tz: таймзона в конфиге
-    :param objects: значения из технической таблицы
     :param hdfs_path: путь к данным в hdfs
 
     :return: возвращает лист - отфильтрованный конфиг с учётом частоты
@@ -100,6 +99,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
     :param copy_to_vertica: путь к sql скрипт
     :param delete_with_partitions: путь к sql скрипт
     :param export_with_partitions: путь к sql скрипт
+    :param hdfs_path_con: путь схранения данных в HDFS
 
     :return: возвращает конфиог с dml сриптом
     """
@@ -121,9 +121,11 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
         current_date = datetime.now()
         date_end_cooling_depth = (datetime.strptime(actual_max_tech_load_ts, date_format) - timedelta(days=depth_cooling)).strftime(date_format)
 
+        conf['date_end_cooling_depth'] = date_end_cooling_depth
+
         sql_export_date_start_date_end_cooling_depth = get_formated_file(
             export_with_partitions,
-            hdfs_path = hdfs_path_con,
+            hdfs_path=hdfs_path_con,
             schema_name=conf['schema_name'],
             table_name=conf['table_name'],
             filter_expression=filter_expression,
@@ -141,13 +143,13 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
         )
 
         if conf['cooling_type'] == 'TimeBased':
-            if conf['replication_policy'] == True:
+            if conf['replication_policy']:
                 if conf['heating_type'] is not None:
 
                     depth_heating = conf['heating_depth']
                     date_end_heating_depth = (datetime.strptime(actual_max_tech_load_ts, date_format) - timedelta(days=int(depth_heating))).strftime(date_format)
-                    date_end_heating = datetime.strptime(conf['heating_date_end'], "%Y-%m-%d %H:%M:%S%z")
-                    date_start_heating = datetime.strptime(conf['heating_date_start'], "%Y-%m-%d %H:%M:%S%z")
+                    date_end_heating = datetime.strptime(conf['heating_date_end'], '%Y-%m-%d %H:%M:%S%z')
+                    date_start_heating = datetime.strptime(conf['heating_date_start'], '%Y-%m-%d %H:%M:%S%z')
 
                     sql_delete_date_start_date_end_heating_depth = get_formated_file(
                         delete_with_partitions,
@@ -160,7 +162,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                     if conf['isAlreadyHeating'] == 0 and current_date >= date_start_heating.replace(tzinfo=None) and current_date < date_end_heating.replace(tzinfo=None):
                         sql_copy_to_vertica = get_formated_file(
                             copy_to_vertica,
-                            hdfs_path = hdfs_path_con,
+                            hdfs_path=hdfs_path_con,
                             schema_name=conf['schema_name'],
                             table_name=conf['table_name'],
                             cur_date=(datetime.now()).strftime('%Y%m%d'),
@@ -177,22 +179,21 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                 else:
                     sql = f'{sql_export_date_start_date_end_cooling_depth}\n{sql_delete_date_start_date_end_cooling_depth}'
 
-            elif conf['replication_policy'] == False:
+            elif conf['replication_policy'] is False:
                 sql = f'{sql_export_date_start_date_end_cooling_depth}'
 
-        elif conf['cooling_type'] == 'Full':
-            if conf['replication_policy'] == False:
-                sql_export = get_formated_file(
-                    export_with_partitions,
-                    hdfs_path = hdfs_path_con,
-                    schema_name=conf['schema_name'],
-                    table_name=conf['table_name'],
-                    filter_expression='',
-                    partition_expressions=partition,
-                    time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{actual_max_tech_load_ts}' ''',
-                    cur_date=(datetime.now()).strftime('%Y%m%d'),
-                )
-                sql = f'{sql_export}'
+        elif conf['cooling_type'] == 'Full' and conf['replication_policy'] is False:
+            sql_export = get_formated_file(
+                export_with_partitions,
+                hdfs_path=hdfs_path_con,
+                schema_name=conf['schema_name'],
+                table_name=conf['table_name'],
+                filter_expression='',
+                partition_expressions=partition,
+                time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{actual_max_tech_load_ts}' ''',
+                cur_date=(datetime.now()).strftime('%Y%m%d'),
+            )
+            sql = f'{sql_export}'
 
         conf['dml_script'] = sql
         conf_with_dml.append(conf)
@@ -202,45 +203,64 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
 # ------------------------------------------------------------------------------------------------------------------
 
 
-def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list, config_manager: ConfigManager) -> None:
+def run_dml(config: list, db_connection_src: DBConnection, conf_krb_info: list) -> list:
     """
     Запуск DML скриптов
     :param config: конфиг
     :param db_connection_src: кон к базе
     :param conf_krb_info: конфиг соединения через керберос
-    :param load_max_tech_load_ts_insert: sql скрипт
-    :param schema_table_name_registry: название тех талицы
-    :param config_manager: класс конфига
 
+    :return: возвращает конфиог с флагом выполненого крипта или нет
     """
 
+    conf_data = []
     for conf in config:
         try:
-            if conf['replication_policy'] == True and conf['dml_script'] != '':
-                date_start = datetime.now()
-                db_connection_src.apply_script_hdfs(
-                    conf['dml_script'], conf_krb_info)
-                config_manager.put_data_cooling(conf)
-                config_manager.put_data_heating(conf)
-                date_end = datetime.now()
-                logging.info(
-                    f'''Продолжительность выполнения - {date_end - date_start} ''',
-                )
+            date_start = datetime.now()
 
-            elif conf['replication_policy'] == False  and conf['dml_script'] != '':
-                date_start = datetime.now()
-                db_connection_src.apply_script_hdfs(
-                    conf['dml_script'], conf_krb_info)
-                config_manager.put_data_cooling(conf)
-                date_end = datetime.now()
-                logging.info(
-                    f'''Продолжительность выполнения - {date_end - date_start} ''',
-                )
+            db_connection_src.apply_script_hdfs(conf['dml_script'], conf_krb_info)
+            conf['is_success'] = True
+
+            date_end = datetime.now()
+            logging.info(
+                f'Продолжительность выполнения - {date_end - date_start}',
+            )
+            conf_data.append(conf)
 
         except Exception as e:
             logging.error(
                 f'''Таблица - {conf['schema_name']}.{conf['table_name']} - не будет реплицироваться, ошибка - {e}''',
             )
+
+    return conf_data
+
+
+def put_result(config: list, config_manager: ConfigManager) -> None:
+    """
+    Запуск DML скриптов
+    :param config: конфиг
+    :param config_manager: класс конфига
+
+    """
+
+    for conf in config:
+        if conf['replication_policy'] and conf['dml_script'] != '':
+            try:
+                config_manager.put_data_cooling(conf)
+                config_manager.put_data_heating(conf)
+            except Exception as e:
+                logging.error(
+                    f'''Для таблицы Таблица - {conf['schema_name']}.{conf['table_name']} - не будет записан резалт, ошибка - {e}''',
+                )
+
+        elif conf['replication_policy'] is False and conf['dml_script'] != '':
+            try:
+                config_manager.put_data_cooling(conf)
+            except Exception as e:
+                logging.error(
+                    f'''Для таблицы Таблица - {conf['schema_name']}.{conf['table_name']} - не будет записан резалт, ошибка - {e}''',
+                )
+
 
 # ------------------------------------------------------------------------------------------------------------------
 
@@ -255,7 +275,7 @@ def get_config_func(conf: list) -> None:
     source_type = conf['replication_objects_source']['source_type']
     source_config = conf['replication_objects_source']['source_config']
 
-    'Step 1'
+    'Step 1 - Забираем конфиг из дата каталога'
     config_manager = get_config_manager(source_type, source_config)
     config = config_manager.get_config()
     logging.info(config)
@@ -263,13 +283,14 @@ def get_config_func(conf: list) -> None:
     return config
 
 
-def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: list, config: list) -> None:
+def preprocess_config_cheks_con_dml_func(conf: list, db_connection_config_src: list, config: list) -> None:
     """
     Функция обработки и создания конфига
     :param conf: конфиг запуска охлаждения
     :param db_connection_config_src: креды содинения с базой
     :param config: конфиг из источника
 
+    :return: возвращает конфиог c dml
     """
 
     copy_to_vertica = conf['auxiliary_sql_paths']['sql_copy_to_vertica']
@@ -281,34 +302,25 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: list,
     system_tz = conf['source_system']['system_config']['system_tz']
     hdfs_path = conf['target_system']['system_config']['hdfs_path']
 
-    source_type = conf['replication_objects_source']['source_type']
-    source_config = conf['replication_objects_source']['source_config']
-
     conf_krb_info = conf['target_system']['system_config']['connection_config']['connection_conf']
-    
-    'Step 1'
+
+    'Step 1 - класс сon'
     db_connection_src = get_connect_manager(con_type, db_connection_config_src)
     logging.info(db_connection_src)
 
-    'Step 2'
-    config_manager = get_config_manager(source_type, source_config)
-    logging.info(config_manager)
-
-    'Step 3'
+    'Step 2 - фильтруем объекты оп частоте'
     filter_object = filter_objects(config, system_tz, hdfs_path)
     logging.info(filter_object)
 
-    'Step 4'
-    max_tech_load_ts = get_max_load_ts(
-        filter_object, db_connection_src, get_max_tech_load_ts, conf_krb_info)
+    'Step 3 - берём макс дату на проде'
+    max_tech_load_ts = get_max_load_ts(filter_object, db_connection_src, get_max_tech_load_ts, conf_krb_info)
     logging.info(max_tech_load_ts)
 
     logging.info(
         f'''Колличество таблиц которое будеи охлаждаться - {len(max_tech_load_ts)} ''')
 
-    'Step 5'
-    gen_dmls = gen_dml(max_tech_load_ts, copy_to_vertica,
-                       delete_with_partitions, export_with_partitions, hdfs_path)
+    'Step 4 - генерим dml'
+    gen_dmls = gen_dml(max_tech_load_ts, copy_to_vertica, delete_with_partitions, export_with_partitions, hdfs_path)
     logging.info(gen_dmls)
 
     return gen_dmls
@@ -317,26 +329,38 @@ def preprocess_config_checks_con_dml(conf: list, db_connection_config_src: list,
 def run_dml_func(gen_dmls: list, db_connection_config_src: list, conf: list) -> None:
     """
     Функция обработки и создания конфига
-    :param conf: конфиг запуска охлаждения
+    :param gen_dmls: конфиг
     :param db_connection_config_src: креды содинения с базой
+    :param conf: конфиг из источника
+
+    :return: возвращает конфиог
+    """
+
+    con_type = conf['source_system']['system_type']
+    conf_krb_info = conf['target_system']['system_config']['connection_config']['connection_conf']
+
+    'Step 1 - класс con'
+    db_connection_src = get_connect_manager(con_type, db_connection_config_src)
+    logging.info(db_connection_src)
+
+    'Step 2 - pзапускаем dml'
+    return run_dml(gen_dmls, db_connection_src, conf_krb_info)
+
+
+def put_result_func(config: list, conf: list) -> None:
+    """
+    Функция обработки и создания конфига
+    :param conf: конфиг запуска охлаждения
     :param config: конфиг из источника
 
     """
 
-    con_type = conf['source_system']['system_type']
-
     source_type = conf['replication_objects_source']['source_type']
     source_config = conf['replication_objects_source']['source_config']
 
-    conf_krb_info = conf['target_system']['system_config']['connection_config']['connection_conf']
-
-    'Step 1'
-    db_connection_src = get_connect_manager(con_type, db_connection_config_src)
-    logging.info(db_connection_src)
-
-    'Step 2'
+    'Step 1 - класс конфиг'
     config_manager = get_config_manager(source_type, source_config)
     logging.info(config_manager)
 
-    'Step 3'
-    run_dml(gen_dmls, db_connection_src, conf_krb_info, config_manager)
+    'Step 2'
+    put_result(config, config_manager)
