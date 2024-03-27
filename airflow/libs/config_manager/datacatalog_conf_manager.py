@@ -328,7 +328,7 @@ class DataCatalogConfManager(ConfigManager):
             conf_final = {}
             conf_final['physicalObjectCoolParamsId'] = a.get('physicalObjectCoolParamsId')
             conf_final['physicalObjectHeatParamsId'] = a.get('physicalObjectHeatParamsId') or None
-            conf_final['PhysicalObjectHeatResultId'] = b.get('PhysicalObjectHeatResultId')
+            conf_final['PhysicalObjectHeatResultId'] = a.get('PhysicalObjectHeatResultId')
             conf_final['PhysicalObjectCoolResultId'] = a.get('PhysicalObjectCoolResultId')
             conf_final['schema_name'] = a.get('physicalNameGroup')
             conf_final['table_name'] = a.get('physicalName')
