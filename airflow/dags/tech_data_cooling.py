@@ -139,7 +139,7 @@ with DAG(**DAG_CONFIG) as dag:
         op_kwargs={
             'conf': f'{{{{ var.json.{DAG_NAME}.{AIRFLOW_ENV}.{inegration_name} }}}}',
             'db_connection_config_src': get_conn(dag_name=DAG_NAME, env_name=AIRFLOW_ENV, replication_names=inegration_name, system_type='source_system'),
-            'gen_dmls': "{{ ti.xcom_pull(task_ids='preprocess_config_cheks_con_dml') }}",
+            'gen_dmls': "{{ ti.xcom_pull(task_ids='preprocess_config_cheks_con_dml_func') }}",
         },)
 
     put_result_func = PythonVirtualenvCurlOperator(
