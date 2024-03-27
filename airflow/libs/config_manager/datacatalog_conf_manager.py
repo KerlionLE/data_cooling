@@ -12,7 +12,7 @@ except ImportError:
 from .conf_manager import ConfigManager
 
 
-def conn_to(config: list) -> Repo:
+def conn_to(config: list) -> str:
     """
     Подключение к дата каталогу
     :param config: креды для подключения
@@ -69,7 +69,7 @@ def params_to_dict(obj: str) -> dict:
     return d
 
 
-def compound_coolparams_coolresult(repo: Repo) -> list:
+def compound_coolparams_coolresult(repo: str) -> list:
     """
     Обработка конфига охлаждения - json формата из data catalog
     :param repo: сессия con
