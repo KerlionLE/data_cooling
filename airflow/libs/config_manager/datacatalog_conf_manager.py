@@ -335,7 +335,7 @@ class DataCatalogConfManager(ConfigManager):
             conf_final['cooling_type'] = a.get('coolingType')
             conf_final['replication_policy'] = a.get('shouldDeleteSourceData')
             conf_final['cooling_depth'] = a.get('coolingDepthDays')
-            conf_final['last_date_cooling'] = a.get('coolingLastDate') or None
+            conf_final['last_date_cooling'] = str(a.get('coolingLastDate')) or None
             conf_final['data_cooling_frequency'] = a.get('coolingFrequency')
             conf_final['tech_ts_column_name'] = a.get('coolingFilterTimeColumnName')
             conf_final['filter_expression'] = a.get('coolingFilterExpression')
