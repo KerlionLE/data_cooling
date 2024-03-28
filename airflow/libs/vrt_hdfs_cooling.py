@@ -32,7 +32,7 @@ def filter_objects(config: dict, system_tz: str, hdfs_path: str) -> list:
             continue
 
         conf['is_new'] = False
-        last_tech_load_ts = last_date_cooling.replace(tzinfo=None)
+        last_tech_load_ts = datetime.strptime(last_date_cooling, "%Y-%m-%d %H:%M:%S%z").replace(tzinfo=None)
         conf['last_date_cooling'] = last_tech_load_ts.strftime('%Y-%m-%d %H:%M:%S')
         now = datetime.now(pytz.timezone(system_tz)).replace(tzinfo=None)
         update_freq = croniter(update_freq, last_tech_load_ts).get_next(datetime)
