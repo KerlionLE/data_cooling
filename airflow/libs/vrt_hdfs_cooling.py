@@ -21,7 +21,7 @@ def filter_objects(config: dict, system_tz: str, hdfs_path: str) -> list:
     filtered_objects = []
     for conf in config:
         conf['hdfs_path'] = f'''{hdfs_path}{conf['schema_name']}/{conf['table_name']}'''
-        last_date_cooling = conf.get('last_date_cooling')
+        last_date_cooling = conf.get('last_date_cooling') or '1000-10-01 15:14:15'
         update_freq = conf.get('data_cooling_frequency')
 
         if not last_date_cooling:
