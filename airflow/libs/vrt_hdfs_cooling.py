@@ -21,7 +21,7 @@ def filter_objects(config: dict, system_tz: str, hdfs_path: str) -> list:
     filtered_objects = []
     for conf in config:
         conf['hdfs_path'] = f'''{hdfs_path}{conf['schema_name']}/{conf['table_name']}'''
-        last_date_cooling = conf.get('last_date_cooling') or '1000-10-01 15:14:15'
+        last_date_cooling = conf.get('last_date_cooling')
         update_freq = conf.get('data_cooling_frequency')
 
         if not last_date_cooling:
@@ -31,8 +31,8 @@ def filter_objects(config: dict, system_tz: str, hdfs_path: str) -> list:
             continue
 
         conf['is_new'] = False
-        last_tech_load_ts = datetime.strptime(last_date_cooling, "%Y-%m-%d %H:%M:%S%z").replace(tzinfo=None)
-        conf['last_date_cooling'] = last_tech_load_ts.strftime('%Y-%m-%d %H:%M:%S')
+        last_tech_load_ts = datetime.strptime(last_date_cooling, "%Y-%m-%d %H:%M:%S")
+        conf['last_date_cooling'] = last_tech_load_ts
         now = datetime.now(pytz.timezone(system_tz)).replace(tzinfo=None)
         update_freq = croniter(update_freq, last_tech_load_ts).get_next(datetime)
 
