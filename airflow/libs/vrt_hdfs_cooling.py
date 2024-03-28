@@ -24,7 +24,7 @@ def filter_objects(config: dict, system_tz: str, hdfs_path: str) -> list:
         last_date_cooling = conf.get('last_date_cooling')
         update_freq = conf.get('data_cooling_frequency')
 
-        if not last_date_cooling and last_date_cooling == '' and last_date_cooling is None and last_date_cooling == 'None':
+        if not last_date_cooling or last_date_cooling == '' or last_date_cooling is None or last_date_cooling == 'None':
             conf['is_new'] = True
             conf['last_tech_load_ts'] = None
             filtered_objects.append(conf)
