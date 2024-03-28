@@ -26,7 +26,7 @@ def filter_objects(config: dict, system_tz: str, hdfs_path: str) -> list:
 
         if not last_date_cooling or last_date_cooling == '' or last_date_cooling is None or last_date_cooling == 'None':
             conf['is_new'] = True
-            conf['last_tech_load_ts'] = None
+            conf['last_date_cooling'] = '1000-10-01 15:14:15'
             filtered_objects.append(conf)
             continue
 
@@ -113,7 +113,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
         tech_ts_column_name = conf.get('tech_ts_column_name') or 'tech_load_ts'
         filter_expression = conf.get('filter_expression') or ''
 
-        date_start = conf.get('last_date_cooling') or '1000-10-01 15:14:15'
+        date_start = conf.get('last_date_cooling')
         partition = conf.get('partition_expressions') or f'DATE({tech_ts_column_name})'
         date_format = '%Y-%m-%d %H:%M:%S'
         sql = ''
