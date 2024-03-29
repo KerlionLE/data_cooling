@@ -139,7 +139,7 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
             schema_name=conf['schema_name'],
             table_name=conf['table_name'],
             postfix='_DELETE_AFTER_COPY_DATA',
-            time_between=f'''and not ({tech_ts_column_name} > '{date_start}') and {tech_ts_column_name} <= '{date_end_cooling_depth}' {filter_expression})''',
+            time_between=f'''and not ({tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' {filter_expression})''',
         )
 
         if conf['cooling_type'] == 'TimeBased':
