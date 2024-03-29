@@ -360,17 +360,9 @@ class DataCatalogConfManager(ConfigManager):
         repo = conn_to(self.config)
         data_type = '%Y-%m-%d %H:%M:%S'
 
-        res_read = repo.readEntity(
-        entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
-        payload={
-            "query": {
-                "physicalObjectCoolParamsId": [int(conf['physicalObjectCoolParamsId'])],
-            },
-            "page": 1,
-            "pageSize": 300,
-        })
-
-        if not res_read['items'] or res_read['items'] is None:
+        print(conf)
+        if not conf['physicalObjectCoolResultId'] or conf['physicalObjectCoolResultId'] is None or conf['physicalObjectCoolResultId'] == 'None':
+            print('1')
             post_result = repo.createEntity(
                                         entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
                                         entityDraft={
@@ -381,6 +373,7 @@ class DataCatalogConfManager(ConfigManager):
                                         )
             logging.info(post_result)
         else:
+            print('2')
             res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
                                     entityDraft={
                                                             "id":  conf['physicalObjectCoolResultId'],
