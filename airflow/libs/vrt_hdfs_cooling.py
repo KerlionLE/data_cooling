@@ -31,7 +31,7 @@ def filter_objects(config: dict, system_tz: str, hdfs_path: str) -> list:
             continue
 
         conf['is_new'] = False
-        last_tech_load_ts = datetime.strptime(last_date_cooling, "%Y-%m-%d %H:%M:%S")
+        last_tech_load_ts = datetime.strptime(last_date_cooling, "%Y-%m-%d %H:%M:%S%Z").replace(tzinfo=None)
         conf['last_date_cooling'] = last_tech_load_ts
         now = datetime.now(pytz.timezone(system_tz)).replace(tzinfo=None)
         update_freq = croniter(update_freq, last_tech_load_ts).get_next(datetime)
@@ -138,8 +138,8 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
             delete_with_partitions,
             schema_name=conf['schema_name'],
             table_name=conf['table_name'],
-            filter_expression=filter_expression,
-            time_between=f'''and {tech_ts_column_name} > '{date_start}' and {tech_ts_column_name} <= '{date_end_cooling_depth}' ''',
+            postfix='_DELETE_AFTER_COPY_DATA',
+            time_between=f'''and not ({tech_ts_column_name} > '{date_start}') and {tech_ts_column_name} <= '{date_end_cooling_depth}' {filter_expression})''',
         )
 
         if conf['cooling_type'] == 'TimeBased':
@@ -155,8 +155,9 @@ def gen_dml(config: list, copy_to_vertica: str, delete_with_partitions: str, exp
                         delete_with_partitions,
                         schema_name=conf['schema_name'],
                         table_name=conf['table_name'],
-                        filter_expression=filter_expression,
-                        time_between=f'''and {tech_ts_column_name} <= '{date_end_heating_depth}' ''',
+                        postfix='_DELETE_AFTER_COPY_DATA',
+                        time_between=f'''and not ({tech_ts_column_name} <= '{date_end_heating_depth}' {filter_expression})''',
+
                     )
 
                     if conf['isAlreadyHeating'] == 0 and current_date >= date_start_heating.replace(tzinfo=None) and current_date < date_end_heating.replace(tzinfo=None):
