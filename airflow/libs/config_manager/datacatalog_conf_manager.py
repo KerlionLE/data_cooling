@@ -350,7 +350,7 @@ class DataCatalogConfManager(ConfigManager):
 
         return data_final
 
-    def put_data_cooling(self, conf: list = None) -> None:
+    def put_data_cooling(self, conf: list) -> None:
 
         """
         Заолняем таблицы result для охлаждения
@@ -360,9 +360,7 @@ class DataCatalogConfManager(ConfigManager):
         repo = conn_to(self.config)
         data_type = '%Y-%m-%d %H:%M:%S'
 
-        print(conf)
-        print(conf['physicalObjectCoolResultId'])
-        if not conf['physicalObjectCoolResultId'] or conf['physicalObjectCoolResultId'] is None or conf['physicalObjectCoolResultId'] == 'None':
+        if not conf['PhysicalObjectCoolResultId'] or conf['PhysicalObjectCoolResultId'] is None or conf['PhysicalObjectCoolResultId'] == 'None':
             print('1')
             post_result = repo.createEntity(
                                         entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
@@ -377,7 +375,7 @@ class DataCatalogConfManager(ConfigManager):
             print('2')
             res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
                                     entityDraft={
-                                                            "id":  conf['physicalObjectCoolResultId'],
+                                                            "id":  conf['PhysicalObjectCoolResultId'],
                                                             "coolingLastDate": datetime.strptime(conf['date_end_cooling_depth'], data_type),
                                                 })
             logging.info(res)
@@ -391,7 +389,7 @@ class DataCatalogConfManager(ConfigManager):
         """
         repo = conn_to(self.config)
 
-        if not conf['physicalObjectHeatResultId'] or conf['physicalObjectHeatResultId'] is None or conf['physicalObjectHeatResultId'] == 'None':
+        if not conf['PhysicalObjectHeatResultId'] or conf['PhysicalObjectHeatResultId'] is None or conf['PhysicalObjectHeatResultId'] == 'None':
             post_result = repo.createEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
                                             entityDraft={
                                                         "physicalObjectHeatParamsId": conf['physicalObjectHeatParamsId'],
@@ -402,7 +400,7 @@ class DataCatalogConfManager(ConfigManager):
         else:
             res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
                                     entityDraft={
-                                                    "id": conf['physicalObjectHeatResultId'],
+                                                    "id": conf['PhysicalObjectHeatResultId'],
                                                     "isAlreadyHeating": True,
                                                 })
             logging.info(res)
