@@ -245,28 +245,23 @@ def put_result(config: list, config_manager: ConfigManager) -> None:
     """
 
     for conf in config:
-        if conf['replication_policy'] and conf['dml_script'] != '':
+        if  conf['dml_script'] != '':
+
             try:
                 config_manager.put_data_cooling(conf)
             except Exception as e:
                 logging.error(
                     f'''Для таблицы Таблица - {conf['schema_name']}.{conf['table_name']} - не будет записан резалт охлаждение, ошибка - {e}''',
                 )
-            try:
-                config_manager.put_data_heating(conf)
-            except Exception as e:
-                logging.error(
-                    f'''Для таблицы Таблица - {conf['schema_name']}.{conf['table_name']} - не будет записан резалт разогрева, ошибка - {e}''',
-                )
+        
+            if conf['physicalObjectHeatParamsId'] or conf['physicalObjectHeatParamsId'] is not None or conf['physicalObjectHeatParamsId'] != 'None':
 
-        elif conf['replication_policy'] is False and conf['dml_script'] != '':
-            try:
-                config_manager.put_data_cooling(conf)
-            except Exception as e:
-                logging.error(
-                    f'''Для таблицы Таблица - {conf['schema_name']}.{conf['table_name']} - не будет записан резалт охлаждение, ошибка - {e}''',
-                )
-
+                try:
+                    config_manager.put_data_heating(conf)
+                except Exception as e:
+                    logging.error(
+                        f'''Для таблицы Таблица - {conf['schema_name']}.{conf['table_name']} - не будет записан резалт разогрева, ошибка - {e}''',
+                    )
 
 # ------------------------------------------------------------------------------------------------------------------
 

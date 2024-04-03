@@ -361,7 +361,6 @@ class DataCatalogConfManager(ConfigManager):
         data_type = '%Y-%m-%d %H:%M:%S'
 
         if not conf['PhysicalObjectCoolResultId'] or conf['PhysicalObjectCoolResultId'] is None or conf['PhysicalObjectCoolResultId'] == 'None':
-            print('1')
             post_result = repo.createEntity(
                                         entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
                                         entityDraft={
@@ -372,7 +371,6 @@ class DataCatalogConfManager(ConfigManager):
                                         )
             logging.info(post_result)
         else:
-            print('2')
             res = repo.updateEntity(entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
                                     entityDraft={
                                                             "id":  conf['PhysicalObjectCoolResultId'],
