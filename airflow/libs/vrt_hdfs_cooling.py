@@ -254,7 +254,7 @@ def put_result(config: list, config_manager: ConfigManager) -> None:
                     f'''Для таблицы Таблица - {conf['schema_name']}.{conf['table_name']} - не будет записан резалт охлаждение, ошибка - {e}''',
                 )
         
-            if conf['physicalObjectHeatParamsId'] or conf['physicalObjectHeatParamsId'] is not None or conf['physicalObjectHeatParamsId'] != 'None':
+            if conf['physicalObjectHeatParamsId'] is not None and conf['physicalObjectHeatParamsId'] != 'None':
 
                 try:
                     config_manager.put_data_heating(conf)
