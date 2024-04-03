@@ -95,6 +95,8 @@ def compound_coolparams_coolresult(repo: str) -> list:
         entityType=DataCatalogEntityType.PhysicalObjectCoolParams.value,
         payload=request_cool_parms,
     )
+    print(get_cool_parms)
+    logging.info(get_cool_parms)
 
     data_list_cool_parms = []
     for d in get_cool_parms['items']:
@@ -109,6 +111,9 @@ def compound_coolparams_coolresult(repo: str) -> list:
         entityType=DataCatalogEntityType.PhysicalObjectCoolResult.value,
         payload=request_cool_results,
     )
+    print(get_cool_results)
+    logging.info(get_cool_results)
+
     data_list_cool_results = []
     for d in get_cool_results['items']:
         data_list_cool_results.append(params_to_dict(d))
@@ -155,6 +160,8 @@ def compound_heatparams_heatresult(repo: str) -> list:
         entityType=DataCatalogEntityType.PhysicalObjectHeatParams.value,
         payload=request_heating_parms,
     )
+    print(get_heat_param)
+    logging.info(get_heat_param)
 
     data_list_heat_parms = []
     for d in get_heat_param['items']:
@@ -165,6 +172,8 @@ def compound_heatparams_heatresult(repo: str) -> list:
         entityType=DataCatalogEntityType.PhysicalObjectHeatResult.value,
         payload=request_heating_results,
     )
+    print(get_heat_results)
+    logging.info(get_heat_results)
 
     data_list_heat_results = []
     for d in get_heat_results['items']:
