@@ -213,6 +213,7 @@ def compound_heat_cool(data_list_cool: list, data_list_heat: list) -> list:
                 a['PhysicalObjectHeatResultId'] = b.get('PhysicalObjectHeatResultId') or None
                 a['PhysicalObjectCoolResultId'] = a.get('PhysicalObjectCoolResultId') or None
                 a['heatingType'] = b.get('heatingType')
+                a['coolingDepthDays'] = b.get('heatingDepthDays')
                 a['heatingDepthDays'] = b.get('heatingDepthDays')
                 a['heatingStartDate'] = b.get('heatingStartDate')
                 a['heatingEndDate'] = b.get('heatingEndDate')
